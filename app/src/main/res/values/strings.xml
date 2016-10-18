@@ -6,9 +6,9 @@
     <string name="pref_sortorder_default" translatable="false">popular</string>
     <string name="pref_sortorder_rating" translatable="false">top_rated</string>
     <string name="pref_sortorder_key" translatable="false">sortorder</string>
-    <string name="pref_sortorder_label">Sort order</string>
-    <string name="pref_sortorder_label_popular">Popularity</string>
-    <string name="pref_sortorder_label_rating">Top rating</string>
+    <string name="pref_sortorder_label">Sorting order</string>
+    <string name="pref_sortorder_label_popular">Most popular first</string>
+    <string name="pref_sortorder_label_rating">Highest rating first</string>
     <!-- Strings related to Settings -->
 
 </resources>
