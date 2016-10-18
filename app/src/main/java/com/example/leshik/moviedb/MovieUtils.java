@@ -20,6 +20,7 @@ import java.net.URL;
 public final class MovieUtils {
     private static final String LOG_TAG = MovieUtils.class.getSimpleName(); // for debugging purpose
 
+    public static final String EXTRA_MOVIE_INFO = "com.example.leshik.moviedb.EXTRA_MOVIE_INFO";
     public static final String baseApiUrl = "http://api.themoviedb.org/3/";
     public static final String baseApiSecureUrl = "https://api.themoviedb.org/3/";
 

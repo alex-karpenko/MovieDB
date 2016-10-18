@@ -1,6 +1,7 @@
 package com.example.leshik.moviedb;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -10,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
 
 import org.json.JSONArray;
@@ -39,6 +41,16 @@ public class MovieListFragment extends Fragment {
         GridView gridView = (GridView) rootView.findViewById(R.id.movie_grid);
         gridView.setAdapter(mMoviesAdapter);
 
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                MovieInfo movieInfo = mMoviesAdapter.getItem(position);
+                Intent intent = new Intent(getActivity(), DetailActivity.class)
+                        .putExtra(MovieUtils.EXTRA_MOVIE_INFO, movieInfo);
+                startActivity(intent);
+            }
+
+        });
         return rootView;
     }
 
@@ -160,13 +172,13 @@ public class MovieListFragment extends Fragment {
 
             // Fetch list on films
             // Create URI to fetch configuration
-            String fetchParam=POPULAR_SUFFIX;
-            if(params[0].equals(getString(R.string.pref_sortorder_rating))) {
-                fetchParam=TOP_RATED_SUFFIX;
+            String fetchParam = POPULAR_SUFFIX;
+            if (params[0].equals(getString(R.string.pref_sortorder_rating))) {
+                fetchParam = TOP_RATED_SUFFIX;
             }
 
             Uri moviesUri = Uri.parse(MovieUtils.baseApiUrl).buildUpon()
-                    .appendEncodedPath(fetchParam) /// !!!!
+                    .appendEncodedPath(fetchParam)
                     .appendQueryParameter(API_KEY_PARAM, BuildConfig.THE_MOVIE_DB_API_KEY)
                     .build();
             // Fetch JSON block with films into String and parse it

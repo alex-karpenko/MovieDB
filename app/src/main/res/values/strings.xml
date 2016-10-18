@@ -9,6 +9,7 @@
     <string name="pref_sortorder_label">Sorting order</string>
     <string name="pref_sortorder_label_popular">Most popular first</string>
     <string name="pref_sortorder_label_rating">Highest rating first</string>
+    <string name="title_activity_detail">Movie Info</string>
     <!-- Strings related to Settings -->
 
 </resources>
