@@ -1,7 +1,7 @@
 MovieDB
 ========
 
-MovieDB is training application to complete Udacity Android development course. App displays list of most popular (or top rated) films by www.themoviedb.org site's version and give possibility to view some details about film, like Title, Rating, Overview, poster image etc.
+MovieDB is an application to complete Udacity course of development for Android. App displays a list of most popular (or top rated) movies by version of www.themoviedb.org site and gives possibility to view some details about film, like Title, Rating, Overview, poster image etc.
 
 ### themoviedb.org API Key is required.
 
