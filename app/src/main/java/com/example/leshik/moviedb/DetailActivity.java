@@ -56,6 +56,15 @@ public class DetailActivity extends AppCompatActivity {
                     // Title
                     TextView title=(TextView) rootView.findViewById(R.id.detail_title);
                     title.setText(movieInfo.getOriginalTitle());
+                    // Release date
+                    TextView released=(TextView) rootView.findViewById(R.id.detail_released);
+                    released.setText(movieInfo.getReleaseDate());
+                    // Rating
+                    TextView rating=(TextView) rootView.findViewById(R.id.detail_rating);
+                    rating.setText(String.format("%.1f/10", movieInfo.getVoteAverage()));
+                    // Overview
+                    TextView overview=(TextView) rootView.findViewById(R.id.detail_overview);
+                    overview.setText(movieInfo.getOverviewText());
                 } else {
                     Log.e(LOG_TAG, "movieInfo is null");
                 }
