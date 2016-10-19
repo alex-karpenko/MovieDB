@@ -4,10 +4,11 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
- * Created by Leshik on 16.10.2016.
+ * Class, which holds information about single Movie
+ * It implements Parcelable interface to make possible sending instance via Intent
  */
 
-public class MovieInfo implements Parcelable {
+class MovieInfo implements Parcelable {
     private long id;
     private String originalTitle;
     private String overviewText;
@@ -15,6 +16,7 @@ public class MovieInfo implements Parcelable {
     private String releaseDate;
     private String posterPath;
 
+    // Constructor to simple object creation
     MovieInfo(long id, String originalTitle, String overview, String releaseDate, double voteAverage, String posterPath) {
         this.id = id;
         this.originalTitle = originalTitle;
@@ -24,6 +26,7 @@ public class MovieInfo implements Parcelable {
         this.posterPath = posterPath;
     }
 
+    // Constructor to ctreate via Parcel (after Intent receiving)
     protected MovieInfo(Parcel in) {
         id = in.readLong();
         originalTitle = in.readString();
@@ -45,6 +48,8 @@ public class MovieInfo implements Parcelable {
         }
     };
 
+    // Getter methods for all fields
+    // No setters, no necessity for it
     public long getId() {
         return id;
     }
