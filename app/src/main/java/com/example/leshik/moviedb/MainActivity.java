@@ -23,12 +23,11 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+        // Handle menu item clicks here.
+        // Get pressed menu item
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
+        // if Settings pressed, start SettingsActivity via explicit intent
         if (id == R.id.action_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
