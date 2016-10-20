@@ -13,6 +13,11 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+/**
+*  Activity class for deal with detail movie information 
+*  It starts from MainActivity by clicking on the poster image in list
+*
+*/
 public class DetailActivity extends AppCompatActivity {
 
     @Override
@@ -21,6 +26,7 @@ public class DetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail);
 
         if (savedInstanceState == null) {
+            // Inflate new fragment (inner class belov) with detail info
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.detail_container, new DetailFragment())
                     .commit();
@@ -28,8 +34,10 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     /**
-     *
-     *
+     *  Fragment class with detail info about movie
+     *  Information (MovieInfo instance) gets from Intent
+     *  In future maybe will be necessary to get some information via HTTP request to TMDB,
+     *  with movie referenced by ID (take it from MovieInfo)
      */
     public static class DetailFragment extends Fragment {
         private static final String LOG_TAG = DetailFragment.class.getSimpleName();
@@ -38,10 +46,10 @@ public class DetailActivity extends AppCompatActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-
+            // Inflate fragment
             View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
-            // The detail Activity called via intent.  Inspect the intent for forecast data.
+            // The detail Activity called via intent.  Inspect the intent for MovieInfo data.
             Intent intent = getActivity().getIntent();
             if (intent != null && intent.hasExtra(MovieUtils.EXTRA_MOVIE_INFO)) {
                 movieInfo = (MovieInfo) intent.getParcelableExtra(MovieUtils.EXTRA_MOVIE_INFO);
@@ -49,9 +57,10 @@ public class DetailActivity extends AppCompatActivity {
                 if (movieInfo != null) {
                     // Post image into fragment
                     ImageView posterView = (ImageView) rootView.findViewById(R.id.poster_image);
+                    // Post image by callinf Picasso methods
                     Picasso.with(getActivity())
                             .load(MovieUtils.basePosterUrl
-                                    + "w185" // !!!
+                                    + "w185" // TODO: we have to think to adopt width on image
                                     + movieInfo.getPosterPath()).into(posterView);
                     // Title
                     TextView title=(TextView) rootView.findViewById(R.id.detail_title);
@@ -59,7 +68,7 @@ public class DetailActivity extends AppCompatActivity {
                     // Release date
                     TextView released=(TextView) rootView.findViewById(R.id.detail_released);
                     released.setText(movieInfo.getReleaseDate());
-                    // Rating
+                    // Rating, format it from double value to string like XX.X (one digit after dec.point)
                     TextView rating=(TextView) rootView.findViewById(R.id.detail_rating);
                     rating.setText(String.format("%.1f/10", movieInfo.getVoteAverage()));
                     // Overview
