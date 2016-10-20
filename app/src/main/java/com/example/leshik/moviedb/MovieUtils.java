@@ -44,12 +44,14 @@ public final class MovieUtils {
     }
 
     /**
-    * Method to fetch page form specified URL and return all data as string
-    * TODO: more accurate error handling on network operations
-    */
+     * Method to fetch page form specified URL and return all data as string
+     * TODO: more accurate error handling on network operations
+     */
     public static String fetchUrl(Context context, Uri uri) {
         // If device not connected to any network - return immediately
-        if (!isOnline(context)) return null;
+        if (!isOnline(context)) {
+            return null;
+        }
 
         // These two need to be declared outside the try/catch
         // so that they can be closed in the finally block.

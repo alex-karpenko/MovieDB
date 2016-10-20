@@ -12,5 +12,6 @@
     <string name="pref_sortorder_label">Sorting order</string>
     <string name="pref_sortorder_label_popular">By popularity</string>
     <string name="pref_sortorder_label_rating">By rating</string>
+    <string name="network_error_brief_notify">Network error, try later...</string>
 
 </resources>

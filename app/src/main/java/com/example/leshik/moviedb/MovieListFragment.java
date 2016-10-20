@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -78,7 +79,7 @@ public class MovieListFragment extends Fragment {
     * Methed to update list of movies
     */
     private void updateMoviesArray() {
-        // Ctreate abckground task to fetch information
+        // Create background task to fetch information
         FetchMoviesTask fetchTask = new FetchMoviesTask();
         // Get user's setting abount sorting
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -241,6 +242,9 @@ public class MovieListFragment extends Fragment {
                 // (in foreground thread)
                 mMoviesAdapter.clear();
                 mMoviesAdapter.addAll(result);
+            } else {
+                // If result is null - show message with small network error info
+                Toast.makeText(getActivity(), getString(R.string.network_error_brief_notify), Toast.LENGTH_SHORT).show();
             }
         }
 
