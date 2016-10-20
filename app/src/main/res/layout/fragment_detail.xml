@@ -6,6 +6,7 @@
     android:layout_height="match_parent">
 
     <!-- Main block, includes 3 section: title (text), image+info (linear), overview (text) -->
+    <!-- May by in future I will bring Title TextView out of scrolling area -->
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
