@@ -22,7 +22,13 @@ import java.util.ArrayList;
 
 
 /**
- * Created by Leshik on 16.10.2016.
+ * Main screen fragment with list of movie's posters,
+ * palced in a GridView.
+ * We get information about movies from TMBD as a JSON object, 
+ * parse it and place into list of MovieInfo objects.
+ * And construct adapter to handle list.
+ *
+ * TODO: more accurate error handling on network operations
  */
 public class MovieListFragment extends Fragment {
     private MoviesListAdapter mMoviesAdapter;
@@ -35,18 +41,24 @@ public class MovieListFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        // Inflate fragment
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
+        // Construct adapter and set it on gridview
         mMoviesAdapter = new MoviesListAdapter(getActivity(), new ArrayList<MovieInfo>());
         GridView gridView = (GridView) rootView.findViewById(R.id.movie_grid);
         gridView.setAdapter(mMoviesAdapter);
 
+        // Listener for handling clicks on poster image
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                // Get MovieInfo instance related to clicked item
                 MovieInfo movieInfo = mMoviesAdapter.getItem(position);
+                //Place MovieInfo into Intent (MovieInfo class implements Parelable interface)
                 Intent intent = new Intent(getActivity(), DetailActivity.class)
                         .putExtra(MovieUtils.EXTRA_MOVIE_INFO, movieInfo);
+                // Start
                 startActivity(intent);
             }
 
@@ -57,24 +69,37 @@ public class MovieListFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+        // Every time, when fragment appears on the screen, we have to update contents
+        // (after start activity, returning from details or settings, etc.
         updateMoviesArray();
     }
 
+    /**
+    * Methed to update list of movies
+    */
     private void updateMoviesArray() {
+        // Ctreate abckground task to fetch information
         FetchMoviesTask fetchTask = new FetchMoviesTask();
+        // Get user's setting abount sorting
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String sortOrder = prefs.getString(getString(R.string.pref_sortorder_key),
                 getString(R.string.pref_sortorder_default));
-
+        // start background task
         fetchTask.execute(sortOrder);
     }
 
+    /**
+    * Background task to fetch list of movies from TMDB as JSON object,
+    * parse it and return array on MovieInfo objects
+    */
     public class FetchMoviesTask extends AsyncTask<String, Void, MovieInfo[]> {
 
         private final String LOG_TAG = FetchMoviesTask.class.getSimpleName(); // for debugging purpose
 
         /**
          * Parse JSON string to fill configuration variables
+         * We use some variables to fetch poster images from TMDB
+         * TODO: mayby, will be move this methed into Utils class (it can be useful it DetailFragment)
          */
         public void parseConfigFromJson(String configJsonStr)
                 throws JSONException {
@@ -82,17 +107,23 @@ public class MovieListFragment extends Fragment {
             if (configJsonStr == null) return;
 
             // These are the names of the JSON objects that need to be extracted.
+            // (for JSON structure details of configuration block see corresponding refs on TMDB)
             final String TMDB_CONFIG_IMAGES = "images";
             final String TMDB_CONFIG_BASE_URL = "base_url";
             final String TMDB_CONFIG_SECURE_BASE_URL = "secure_base_url";
             final String TMDB_CONFIG_POSTER_SIZES = "poster_sizes";
 
+            // Parse step by step
+            // (for JSON structure details of configuration block see corresponding refs on TMDB)
             JSONObject rootConfigJson = new JSONObject(configJsonStr);
             JSONObject imagesConfigJson = rootConfigJson.getJSONObject(TMDB_CONFIG_IMAGES);
+
+            // Base urls for images
             MovieUtils.basePosterUrl = imagesConfigJson.getString(TMDB_CONFIG_BASE_URL);
             MovieUtils.basePosterSecureUrl = imagesConfigJson.getString(TMDB_CONFIG_SECURE_BASE_URL);
+            
+            // Array with allowed poster sizes
             JSONArray posterSizesArray = imagesConfigJson.getJSONArray(TMDB_CONFIG_POSTER_SIZES);
-
             MovieUtils.posterSizes = new String[posterSizesArray.length()];
             for (int i = 0; i < posterSizesArray.length(); i++)
                 MovieUtils.posterSizes[i] = posterSizesArray.getString(i);
@@ -115,23 +146,29 @@ public class MovieListFragment extends Fragment {
             final String TMDB_ORIGINAL_TITLE = "original_title";
             final String TMDB_VOTE_AVERAGE = "vote_average";
 
+            // Parse step by step
+            // (for JSON structure details of movies block see corresponding refs on TMDB)
             JSONObject moviesJson = new JSONObject(moviesJsonStr);
             JSONArray moviesArray = moviesJson.getJSONArray(TMDB_RESULTS);
 
             MovieInfo[] resultsArray = new MovieInfo[moviesArray.length()];
-
+            // For every item in list of movies
+            // place it into array of MovieInfo objects
             for (int i = 0; i < moviesArray.length(); i++) {
                 // Get the JSON object representing the one movie
                 JSONObject movieObject = moviesArray.getJSONObject(i);
-
+                // Extract every nedded variable
                 long id = movieObject.getLong(TMDB_ID);
                 String originalTitle = movieObject.getString(TMDB_ORIGINAL_TITLE);
                 String overview = movieObject.getString(TMDB_OVERVIEW);
                 String releaseDate = movieObject.getString(TMDB_RELEASE_DATE);
                 double voteAverage = movieObject.getDouble(TMDB_VOTE_AVERAGE);
                 String posterPath = movieObject.getString(TMDB_POSTER_PATH);
+                // Construct new MovieInfo object and place it into the array
                 resultsArray[i] = new MovieInfo(id, originalTitle, overview, releaseDate, voteAverage, posterPath);
             }
+            
+            // Return array of MovieInfo objects
             return resultsArray;
         }
 
@@ -139,7 +176,8 @@ public class MovieListFragment extends Fragment {
         @Override
         protected MovieInfo[] doInBackground(String... params) {
 
-            // Only one parameter is sort criteria: ???
+            // Only one parameter, it is sort criteria: ???
+            // Parameter string for sorting order taken from SharedPreference
             if (params.length == 0) {
                 return null;
             }
@@ -177,6 +215,7 @@ public class MovieListFragment extends Fragment {
                 fetchParam = TOP_RATED_SUFFIX;
             }
 
+            // Construct URI
             Uri moviesUri = Uri.parse(MovieUtils.baseApiUrl).buildUpon()
                     .appendEncodedPath(fetchParam)
                     .appendQueryParameter(API_KEY_PARAM, BuildConfig.THE_MOVIE_DB_API_KEY)
@@ -198,6 +237,8 @@ public class MovieListFragment extends Fragment {
         @Override
         protected void onPostExecute(MovieInfo[] result) {
             if (result != null) {
+                // Clear adapter's list on object and put new one
+                // (in foreground thread)
                 mMoviesAdapter.clear();
                 mMoviesAdapter.addAll(result);
             }
