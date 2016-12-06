@@ -6,40 +6,58 @@ import android.provider.BaseColumns;
  * Created by Leshik on 06.12.2016.
  */
 
-public final class MoviesContract {
+final class MoviesContract {
     private MoviesContract() {
     }
 
-    // Database file name
-    public static final String DB_NAME = "movies.db";
-
     // Class to describe movies table
-    public static abstract class Movies implements BaseColumns {
+    static abstract class Movies implements BaseColumns {
         // Table name
-        public static final String TABLE_NAME = "movies";
+        static final String TABLE_NAME = "movies";
         // Table columns
-        public static final String COLUMN_NAME_ID = "id";
-        public static final String COLUMN_NAME_ORIGINAL_TITLE = "original_title";
-        public static final String COLUMN_NAME_OVERVIEW = "overview";
-        public static final String COLUMN_NAME_RELEASE_DATE = "release_date";
-        public static final String COLUMN_NAME_VOTE_AVERAGE = "vote_average";
-        public static final String COLUMN_NAME_POPULARITY = "popularity";
-        public static final String COLUMN_NAME_POSTER_PATH = "poster_path";
-        public static final String COLUMN_NAME_HOMEPAGE = "homepage";
-        public static final String COLUMN_NAME_ADULT = "adult";
-        public static final String COLUMN_NAME_VIDEO = "video";
+        static final String COLUMN_NAME_ID = "id";
+        static final String COLUMN_NAME_ORIGINAL_TITLE = "original_title";
+        static final String COLUMN_NAME_OVERVIEW = "overview";
+        static final String COLUMN_NAME_RELEASE_DATE = "release_date";
+        static final String COLUMN_NAME_VOTE_AVERAGE = "vote_average";
+        static final String COLUMN_NAME_POPULARITY = "popularity";
+        static final String COLUMN_NAME_POSTER_PATH = "poster_path";
+        static final String COLUMN_NAME_HOMEPAGE = "homepage";
+        static final String COLUMN_NAME_ADULT = "adult";
+        static final String COLUMN_NAME_VIDEO = "video";
         // Create table sql-statement
-        public static final String CREATE_TABLE_STATEMENT = "CREATE TABLE " + TABLE_NAME + " (" +
+        static final String CREATE_TABLE_STATEMENT = "CREATE TABLE " + TABLE_NAME + " (" +
                 COLUMN_NAME_ID + " INTEGER PRIMARY KEY, " + // movie_id from TMDB
-                COLUMN_NAME_ORIGINAL_TITLE + " TEXT, " +
-                COLUMN_NAME_OVERVIEW + " TEXT, " +
-                COLUMN_NAME_RELEASE_DATE + "TEXT, " + // release date stored in format YYYY-MM-DD
-                COLUMN_NAME_VOTE_AVERAGE + "REAL, " +
-                COLUMN_NAME_POPULARITY + "REAL, " +
+                COLUMN_NAME_ORIGINAL_TITLE + " TEXT NOT NULL, " +
+                COLUMN_NAME_OVERVIEW + " TEXT NOT NULL, " +
+                COLUMN_NAME_RELEASE_DATE + "TEXT NOT NULL, " + // release date stored in format YYYY-MM-DD
+                COLUMN_NAME_VOTE_AVERAGE + "REAL DEFAULT 0.0, " +
+                COLUMN_NAME_POPULARITY + "REAL DEFAULT 0.0, " +
                 COLUMN_NAME_POSTER_PATH + "TEXT, " +
                 COLUMN_NAME_HOMEPAGE + "TEXT, " +
-                COLUMN_NAME_ADULT + "INTEGER, " + // 0 - false, 1 - true
-                COLUMN_NAME_VIDEO + "INTEGER " + // 0 - false, 1 - true
-                ")";
+                COLUMN_NAME_ADULT + "INTEGER DEFAULT 0, " + // 0 - false, 1 - true
+                COLUMN_NAME_VIDEO + "INTEGER DEFAULT 0 " + // 0 - false, 1 - true
+                ");";
+        // Delete table sql-statement
+        static final String DROP_TABLE_STATEMENT = "DROP TABLE " + TABLE_NAME + ";";
+    }
+
+    // Class to describe movies by popularity
+    static abstract class Popularity implements BaseColumns {
+        // Table name
+        static final String TABLE_NAME = "popularity";
+        // Columns
+        static final String COLUMN_NAME_SORT_ID = "sort_id";
+        static final String COLUMN_NAME_MOVIE_ID = "movie_id";
+        // Create statement
+        static final String CREATE_TABLE_STATEMENT = "CREATE TABLE " + TABLE_NAME + " (" +
+                COLUMN_NAME_SORT_ID + " INTEGER PRIMARY KEY, " +
+                COLUMN_NAME_MOVIE_ID + " INTEGER NOT NULL, " +
+                "FOREIGN KEY (" + COLUMN_NAME_MOVIE_ID + ") " +
+                "REFERENCES " + Movies.TABLE_NAME + "(" + Movies.COLUMN_NAME_ID + ") " +
+                "ON DELETE CASCADE ON UPDATE CASCADE " +
+                ");";
+        // Drop table statement
+        static final String DROP_TABLE_STATEMENT = "DROP TABLE " + TABLE_NAME + ";";
     }
 }
