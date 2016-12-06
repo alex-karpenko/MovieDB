@@ -79,4 +79,33 @@ final class MoviesContract {
         // Drop table statement
         static final String DROP_TABLE_STATEMENT = "DROP TABLE " + TABLE_NAME + ";";
     }
+
+    // Class videos
+    static abstract class Videos implements BaseColumns {
+        // Table name
+        static final String TABLE_NAME = "videos";
+        // Columns
+        static final String COLUMN_NAME_MOVIE_ID = "movie_id";
+        static final String COLUMN_NAME_VIDEO_ID = "video_id";
+        static final String COLUMN_NAME_KEY = "video_key";
+        static final String COLUMN_NAME_NAME = "name";
+        static final String COLUMN_NAME_SITE = "site";
+        static final String COLUMN_NAME_SIZE = "size";
+        static final String COLUMN_NAME_TYPE = "type";
+        // Create statement
+        static final String CREATE_TABLE_STATEMENT = "CREATE TABLE " + TABLE_NAME + " (" +
+                COLUMN_NAME_VIDEO_ID + " TEXT PRIMARY KEY, " +
+                COLUMN_NAME_MOVIE_ID + "INTEGER NOT NULL, " +
+                COLUMN_NAME_KEY + "TEXT, " +
+                COLUMN_NAME_NAME + "TEXT, " +
+                COLUMN_NAME_SITE + "TEXT, " +
+                COLUMN_NAME_SIZE + "INTEGER, " +
+                COLUMN_NAME_TYPE + "TEXT, " +
+                "FOREIGN KEY (" + COLUMN_NAME_MOVIE_ID + ") " +
+                "REFERENCES " + Movies.TABLE_NAME + "(" + Movies.COLUMN_NAME_ID + ") " +
+                "ON DELETE CASCADE ON UPDATE CASCADE " +
+                ");";
+        // Drop table statement
+        static final String DROP_TABLE_STATEMENT = "DROP TABLE " + TABLE_NAME + ";";
+    }
 }
