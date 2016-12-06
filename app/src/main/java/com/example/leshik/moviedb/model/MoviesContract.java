@@ -60,4 +60,23 @@ final class MoviesContract {
         // Drop table statement
         static final String DROP_TABLE_STATEMENT = "DROP TABLE " + TABLE_NAME + ";";
     }
+
+    // Class to describe movies by popularity
+    static abstract class TopRated implements BaseColumns {
+        // Table name
+        static final String TABLE_NAME = "top_rated";
+        // Columns
+        static final String COLUMN_NAME_SORT_ID = "sort_id";
+        static final String COLUMN_NAME_MOVIE_ID = "movie_id";
+        // Create statement
+        static final String CREATE_TABLE_STATEMENT = "CREATE TABLE " + TABLE_NAME + " (" +
+                COLUMN_NAME_SORT_ID + " INTEGER PRIMARY KEY, " +
+                COLUMN_NAME_MOVIE_ID + " INTEGER NOT NULL, " +
+                "FOREIGN KEY (" + COLUMN_NAME_MOVIE_ID + ") " +
+                "REFERENCES " + Movies.TABLE_NAME + "(" + Movies.COLUMN_NAME_ID + ") " +
+                "ON DELETE CASCADE ON UPDATE CASCADE " +
+                ");";
+        // Drop table statement
+        static final String DROP_TABLE_STATEMENT = "DROP TABLE " + TABLE_NAME + ";";
+    }
 }
