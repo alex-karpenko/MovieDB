@@ -18,7 +18,9 @@ public class MoviesDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        // Movies table in first place because foreign indexes
         db.execSQL(MoviesContract.Movies.CREATE_TABLE_STATEMENT);
+        // create rest tables
         db.execSQL(MoviesContract.Popularity.CREATE_TABLE_STATEMENT);
         db.execSQL(MoviesContract.TopRated.CREATE_TABLE_STATEMENT);
         db.execSQL(MoviesContract.Videos.CREATE_TABLE_STATEMENT);
@@ -26,21 +28,25 @@ public class MoviesDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        // In first time we have to dekete tables with foreign indexes on movies table
         db.execSQL(MoviesContract.Popularity.DROP_TABLE_STATEMENT);
         db.execSQL(MoviesContract.TopRated.DROP_TABLE_STATEMENT);
         db.execSQL(MoviesContract.Videos.DROP_TABLE_STATEMENT);
+        // and drop movies table after all
         db.execSQL(MoviesContract.Movies.DROP_TABLE_STATEMENT);
         onCreate(db);
     }
 
     @Override
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        // :))
         onUpgrade(db, oldVersion, newVersion);
     }
 
     @Override
     public void onConfigure(SQLiteDatabase db) {
         super.onConfigure(db);
+        // To force foreign keys to work ...
         db.setForeignKeyConstraintsEnabled(true);
     }
 }
