@@ -61,7 +61,6 @@ final class MoviesContract {
                 ");";
         // Delete table sql-statement
         static final String DROP_TABLE_STATEMENT = "DROP TABLE " + TABLE_NAME + ";";
-
         // URI build method
         public static Uri buildUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
@@ -92,6 +91,11 @@ final class MoviesContract {
                 ");";
         // Drop table statement
         static final String DROP_TABLE_STATEMENT = "DROP TABLE " + TABLE_NAME + ";";
+
+        // URI build method
+        public static Uri buildUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
     }
 
     // Class to describe movies by popularity
@@ -118,6 +122,11 @@ final class MoviesContract {
                 ");";
         // Drop table statement
         static final String DROP_TABLE_STATEMENT = "DROP TABLE " + TABLE_NAME + ";";
+
+        // URI build method
+        public static Uri buildUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
     }
 
     // Class to describe favorites table
@@ -144,6 +153,11 @@ final class MoviesContract {
                 ");";
         // Drop table statement
         static final String DROP_TABLE_STATEMENT = "DROP TABLE " + TABLE_NAME + ";";
+
+        // URI build method
+        public static Uri buildUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
     }
 
 
