@@ -36,7 +36,7 @@ final class MoviesContract {
         public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIES;
         // Table columns
-        static final String COLUMN_NAME_ID = "id";
+        static final String COLUMN_NAME_MOVIE_ID = "movie_id";
         static final String COLUMN_NAME_ORIGINAL_TITLE = "original_title";
         static final String COLUMN_NAME_OVERVIEW = "overview";
         static final String COLUMN_NAME_RELEASE_DATE = "release_date";
@@ -48,7 +48,7 @@ final class MoviesContract {
         static final String COLUMN_NAME_VIDEO = "video";
         // Create table sql-statement
         static final String CREATE_TABLE_STATEMENT = "CREATE TABLE " + TABLE_NAME + " (" +
-                COLUMN_NAME_ID + " INTEGER PRIMARY KEY, " + // movie_id from TMDB
+                COLUMN_NAME_MOVIE_ID + " INTEGER PRIMARY KEY, " + // movie_id from TMDB
                 COLUMN_NAME_ORIGINAL_TITLE + " TEXT NOT NULL, " +
                 COLUMN_NAME_OVERVIEW + " TEXT NOT NULL, " +
                 COLUMN_NAME_RELEASE_DATE + "TEXT NOT NULL, " + // release date stored in format YYYY-MM-DD
@@ -86,7 +86,7 @@ final class MoviesContract {
                 COLUMN_NAME_SORT_ID + " INTEGER PRIMARY KEY, " +
                 COLUMN_NAME_MOVIE_ID + " INTEGER NOT NULL, " +
                 "FOREIGN KEY (" + COLUMN_NAME_MOVIE_ID + ") " +
-                "REFERENCES " + Movies.TABLE_NAME + "(" + Movies.COLUMN_NAME_ID + ") " +
+                "REFERENCES " + Movies.TABLE_NAME + "(" + Movies.COLUMN_NAME_MOVIE_ID + ") " +
                 "ON DELETE CASCADE ON UPDATE CASCADE " +
                 ");";
         // Drop table statement
@@ -117,7 +117,7 @@ final class MoviesContract {
                 COLUMN_NAME_SORT_ID + " INTEGER PRIMARY KEY, " +
                 COLUMN_NAME_MOVIE_ID + " INTEGER NOT NULL, " +
                 "FOREIGN KEY (" + COLUMN_NAME_MOVIE_ID + ") " +
-                "REFERENCES " + Movies.TABLE_NAME + "(" + Movies.COLUMN_NAME_ID + ") " +
+                "REFERENCES " + Movies.TABLE_NAME + "(" + Movies.COLUMN_NAME_MOVIE_ID + ") " +
                 "ON DELETE CASCADE ON UPDATE CASCADE " +
                 ");";
         // Drop table statement
@@ -148,7 +148,7 @@ final class MoviesContract {
                 COLUMN_NAME_SORT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COLUMN_NAME_MOVIE_ID + " INTEGER NOT NULL, " +
                 "FOREIGN KEY (" + COLUMN_NAME_MOVIE_ID + ") " +
-                "REFERENCES " + Movies.TABLE_NAME + "(" + Movies.COLUMN_NAME_ID + ") " +
+                "REFERENCES " + Movies.TABLE_NAME + "(" + Movies.COLUMN_NAME_MOVIE_ID + ") " +
                 "ON DELETE RESTRICT ON UPDATE CASCADE " +
                 ");";
         // Drop table statement
@@ -190,7 +190,7 @@ final class MoviesContract {
                 COLUMN_NAME_SIZE + "INTEGER, " +
                 COLUMN_NAME_TYPE + "TEXT, " +
                 "FOREIGN KEY (" + COLUMN_NAME_MOVIE_ID + ") " +
-                "REFERENCES " + Movies.TABLE_NAME + "(" + Movies.COLUMN_NAME_ID + ") " +
+                "REFERENCES " + Movies.TABLE_NAME + "(" + Movies.COLUMN_NAME_MOVIE_ID + ") " +
                 "ON DELETE CASCADE ON UPDATE CASCADE " +
                 ");";
         // Drop table statement
