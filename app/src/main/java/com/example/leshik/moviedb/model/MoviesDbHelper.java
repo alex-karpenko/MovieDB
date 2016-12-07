@@ -23,6 +23,7 @@ public class MoviesDbHelper extends SQLiteOpenHelper {
         // create rest tables
         db.execSQL(MoviesContract.Popularity.CREATE_TABLE_STATEMENT);
         db.execSQL(MoviesContract.TopRated.CREATE_TABLE_STATEMENT);
+        db.execSQL(MoviesContract.Favorites.CREATE_TABLE_STATEMENT);
         db.execSQL(MoviesContract.Videos.CREATE_TABLE_STATEMENT);
     }
 
@@ -31,6 +32,7 @@ public class MoviesDbHelper extends SQLiteOpenHelper {
         // In first time we have to dekete tables with foreign indexes on movies table
         db.execSQL(MoviesContract.Popularity.DROP_TABLE_STATEMENT);
         db.execSQL(MoviesContract.TopRated.DROP_TABLE_STATEMENT);
+        db.execSQL(MoviesContract.Favorites.DROP_TABLE_STATEMENT);
         db.execSQL(MoviesContract.Videos.DROP_TABLE_STATEMENT);
         // and drop movies table after all
         db.execSQL(MoviesContract.Movies.DROP_TABLE_STATEMENT);
