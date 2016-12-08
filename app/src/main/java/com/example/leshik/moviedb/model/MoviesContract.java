@@ -51,13 +51,13 @@ final class MoviesContract {
                 COLUMN_NAME_MOVIE_ID + " INTEGER PRIMARY KEY, " + // movie_id from TMDB
                 COLUMN_NAME_ORIGINAL_TITLE + " TEXT NOT NULL, " +
                 COLUMN_NAME_OVERVIEW + " TEXT NOT NULL, " +
-                COLUMN_NAME_RELEASE_DATE + "TEXT NOT NULL, " + // release date stored in format YYYY-MM-DD
-                COLUMN_NAME_VOTE_AVERAGE + "REAL DEFAULT 0.0, " +
-                COLUMN_NAME_POPULARITY + "REAL DEFAULT 0.0, " +
-                COLUMN_NAME_POSTER_PATH + "TEXT NOT NULL, " +
-                COLUMN_NAME_HOMEPAGE + "TEXT, " +
-                COLUMN_NAME_ADULT + "INTEGER DEFAULT 0, " + // 0 - false, 1 - true
-                COLUMN_NAME_VIDEO + "INTEGER DEFAULT 0 " + // 0 - false, 1 - true
+                COLUMN_NAME_RELEASE_DATE + " TEXT NOT NULL, " + // release date stored in format YYYY-MM-DD
+                COLUMN_NAME_VOTE_AVERAGE + " REAL DEFAULT 0.0, " +
+                COLUMN_NAME_POPULARITY + " REAL DEFAULT 0.0, " +
+                COLUMN_NAME_POSTER_PATH + " TEXT NOT NULL, " +
+                COLUMN_NAME_HOMEPAGE + " TEXT, " +
+                COLUMN_NAME_ADULT + " INTEGER DEFAULT 0, " + // 0 - false, 1 - true
+                COLUMN_NAME_VIDEO + " INTEGER DEFAULT 0 " + // 0 - false, 1 - true
                 ");";
         // Delete table sql-statement
         static final String DROP_TABLE_STATEMENT = "DROP TABLE " + TABLE_NAME + ";";
@@ -183,12 +183,12 @@ final class MoviesContract {
         // Create statement
         static final String CREATE_TABLE_STATEMENT = "CREATE TABLE " + TABLE_NAME + " (" +
                 COLUMN_NAME_VIDEO_ID + " TEXT PRIMARY KEY, " +
-                COLUMN_NAME_MOVIE_ID + "INTEGER NOT NULL, " +
-                COLUMN_NAME_KEY + "TEXT, " +
-                COLUMN_NAME_NAME + "TEXT, " +
-                COLUMN_NAME_SITE + "TEXT, " +
-                COLUMN_NAME_SIZE + "INTEGER, " +
-                COLUMN_NAME_TYPE + "TEXT, " +
+                COLUMN_NAME_MOVIE_ID + " INTEGER NOT NULL, " +
+                COLUMN_NAME_KEY + " TEXT, " +
+                COLUMN_NAME_NAME + " TEXT, " +
+                COLUMN_NAME_SITE + " TEXT, " +
+                COLUMN_NAME_SIZE + " INTEGER, " +
+                COLUMN_NAME_TYPE + " TEXT, " +
                 "FOREIGN KEY (" + COLUMN_NAME_MOVIE_ID + ") " +
                 "REFERENCES " + Movies.TABLE_NAME + "(" + Movies.COLUMN_NAME_MOVIE_ID + ") " +
                 "ON DELETE CASCADE ON UPDATE CASCADE " +
