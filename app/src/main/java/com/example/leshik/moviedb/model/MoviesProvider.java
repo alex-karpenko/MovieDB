@@ -39,12 +39,6 @@ public class MoviesProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        return null;
-    }
-
-    @Nullable
-    @Override
     public String getType(Uri uri) {
         final int match = sUriMatcher.match(uri);
 
@@ -79,6 +73,38 @@ public class MoviesProvider extends ContentProvider {
 
     @Nullable
     @Override
+    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+        Cursor returnCursor;
+        final SQLiteDatabase db = mOpenHelper.getReadableDatabase();
+        final int match = sUriMatcher.match(uri);
+
+        switch (match) {
+            case MOVIES:
+                returnCursor = db.query(MoviesContract.Movies.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null, null,
+                        sortOrder);
+                break;
+            case MOVIES_WITH_MOVIE_ID:
+                returnCursor = db.query(MoviesContract.Movies.TABLE_NAME,
+                        projection,
+                        MoviesContract.Movies.COLUMN_NAME_MOVIE_ID + "=?",
+                        new String[]{uri.getLastPathSegment()},
+                        null, null,
+                        sortOrder);
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown URI: " + uri);
+        }
+
+        returnCursor.setNotificationUri(getContext().getContentResolver(), uri);
+        return returnCursor;
+    }
+
+    @Nullable
+    @Override
     public Uri insert(Uri uri, ContentValues values) {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
@@ -102,17 +128,77 @@ public class MoviesProvider extends ContentProvider {
 
     @Override
     public int bulkInsert(Uri uri, ContentValues[] values) {
-        return super.bulkInsert(uri, values);
+        int result = 0;
+        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        final int match = sUriMatcher.match(uri);
+
+        switch (match) {
+            case MOVIES:
+                db.beginTransaction();
+                try {
+                    for (ContentValues v : values) {
+                        int r = moviesRecordInsertOrUpdate(db, v);
+                        if (r != -1) result++;
+                    }
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+                getContext().getContentResolver().notifyChange(uri, null);
+                return result;
+            default:
+                return super.bulkInsert(uri, values);
+        }
     }
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        return 0;
+        int result;
+        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        final int match = sUriMatcher.match(uri);
+
+        switch (match) {
+            case MOVIES:
+                result = db.delete(MoviesContract.Movies.TABLE_NAME, selection, selectionArgs);
+                break;
+            case MOVIES_WITH_MOVIE_ID:
+                result = db.delete(MoviesContract.Movies.TABLE_NAME,
+                        MoviesContract.Movies.TABLE_NAME + "=?",
+                        new String[]{uri.getLastPathSegment()});
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown URI: " + uri);
+        }
+
+        getContext().getContentResolver().notifyChange(uri, null);
+        return result;
     }
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        return 0;
+        int result;
+        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        final int match = sUriMatcher.match(uri);
+
+        switch (match) {
+            case MOVIES:
+                result = db.update(MoviesContract.Movies.TABLE_NAME,
+                        values,
+                        selection,
+                        selectionArgs);
+                break;
+            case MOVIES_WITH_MOVIE_ID:
+                result = db.update(MoviesContract.Movies.TABLE_NAME,
+                        values,
+                        MoviesContract.Movies.TABLE_NAME + "=?",
+                        new String[]{uri.getLastPathSegment()});
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown URI: " + uri);
+        }
+
+        getContext().getContentResolver().notifyChange(uri, null);
+        return result;
     }
 
     @Override
