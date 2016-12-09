@@ -2,23 +2,13 @@ package com.example.leshik.moviedb;
 
 import android.test.suitebuilder.TestSuiteBuilder;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
+import com.example.leshik.moviedb.model.TestDb;
 
-/**
- * Instrumentation test, which will execute on an Android device.
- *
- * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
- */
-
-public class FullTestSuite extends TestSuite {
-    public static Test suite() {
-        return new TestSuiteBuilder(FullTestSuite.class)
-                .includeAllPackagesUnderHere().build();
-    }
-
-    public FullTestSuite() {
-        super();
-    }
-}
+// Runs all unit tests.
+@RunWith(Suite.class)
+@Suite.SuiteClasses({TestDb.class
+    })
+public class UnitTestSuite {}
