@@ -1,11 +1,9 @@
 package com.example.leshik.moviedb;
 
-import android.test.suitebuilder.TestSuiteBuilder;
+import com.example.leshik.moviedb.model.TestDb;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-
-import com.example.leshik.moviedb.model.TestDb;
 
 // Runs all unit tests.
 @RunWith(Suite.class)

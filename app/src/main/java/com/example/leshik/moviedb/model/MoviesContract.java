@@ -48,7 +48,8 @@ final class MoviesContract {
         static final String COLUMN_NAME_VIDEO = "video";
         // Create table sql-statement
         static final String CREATE_TABLE_STATEMENT = "CREATE TABLE " + TABLE_NAME + " (" +
-                COLUMN_NAME_MOVIE_ID + " INTEGER PRIMARY KEY, " + // movie_id from TMDB
+                _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COLUMN_NAME_MOVIE_ID + " INTEGER NOT NULL UNIQUE, " + // movie_id from TMDB
                 COLUMN_NAME_ORIGINAL_TITLE + " TEXT NOT NULL, " +
                 COLUMN_NAME_OVERVIEW + " TEXT NOT NULL, " +
                 COLUMN_NAME_RELEASE_DATE + " TEXT NOT NULL, " + // release date stored in format YYYY-MM-DD
@@ -83,7 +84,8 @@ final class MoviesContract {
         static final String COLUMN_NAME_MOVIE_ID = "movie_id";
         // Create statement
         static final String CREATE_TABLE_STATEMENT = "CREATE TABLE " + TABLE_NAME + " (" +
-                COLUMN_NAME_SORT_ID + " INTEGER PRIMARY KEY, " +
+                _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COLUMN_NAME_SORT_ID + " INTEGER NOT NULL UNIQUE, " +
                 COLUMN_NAME_MOVIE_ID + " INTEGER NOT NULL, " +
                 "FOREIGN KEY (" + COLUMN_NAME_MOVIE_ID + ") " +
                 "REFERENCES " + Movies.TABLE_NAME + "(" + Movies.COLUMN_NAME_MOVIE_ID + ") " +
@@ -114,7 +116,8 @@ final class MoviesContract {
         static final String COLUMN_NAME_MOVIE_ID = "movie_id";
         // Create statement
         static final String CREATE_TABLE_STATEMENT = "CREATE TABLE " + TABLE_NAME + " (" +
-                COLUMN_NAME_SORT_ID + " INTEGER PRIMARY KEY, " +
+                _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COLUMN_NAME_SORT_ID + " INTEGER NOT NULL UNIQUE, " +
                 COLUMN_NAME_MOVIE_ID + " INTEGER NOT NULL, " +
                 "FOREIGN KEY (" + COLUMN_NAME_MOVIE_ID + ") " +
                 "REFERENCES " + Movies.TABLE_NAME + "(" + Movies.COLUMN_NAME_MOVIE_ID + ") " +
@@ -145,7 +148,8 @@ final class MoviesContract {
         static final String COLUMN_NAME_MOVIE_ID = "movie_id";
         // Create statement
         static final String CREATE_TABLE_STATEMENT = "CREATE TABLE " + TABLE_NAME + " (" +
-                COLUMN_NAME_SORT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COLUMN_NAME_SORT_ID + " INTEGER NOT NULL UNIQUE, " +
                 COLUMN_NAME_MOVIE_ID + " INTEGER NOT NULL, " +
                 "FOREIGN KEY (" + COLUMN_NAME_MOVIE_ID + ") " +
                 "REFERENCES " + Movies.TABLE_NAME + "(" + Movies.COLUMN_NAME_MOVIE_ID + ") " +
@@ -182,7 +186,8 @@ final class MoviesContract {
         static final String COLUMN_NAME_TYPE = "type";
         // Create statement
         static final String CREATE_TABLE_STATEMENT = "CREATE TABLE " + TABLE_NAME + " (" +
-                COLUMN_NAME_VIDEO_ID + " TEXT PRIMARY KEY, " +
+                _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COLUMN_NAME_VIDEO_ID + " TEXT NOT NULL UNIQUE, " +
                 COLUMN_NAME_MOVIE_ID + " INTEGER NOT NULL, " +
                 COLUMN_NAME_KEY + " TEXT, " +
                 COLUMN_NAME_NAME + " TEXT, " +
