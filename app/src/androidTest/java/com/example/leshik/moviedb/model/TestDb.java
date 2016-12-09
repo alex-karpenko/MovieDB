@@ -2,15 +2,19 @@ package com.example.leshik.moviedb.model;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.test.AndroidTestCase;
-
 import java.util.HashSet;
+
+import android.support.test.runner.AndroidJUnit4;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Created by Leshik on 08.12.2016.
  */
 
-public class TestDb extends AndroidTestCase {
+@RunWith(AndroidJUnit4.class)
+@SmallTest
+public class TestDb {
     public static final String LOG_TAG = TestDb.class.getSimpleName();
 
     // Since we want each test to start with a clean slate
@@ -22,10 +26,12 @@ public class TestDb extends AndroidTestCase {
         This function gets called before each test is executed to delete the database.  This makes
         sure that we always have a clean test.
      */
+    @Before
     public void setUp() {
         deleteTheDatabase();
     }
 
+    @Test
     public void testCreateDb() throws Throwable {
         // build a HashSet of all of the table names we wish to look for
         // Note that there will be another table in the DB that stores the
