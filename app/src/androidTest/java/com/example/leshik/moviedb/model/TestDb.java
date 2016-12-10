@@ -1,7 +1,9 @@
 package com.example.leshik.moviedb.model;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
@@ -10,9 +12,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -23,6 +28,7 @@ import static org.junit.Assert.assertTrue;
 public class TestDb {
     public static final String LOG_TAG = TestDb.class.getSimpleName();
     private static final Context mContext = InstrumentationRegistry.getTargetContext();
+    private static final int MOVIES_FAKE_DATA_ROWS = 20;
 
     // Since we want each test to start with a clean slate
     void deleteTheDatabase() {
@@ -211,6 +217,161 @@ public class TestDb {
 
 
         db.close();
+    }
+
+    @Test
+    public void testMoviesTable() {
+        MoviesDbHelper dbHelper = new MoviesDbHelper(mContext);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        insertTestData_intoMovies(db);
+
+        Cursor c = db.query(MoviesContract.Movies.TABLE_NAME, new String[]{"COUNT(*)"}, null, null, null, null, null);
+        assertNotNull("Query to count rows in movies table failed.", c);
+        assertTrue("moveToNext() failed.", c.moveToNext());
+        assertEquals("Counted rows not equal to inserted.", MOVIES_FAKE_DATA_ROWS, c.getInt(0));
+        c.close();
+
+        db.close();
+    }
+
+    @Test
+    public void testPopularTable() {
+        MoviesDbHelper dbHelper = new MoviesDbHelper(mContext);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        insertTestData_intoMovies(db);
+        insertTestData_intoPopular(db);
+
+        Cursor c = db.query(MoviesContract.Popular.TABLE_NAME, new String[]{"COUNT(*)"}, null, null, null, null, null);
+        assertNotNull("Query to count rows in popular table failed.", c);
+        assertTrue("moveToNext() failed.", c.moveToNext());
+        assertEquals("Counted rows not equal to inserted.", MOVIES_FAKE_DATA_ROWS, c.getInt(0));
+        c.close();
+
+        db.close();
+    }
+
+    @Test
+    public void testTopratedTable() {
+        MoviesDbHelper dbHelper = new MoviesDbHelper(mContext);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        insertTestData_intoMovies(db);
+        insertTestData_intoToprated(db);
+
+        Cursor c = db.query(MoviesContract.TopRated.TABLE_NAME, new String[]{"COUNT(*)"}, null, null, null, null, null);
+        assertNotNull("Query to count rows in popular table failed.", c);
+        assertTrue("moveToNext() failed.", c.moveToNext());
+        assertEquals("Counted rows not equal to inserted.", MOVIES_FAKE_DATA_ROWS, c.getInt(0));
+        c.close();
+
+        db.close();
+    }
+
+    @Test(expected = SQLiteConstraintException.class)
+    public void testForeignKeys() {
+        MoviesDbHelper dbHelper = new MoviesDbHelper(mContext);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        insertTestData_intoMovies(db);
+        insertTestData_intoToprated(db);
+        insertTestData_intoPopular(db);
+
+        db.delete(MoviesContract.Movies.TABLE_NAME, null, null);
+        assertTrue("Foreign key constrain failed - rows from movies table was deleted.", false);
+
+        db.close();
+    }
+
+    // Helper methods to insert test data into the tables
+    private void insertTestData_intoMovies(SQLiteDatabase db) {
+        List<ContentValues> data = moviesFakeData();
+
+        db.beginTransaction();
+        for (ContentValues d : data) db.insert(MoviesContract.Movies.TABLE_NAME, null, d);
+        db.setTransactionSuccessful();
+        db.endTransaction();
+    }
+
+    private void insertTestData_intoPopular(SQLiteDatabase db) {
+        List<ContentValues> data = popularFakeData();
+
+        db.beginTransaction();
+        for (ContentValues d : data) db.insert(MoviesContract.Popular.TABLE_NAME, null, d);
+        db.setTransactionSuccessful();
+        db.endTransaction();
+    }
+
+    private void insertTestData_intoToprated(SQLiteDatabase db) {
+        List<ContentValues> data = topratedFakeData();
+
+        db.beginTransaction();
+        for (ContentValues d : data) db.insert(MoviesContract.TopRated.TABLE_NAME, null, d);
+        db.setTransactionSuccessful();
+        db.endTransaction();
+    }
+
+    private void insertTestData_intoFavorites(SQLiteDatabase db) {
+
+    }
+
+    private void insertTestData_intoVideos(SQLiteDatabase db) {
+
+    }
+
+    // Methods to create fake data for our tables
+    List<ContentValues> moviesFakeData() {
+        List<ContentValues> returnData = new ArrayList<>();
+        ContentValues dataValues;
+
+        for (int i = 0; i < MOVIES_FAKE_DATA_ROWS; i++) {
+            dataValues = new ContentValues();
+            dataValues.put(MoviesContract.Movies.COLUMN_NAME_MOVIE_ID, 100 + i * 2);
+            dataValues.put(MoviesContract.Movies.COLUMN_NAME_ORIGINAL_TITLE, "Original title #" + Integer.valueOf(i).toString());
+            dataValues.put(MoviesContract.Movies.COLUMN_NAME_OVERVIEW, "Overview #" + Integer.valueOf(i).toString());
+            dataValues.put(MoviesContract.Movies.COLUMN_NAME_RELEASE_DATE,
+                    Integer.valueOf(1900 + Integer.valueOf((int) (Math.random() * 100))).toString() + "-" +
+                            Integer.valueOf((int) (Math.random() * 12)).toString() + "-" +
+                            Integer.valueOf((int) (Math.random() * 28)).toString());
+            dataValues.put(MoviesContract.Movies.COLUMN_NAME_VOTE_AVERAGE, Math.random() * 10);
+            dataValues.put(MoviesContract.Movies.COLUMN_NAME_POPULARITY, Math.random() * 100);
+            dataValues.put(MoviesContract.Movies.COLUMN_NAME_POSTER_PATH, "poster_path_" + Integer.valueOf(i).toString());
+            dataValues.put(MoviesContract.Movies.COLUMN_NAME_HOMEPAGE, "http://movie" + Integer.valueOf(i).toString() + ".home.page.com/");
+            dataValues.put(MoviesContract.Movies.COLUMN_NAME_ADULT, (i + 1) % 2);
+            dataValues.put(MoviesContract.Movies.COLUMN_NAME_VIDEO, i % 2);
+
+            returnData.add(dataValues);
+        }
+        return returnData;
+    }
+
+    List<ContentValues> popularFakeData() {
+        List<ContentValues> returnData = new ArrayList<>();
+        ContentValues dataValues;
+
+        for (int i = 0; i < MOVIES_FAKE_DATA_ROWS; i++) {
+            dataValues = new ContentValues();
+            dataValues.put(MoviesContract.Popular.COLUMN_NAME_SORT_ID, i + 1);
+            dataValues.put(MoviesContract.Popular.COLUMN_NAME_MOVIE_ID, 100 + i * 2);
+
+            returnData.add(dataValues);
+        }
+        return returnData;
+    }
+
+    List<ContentValues> topratedFakeData() {
+        List<ContentValues> returnData = new ArrayList<>();
+        ContentValues dataValues;
+
+        for (int i = 0; i < MOVIES_FAKE_DATA_ROWS; i++) {
+            dataValues = new ContentValues();
+            dataValues.put(MoviesContract.TopRated.COLUMN_NAME_SORT_ID, MOVIES_FAKE_DATA_ROWS - i);
+            dataValues.put(MoviesContract.TopRated.COLUMN_NAME_MOVIE_ID, 100 + i * 2);
+
+            returnData.add(dataValues);
+        }
+        return returnData;
     }
 
 }
