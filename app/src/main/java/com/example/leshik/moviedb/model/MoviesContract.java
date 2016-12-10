@@ -89,7 +89,7 @@ final class MoviesContract {
                 COLUMN_NAME_MOVIE_ID + " INTEGER NOT NULL, " +
                 "FOREIGN KEY (" + COLUMN_NAME_MOVIE_ID + ") " +
                 "REFERENCES " + Movies.TABLE_NAME + "(" + Movies.COLUMN_NAME_MOVIE_ID + ") " +
-                "ON DELETE CASCADE ON UPDATE CASCADE " +
+                "ON DELETE RESTRICT ON UPDATE CASCADE " +
                 ");";
         // Drop table statement
         static final String DROP_TABLE_STATEMENT = "DROP TABLE " + TABLE_NAME + ";";
@@ -121,7 +121,7 @@ final class MoviesContract {
                 COLUMN_NAME_MOVIE_ID + " INTEGER NOT NULL, " +
                 "FOREIGN KEY (" + COLUMN_NAME_MOVIE_ID + ") " +
                 "REFERENCES " + Movies.TABLE_NAME + "(" + Movies.COLUMN_NAME_MOVIE_ID + ") " +
-                "ON DELETE CASCADE ON UPDATE CASCADE " +
+                "ON DELETE RESTRICT ON UPDATE CASCADE " +
                 ");";
         // Drop table statement
         static final String DROP_TABLE_STATEMENT = "DROP TABLE " + TABLE_NAME + ";";
@@ -196,7 +196,7 @@ final class MoviesContract {
                 COLUMN_NAME_TYPE + " TEXT, " +
                 "FOREIGN KEY (" + COLUMN_NAME_MOVIE_ID + ") " +
                 "REFERENCES " + Movies.TABLE_NAME + "(" + Movies.COLUMN_NAME_MOVIE_ID + ") " +
-                "ON DELETE CASCADE ON UPDATE CASCADE " +
+                "ON DELETE RESTRICT ON UPDATE CASCADE " +
                 ");";
         // Drop table statement
         static final String DROP_TABLE_STATEMENT = "DROP TABLE " + TABLE_NAME + ";";
