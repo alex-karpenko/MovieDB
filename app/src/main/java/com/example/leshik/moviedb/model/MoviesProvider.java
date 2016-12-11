@@ -109,12 +109,41 @@ public class MoviesProvider extends ContentProvider {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
         Uri returnUri;
+        long _id;
 
         switch (match) {
             case MOVIES:
                 int movieId = moviesRecordInsertOrUpdate(db, values);
                 if (movieId > 0)
                     returnUri = MoviesContract.Movies.buildUri(movieId);
+                else
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                break;
+            case POPULAR:
+                _id = db.insert(MoviesContract.Popular.TABLE_NAME, null, values);
+                if (_id > 0)
+                    returnUri = MoviesContract.Popular.buildUri(values.getAsLong(MoviesContract.Popular.COLUMN_NAME_SORT_ID));
+                else
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                break;
+            case TOPRATED:
+                _id = db.insert(MoviesContract.TopRated.TABLE_NAME, null, values);
+                if (_id > 0)
+                    returnUri = MoviesContract.TopRated.buildUri(values.getAsLong(MoviesContract.TopRated.COLUMN_NAME_SORT_ID));
+                else
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                break;
+            case FAVORITES:
+                _id = db.insert(MoviesContract.Favorites.TABLE_NAME, null, values);
+                if (_id > 0)
+                    returnUri = MoviesContract.Favorites.buildUri(values.getAsLong(MoviesContract.Favorites.COLUMN_NAME_SORT_ID));
+                else
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                break;
+            case VIDEOS:
+                _id = db.insert(MoviesContract.Videos.TABLE_NAME, null, values);
+                if (_id > 0)
+                    returnUri = MoviesContract.Videos.buildUri(values.getAsLong(MoviesContract.Videos.COLUMN_NAME_VIDEO_ID));
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
@@ -163,7 +192,7 @@ public class MoviesProvider extends ContentProvider {
                 break;
             case MOVIES_WITH_MOVIE_ID:
                 result = db.delete(MoviesContract.Movies.TABLE_NAME,
-                        MoviesContract.Movies.TABLE_NAME + "=?",
+                        MoviesContract.Movies.COLUMN_NAME_MOVIE_ID + "=?",
                         new String[]{uri.getLastPathSegment()});
                 break;
             default:
@@ -190,7 +219,7 @@ public class MoviesProvider extends ContentProvider {
             case MOVIES_WITH_MOVIE_ID:
                 result = db.update(MoviesContract.Movies.TABLE_NAME,
                         values,
-                        MoviesContract.Movies.TABLE_NAME + "=?",
+                        MoviesContract.Movies.COLUMN_NAME_MOVIE_ID + "=?",
                         new String[]{uri.getLastPathSegment()});
                 break;
             default:
