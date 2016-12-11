@@ -290,6 +290,60 @@ public class MoviesProvider extends ContentProvider {
                         MoviesContract.Movies.COLUMN_NAME_MOVIE_ID + "=?",
                         new String[]{uri.getLastPathSegment()});
                 break;
+            case POPULAR:
+                result = db.update(MoviesContract.Popular.TABLE_NAME,
+                        values,
+                        selection,
+                        selectionArgs);
+                break;
+            case POPULAR_WITH_SORT_ID:
+                result = db.update(MoviesContract.Popular.TABLE_NAME,
+                        values,
+                        MoviesContract.Popular.COLUMN_NAME_SORT_ID + "=?",
+                        new String[]{uri.getLastPathSegment()});
+                break;
+            case TOPRATED:
+                result = db.update(MoviesContract.TopRated.TABLE_NAME,
+                        values,
+                        selection,
+                        selectionArgs);
+                break;
+            case TOPRATED_WITH_SORT_ID:
+                result = db.update(MoviesContract.TopRated.TABLE_NAME,
+                        values,
+                        MoviesContract.TopRated.COLUMN_NAME_SORT_ID + "=?",
+                        new String[]{uri.getLastPathSegment()});
+                break;
+            case FAVORITES:
+                result = db.update(MoviesContract.Favorites.TABLE_NAME,
+                        values,
+                        selection,
+                        selectionArgs);
+                break;
+            case FAVORITES_WITH_SORT_ID:
+                result = db.update(MoviesContract.Favorites.TABLE_NAME,
+                        values,
+                        MoviesContract.Favorites.COLUMN_NAME_SORT_ID + "=?",
+                        new String[]{uri.getLastPathSegment()});
+                break;
+            case VIDEOS:
+                result = db.update(MoviesContract.Videos.TABLE_NAME,
+                        values,
+                        selection,
+                        selectionArgs);
+                break;
+            case VIDEOS_WITH_MOVIE_ID:
+                result = db.update(MoviesContract.Videos.TABLE_NAME,
+                        values,
+                        MoviesContract.Videos.COLUMN_NAME_MOVIE_ID + "=?",
+                        new String[]{uri.getLastPathSegment()});
+                break;
+            case VIDEOS_WITH_VIDEO_ID:
+                result = db.update(MoviesContract.Videos.TABLE_NAME,
+                        values,
+                        MoviesContract.Videos.COLUMN_NAME_VIDEO_ID + "=?",
+                        new String[]{uri.getLastPathSegment()});
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown URI: " + uri);
         }
