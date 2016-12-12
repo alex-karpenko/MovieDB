@@ -2,6 +2,7 @@ package com.example.leshik.moviedb.model;
 
 import android.annotation.TargetApi;
 import android.content.ContentProvider;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
@@ -91,7 +92,7 @@ public class MoviesProvider extends ContentProvider {
                 returnCursor = db.query(MoviesContract.Movies.TABLE_NAME,
                         projection,
                         MoviesContract.Movies.COLUMN_NAME_MOVIE_ID + "=?",
-                        new String[]{uri.getLastPathSegment()},
+                        new String[]{String.valueOf(ContentUris.parseId(uri))},
                         null, null,
                         sortOrder);
                 break;
@@ -143,7 +144,7 @@ public class MoviesProvider extends ContentProvider {
             case VIDEOS:
                 _id = db.insert(MoviesContract.Videos.TABLE_NAME, null, values);
                 if (_id > 0)
-                    returnUri = MoviesContract.Videos.buildUri(values.getAsLong(MoviesContract.Videos.COLUMN_NAME_VIDEO_ID));
+                    returnUri = MoviesContract.Videos.buildUri(values.getAsString(MoviesContract.Videos.COLUMN_NAME_VIDEO_ID));
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
@@ -224,7 +225,7 @@ public class MoviesProvider extends ContentProvider {
             case MOVIES_WITH_MOVIE_ID:
                 result = db.delete(MoviesContract.Movies.TABLE_NAME,
                         MoviesContract.Movies.COLUMN_NAME_MOVIE_ID + "=?",
-                        new String[]{uri.getLastPathSegment()});
+                        new String[]{String.valueOf(ContentUris.parseId(uri))});
                 break;
             case POPULAR:
                 result = db.delete(MoviesContract.Popular.TABLE_NAME, selection, selectionArgs);
@@ -232,7 +233,7 @@ public class MoviesProvider extends ContentProvider {
             case POPULAR_WITH_SORT_ID:
                 result = db.delete(MoviesContract.Popular.TABLE_NAME,
                         MoviesContract.Popular.COLUMN_NAME_SORT_ID + "=?",
-                        new String[]{uri.getLastPathSegment()});
+                        new String[]{String.valueOf(ContentUris.parseId(uri))});
                 break;
             case TOPRATED:
                 result = db.delete(MoviesContract.TopRated.TABLE_NAME, selection, selectionArgs);
@@ -240,7 +241,7 @@ public class MoviesProvider extends ContentProvider {
             case TOPRATED_WITH_SORT_ID:
                 result = db.delete(MoviesContract.TopRated.TABLE_NAME,
                         MoviesContract.TopRated.COLUMN_NAME_SORT_ID + "=?",
-                        new String[]{uri.getLastPathSegment()});
+                        new String[]{String.valueOf(ContentUris.parseId(uri))});
                 break;
             case FAVORITES:
                 result = db.delete(MoviesContract.Favorites.TABLE_NAME, selection, selectionArgs);
@@ -248,7 +249,7 @@ public class MoviesProvider extends ContentProvider {
             case FAVORITES_WITH_SORT_ID:
                 result = db.delete(MoviesContract.Favorites.TABLE_NAME,
                         MoviesContract.Favorites.COLUMN_NAME_SORT_ID + "=?",
-                        new String[]{uri.getLastPathSegment()});
+                        new String[]{String.valueOf(ContentUris.parseId(uri))});
                 break;
             case VIDEOS:
                 result = db.delete(MoviesContract.Videos.TABLE_NAME, selection, selectionArgs);
@@ -256,7 +257,7 @@ public class MoviesProvider extends ContentProvider {
             case VIDEOS_WITH_MOVIE_ID:
                 result = db.delete(MoviesContract.Videos.TABLE_NAME,
                         MoviesContract.Videos.COLUMN_NAME_MOVIE_ID + "=?",
-                        new String[]{uri.getLastPathSegment()});
+                        new String[]{String.valueOf(ContentUris.parseId(uri))});
                 break;
             case VIDEOS_WITH_VIDEO_ID:
                 result = db.delete(MoviesContract.Videos.TABLE_NAME,
@@ -288,7 +289,7 @@ public class MoviesProvider extends ContentProvider {
                 result = db.update(MoviesContract.Movies.TABLE_NAME,
                         values,
                         MoviesContract.Movies.COLUMN_NAME_MOVIE_ID + "=?",
-                        new String[]{uri.getLastPathSegment()});
+                        new String[]{String.valueOf(ContentUris.parseId(uri))});
                 break;
             case POPULAR:
                 result = db.update(MoviesContract.Popular.TABLE_NAME,
@@ -300,7 +301,7 @@ public class MoviesProvider extends ContentProvider {
                 result = db.update(MoviesContract.Popular.TABLE_NAME,
                         values,
                         MoviesContract.Popular.COLUMN_NAME_SORT_ID + "=?",
-                        new String[]{uri.getLastPathSegment()});
+                        new String[]{String.valueOf(ContentUris.parseId(uri))});
                 break;
             case TOPRATED:
                 result = db.update(MoviesContract.TopRated.TABLE_NAME,
@@ -312,7 +313,7 @@ public class MoviesProvider extends ContentProvider {
                 result = db.update(MoviesContract.TopRated.TABLE_NAME,
                         values,
                         MoviesContract.TopRated.COLUMN_NAME_SORT_ID + "=?",
-                        new String[]{uri.getLastPathSegment()});
+                        new String[]{String.valueOf(ContentUris.parseId(uri))});
                 break;
             case FAVORITES:
                 result = db.update(MoviesContract.Favorites.TABLE_NAME,
@@ -324,7 +325,7 @@ public class MoviesProvider extends ContentProvider {
                 result = db.update(MoviesContract.Favorites.TABLE_NAME,
                         values,
                         MoviesContract.Favorites.COLUMN_NAME_SORT_ID + "=?",
-                        new String[]{uri.getLastPathSegment()});
+                        new String[]{String.valueOf(ContentUris.parseId(uri))});
                 break;
             case VIDEOS:
                 result = db.update(MoviesContract.Videos.TABLE_NAME,
@@ -336,7 +337,7 @@ public class MoviesProvider extends ContentProvider {
                 result = db.update(MoviesContract.Videos.TABLE_NAME,
                         values,
                         MoviesContract.Videos.COLUMN_NAME_MOVIE_ID + "=?",
-                        new String[]{uri.getLastPathSegment()});
+                        new String[]{String.valueOf(ContentUris.parseId(uri))});
                 break;
             case VIDEOS_WITH_VIDEO_ID:
                 result = db.update(MoviesContract.Videos.TABLE_NAME,

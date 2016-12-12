@@ -9,8 +9,10 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
 import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.MethodSorters;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -25,6 +27,7 @@ import static org.junit.Assert.assertTrue;
  */
 
 @RunWith(AndroidJUnit4.class)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestDb {
     public static final String LOG_TAG = TestDb.class.getSimpleName();
     private static final Context mContext = InstrumentationRegistry.getTargetContext();
@@ -45,7 +48,7 @@ public class TestDb {
     }
 
     @Test
-    public void testCreateDb() throws Throwable {
+    public void test01_CreateDb() throws Throwable {
         // build a HashSet of all of the table names we wish to look for
         // Note that there will be another table in the DB that stores the
         // Android metadata (db version information)
@@ -220,7 +223,7 @@ public class TestDb {
     }
 
     @Test
-    public void testMoviesTable() {
+    public void test02_MoviesTable() {
         MoviesDbHelper dbHelper = new MoviesDbHelper(mContext);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
@@ -236,7 +239,7 @@ public class TestDb {
     }
 
     @Test
-    public void testPopularTable() {
+    public void test03_PopularTable() {
         MoviesDbHelper dbHelper = new MoviesDbHelper(mContext);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
@@ -253,7 +256,7 @@ public class TestDb {
     }
 
     @Test
-    public void testTopratedTable() {
+    public void test04_TopratedTable() {
         MoviesDbHelper dbHelper = new MoviesDbHelper(mContext);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
@@ -270,7 +273,7 @@ public class TestDb {
     }
 
     @Test(expected = SQLiteConstraintException.class)
-    public void testForeignKeys() {
+    public void test05_ForeignKeys() {
         MoviesDbHelper dbHelper = new MoviesDbHelper(mContext);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
@@ -280,6 +283,30 @@ public class TestDb {
 
         db.delete(MoviesContract.Movies.TABLE_NAME, null, null);
         assertTrue("Foreign key constrain failed - rows from movies table was deleted.", false);
+
+        db.close();
+    }
+
+    @Test
+    public void test06_Select() {
+        MoviesDbHelper dbHelper = new MoviesDbHelper(mContext);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        insertTestData_intoMovies(db);
+        insertTestData_intoToprated(db);
+        insertTestData_intoPopular(db);
+
+        Cursor c = db.query(MoviesContract.Popular.SELECT_STATEMENT, null, null, null, null, null, null);
+        assertNotNull("Query to select wide popular data table failed.", c);
+        assertTrue("moveToNext() failed.", c.moveToNext());
+        assertEquals("Count of rows in the wide popular table is wrong", MOVIES_FAKE_DATA_ROWS, c.getCount());
+        c.close();
+
+        c = db.query(MoviesContract.TopRated.SELECT_STATEMENT, null, null, null, null, null, null);
+        assertNotNull("Query to select wide toprated data table failed.", c);
+        assertTrue("moveToNext() failed.", c.moveToNext());
+        assertEquals("Count of rows in the wide toprated table is wrong", MOVIES_FAKE_DATA_ROWS, c.getCount());
+        c.close();
 
         db.close();
     }

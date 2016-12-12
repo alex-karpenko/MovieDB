@@ -93,7 +93,14 @@ final class MoviesContract {
                 ");";
         // Drop table statement
         static final String DROP_TABLE_STATEMENT = "DROP TABLE " + TABLE_NAME + ";";
-
+        // Wide SELECT query
+        static final String SELECT_STATEMENT = "(SELECT " +
+                Movies.TABLE_NAME + ".*, " +
+                TABLE_NAME + "." + COLUMN_NAME_SORT_ID +
+                " FROM " + Movies.TABLE_NAME + ", " + TABLE_NAME +
+                " WHERE " + Movies.TABLE_NAME + "." + Movies.COLUMN_NAME_MOVIE_ID + "=" +
+                TABLE_NAME + "." + COLUMN_NAME_MOVIE_ID +
+                ")";
         // URI build method
         public static Uri buildUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
@@ -125,6 +132,14 @@ final class MoviesContract {
                 ");";
         // Drop table statement
         static final String DROP_TABLE_STATEMENT = "DROP TABLE " + TABLE_NAME + ";";
+        // Wide SELECT query
+        static final String SELECT_STATEMENT = "(SELECT " +
+                Movies.TABLE_NAME + ".*, " +
+                TABLE_NAME + "." + COLUMN_NAME_SORT_ID +
+                " FROM " + Movies.TABLE_NAME + ", " + TABLE_NAME +
+                " WHERE " + Movies.TABLE_NAME + "." + Movies.COLUMN_NAME_MOVIE_ID + "=" +
+                TABLE_NAME + "." + COLUMN_NAME_MOVIE_ID +
+                ")";
 
         // URI build method
         public static Uri buildUri(long id) {
@@ -157,6 +172,14 @@ final class MoviesContract {
                 ");";
         // Drop table statement
         static final String DROP_TABLE_STATEMENT = "DROP TABLE " + TABLE_NAME + ";";
+        // Wide SELECT query
+        static final String SELECT_STATEMENT = "(SELECT " +
+                Movies.TABLE_NAME + ".*, " +
+                TABLE_NAME + "." + COLUMN_NAME_SORT_ID +
+                " FROM " + Movies.TABLE_NAME + ", " + TABLE_NAME +
+                " WHERE " + Movies.TABLE_NAME + "." + Movies.COLUMN_NAME_MOVIE_ID + "=" +
+                TABLE_NAME + "." + COLUMN_NAME_MOVIE_ID +
+                ")";
 
         // URI build method
         public static Uri buildUri(long id) {
@@ -202,8 +225,8 @@ final class MoviesContract {
         static final String DROP_TABLE_STATEMENT = "DROP TABLE " + TABLE_NAME + ";";
 
         // URI build method
-        public static Uri buildUri(long id) {
-            return ContentUris.withAppendedId(CONTENT_URI, id);
+        public static Uri buildUri(String id) {
+            return Uri.withAppendedPath(CONTENT_URI, id);
         }
     }
 }
