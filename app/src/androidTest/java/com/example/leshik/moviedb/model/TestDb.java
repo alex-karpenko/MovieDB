@@ -31,10 +31,10 @@ import static org.junit.Assert.assertTrue;
 public class TestDb {
     public static final String LOG_TAG = TestDb.class.getSimpleName();
     private static final Context mContext = InstrumentationRegistry.getTargetContext();
-    private static final int MOVIES_FAKE_DATA_ROWS = 20;
+    static final int MOVIES_FAKE_DATA_ROWS = 20;
 
     // Since we want each test to start with a clean slate
-    void deleteTheDatabase() {
+    static void deleteTheDatabase() {
         mContext.deleteDatabase(MoviesDbHelper.DATABASE_NAME);
     }
 
@@ -272,8 +272,25 @@ public class TestDb {
         db.close();
     }
 
+    @Test
+    public void test05_FavoritesTable() {
+        MoviesDbHelper dbHelper = new MoviesDbHelper(mContext);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        insertTestData_intoMovies(db);
+        insertTestData_intoFavorites(db);
+
+        Cursor c = db.query(MoviesContract.Favorites.TABLE_NAME, new String[]{"COUNT(*)"}, null, null, null, null, null);
+        assertNotNull("Query to count rows in popular table failed.", c);
+        assertTrue("moveToNext() failed.", c.moveToNext());
+        assertEquals("Counted rows not equal to inserted.", MOVIES_FAKE_DATA_ROWS / 2, c.getInt(0));
+        c.close();
+
+        db.close();
+    }
+
     @Test(expected = SQLiteConstraintException.class)
-    public void test05_ForeignKeys() {
+    public void test07_ForeignKeys() {
         MoviesDbHelper dbHelper = new MoviesDbHelper(mContext);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
@@ -288,7 +305,7 @@ public class TestDb {
     }
 
     @Test
-    public void test06_Select() {
+    public void test08_Select() {
         MoviesDbHelper dbHelper = new MoviesDbHelper(mContext);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
@@ -312,43 +329,35 @@ public class TestDb {
     }
 
     // Helper methods to insert test data into the tables
-    private void insertTestData_intoMovies(SQLiteDatabase db) {
-        List<ContentValues> data = moviesFakeData();
-
+    void insertTestData_Helper(SQLiteDatabase db, String table, List<ContentValues> data) {
         db.beginTransaction();
-        for (ContentValues d : data) db.insert(MoviesContract.Movies.TABLE_NAME, null, d);
+        for (ContentValues d : data) db.insert(table, null, d);
         db.setTransactionSuccessful();
         db.endTransaction();
     }
 
-    private void insertTestData_intoPopular(SQLiteDatabase db) {
-        List<ContentValues> data = popularFakeData();
-
-        db.beginTransaction();
-        for (ContentValues d : data) db.insert(MoviesContract.Popular.TABLE_NAME, null, d);
-        db.setTransactionSuccessful();
-        db.endTransaction();
+    void insertTestData_intoMovies(SQLiteDatabase db) {
+        insertTestData_Helper(db, MoviesContract.Movies.TABLE_NAME, moviesFakeData());
     }
 
-    private void insertTestData_intoToprated(SQLiteDatabase db) {
-        List<ContentValues> data = topratedFakeData();
-
-        db.beginTransaction();
-        for (ContentValues d : data) db.insert(MoviesContract.TopRated.TABLE_NAME, null, d);
-        db.setTransactionSuccessful();
-        db.endTransaction();
+    void insertTestData_intoPopular(SQLiteDatabase db) {
+        insertTestData_Helper(db, MoviesContract.Popular.TABLE_NAME, popularFakeData());
     }
 
-    private void insertTestData_intoFavorites(SQLiteDatabase db) {
-
+    void insertTestData_intoToprated(SQLiteDatabase db) {
+        insertTestData_Helper(db, MoviesContract.TopRated.TABLE_NAME, topratedFakeData());
     }
 
-    private void insertTestData_intoVideos(SQLiteDatabase db) {
+    void insertTestData_intoFavorites(SQLiteDatabase db) {
+        insertTestData_Helper(db, MoviesContract.Favorites.TABLE_NAME, favoritesFakeData());
+    }
+
+    void insertTestData_intoVideos(SQLiteDatabase db) {
 
     }
 
     // Methods to create fake data for our tables
-    List<ContentValues> moviesFakeData() {
+    static List<ContentValues> moviesFakeData() {
         List<ContentValues> returnData = new ArrayList<>();
         ContentValues dataValues;
 
@@ -373,7 +382,7 @@ public class TestDb {
         return returnData;
     }
 
-    List<ContentValues> popularFakeData() {
+    static List<ContentValues> popularFakeData() {
         List<ContentValues> returnData = new ArrayList<>();
         ContentValues dataValues;
 
@@ -387,7 +396,7 @@ public class TestDb {
         return returnData;
     }
 
-    List<ContentValues> topratedFakeData() {
+    static List<ContentValues> topratedFakeData() {
         List<ContentValues> returnData = new ArrayList<>();
         ContentValues dataValues;
 
@@ -401,4 +410,17 @@ public class TestDb {
         return returnData;
     }
 
+    static List<ContentValues> favoritesFakeData() {
+        List<ContentValues> returnData = new ArrayList<>();
+        ContentValues dataValues;
+
+        for (int i = 0; i < MOVIES_FAKE_DATA_ROWS / 2; i++) {
+            dataValues = new ContentValues();
+            dataValues.put(MoviesContract.Favorites.COLUMN_NAME_SORT_ID, i);
+            dataValues.put(MoviesContract.Favorites.COLUMN_NAME_MOVIE_ID, 100 + i * 2);
+
+            returnData.add(dataValues);
+        }
+        return returnData;
+    }
 }
