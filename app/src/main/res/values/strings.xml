@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">MovieDB</string>
     <string name="title_activity_detail">Movie details</string>
+    <string name="content_authority">com.example.leshik.moviedb</string>
 
     <!-- Strings related to Settings -->
     <string name="action_settings">Settings</string>
