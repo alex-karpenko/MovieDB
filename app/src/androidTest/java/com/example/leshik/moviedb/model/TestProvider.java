@@ -14,6 +14,7 @@ import org.junit.runners.MethodSorters;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by Leshik on 12.12.2016.
@@ -51,11 +52,27 @@ public class TestProvider {
 
         values = new ContentValues[favoritesData.size()];
         result = mContext.getContentResolver().bulkInsert(MoviesContract.Favorites.CONTENT_URI, favoritesData.toArray(values));
-        assertEquals("Inserted wrong number of rows into popular table", values.length, result);
+        assertEquals("Inserted wrong number of rows into favorites table", values.length, result);
     }
 
+    @Test
+    public void test02_delete() {
+        test01_bulkInsert();
 
-    static void deleteAllRecordsFromProvider() {
+        int result = mContext.getContentResolver().delete(MoviesContract.Favorites.CONTENT_URI, null, null);
+        assertTrue("Deleted wrong number of rows from favorites table", result > 0);
+
+        result = mContext.getContentResolver().delete(MoviesContract.TopRated.CONTENT_URI, null, null);
+        assertTrue("Deleted wrong number of rows from toprated table", result > 0);
+
+        result = mContext.getContentResolver().delete(MoviesContract.Popular.CONTENT_URI, null, null);
+        assertTrue("Deleted wrong number of rows from popular table", result > 0);
+
+        result = mContext.getContentResolver().delete(MoviesContract.Movies.CONTENT_URI, null, null);
+        assertTrue("Deleted wrong number of rows from movies table", result > 0);
+    }
+
+    private void deleteAllRecordsFromProvider() {
         mContext.getContentResolver().delete(MoviesContract.Videos.CONTENT_URI, null, null);
         mContext.getContentResolver().delete(MoviesContract.Favorites.CONTENT_URI, null, null);
         mContext.getContentResolver().delete(MoviesContract.TopRated.CONTENT_URI, null, null);
