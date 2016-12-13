@@ -96,6 +96,78 @@ public class MoviesProvider extends ContentProvider {
                         null, null,
                         sortOrder);
                 break;
+            case POPULAR:
+                returnCursor = db.query(MoviesContract.Popular.SELECT_STATEMENT,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null, null,
+                        sortOrder);
+                break;
+            case POPULAR_WITH_SORT_ID:
+                returnCursor = db.query(MoviesContract.Popular.SELECT_STATEMENT,
+                        projection,
+                        MoviesContract.Popular.COLUMN_NAME_SORT_ID + "=?",
+                        new String[]{String.valueOf(ContentUris.parseId(uri))},
+                        null, null,
+                        sortOrder);
+                break;
+            case TOPRATED:
+                returnCursor = db.query(MoviesContract.TopRated.SELECT_STATEMENT,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null, null,
+                        sortOrder);
+                break;
+            case TOPRATED_WITH_SORT_ID:
+                returnCursor = db.query(MoviesContract.TopRated.SELECT_STATEMENT,
+                        projection,
+                        MoviesContract.TopRated.COLUMN_NAME_SORT_ID + "=?",
+                        new String[]{String.valueOf(ContentUris.parseId(uri))},
+                        null, null,
+                        sortOrder);
+                break;
+            case FAVORITES:
+                returnCursor = db.query(MoviesContract.Favorites.SELECT_STATEMENT,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null, null,
+                        sortOrder);
+                break;
+            case FAVORITES_WITH_SORT_ID:
+                returnCursor = db.query(MoviesContract.Favorites.SELECT_STATEMENT,
+                        projection,
+                        MoviesContract.Favorites.COLUMN_NAME_SORT_ID + "=?",
+                        new String[]{String.valueOf(ContentUris.parseId(uri))},
+                        null, null,
+                        sortOrder);
+                break;
+            case VIDEOS:
+                returnCursor = db.query(MoviesContract.Videos.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null, null,
+                        sortOrder);
+                break;
+            case VIDEOS_WITH_MOVIE_ID:
+                returnCursor = db.query(MoviesContract.Videos.TABLE_NAME,
+                        projection,
+                        MoviesContract.Videos.COLUMN_NAME_MOVIE_ID + "=?",
+                        new String[]{String.valueOf(ContentUris.parseId(uri))},
+                        null, null,
+                        sortOrder);
+                break;
+            case VIDEOS_WITH_VIDEO_ID_ID:
+                returnCursor = db.query(MoviesContract.Videos.TABLE_NAME,
+                        projection,
+                        MoviesContract.Videos.COLUMN_NAME_VIDEO_ID_ID + "=?",
+                        new String[]{uri.getLastPathSegment()},
+                        null, null,
+                        sortOrder);
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown URI: " + uri);
         }
