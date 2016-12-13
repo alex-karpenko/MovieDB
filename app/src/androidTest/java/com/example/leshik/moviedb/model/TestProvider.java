@@ -149,6 +149,41 @@ public class TestProvider {
         assertTrue("Deleted wrong number of rows from movies table", result == TestDb.MOVIES_FAKE_DATA_ROWS - 1);
     }
 
+    @Test
+    public void test04_query() {
+        test01_bulkInsert();
+
+        Cursor c = mContext.getContentResolver().query(MoviesContract.Movies.CONTENT_URI, null, null, null, null);
+        assertNotNull("Cursor is null after query movies table.", c);
+        assertTrue("No next record in the cursor after query movies table.", c.moveToNext());
+        assertEquals("Invalid rows count in the movies table", TestDb.MOVIES_FAKE_DATA_ROWS, c.getCount());
+        c.close();
+
+        c = mContext.getContentResolver().query(MoviesContract.Popular.CONTENT_URI, null, null, null, null);
+        assertNotNull("Cursor is null after query popular table.", c);
+        assertTrue("No next record in the cursor after query popular table.", c.moveToNext());
+        assertEquals("Invalid rows count in the popular table", TestDb.MOVIES_FAKE_DATA_ROWS, c.getCount());
+        c.close();
+
+        c = mContext.getContentResolver().query(MoviesContract.TopRated.CONTENT_URI, null, null, null, null);
+        assertNotNull("Cursor is null after query toprated table.", c);
+        assertTrue("No next record in the cursor after query toprated table.", c.moveToNext());
+        assertEquals("Invalid rows count in the toprated table", TestDb.MOVIES_FAKE_DATA_ROWS, c.getCount());
+        c.close();
+
+        c = mContext.getContentResolver().query(MoviesContract.Favorites.CONTENT_URI, null, null, null, null);
+        assertNotNull("Cursor is null after query favorites table.", c);
+        assertTrue("No next record in the cursor after query favorites table.", c.moveToNext());
+        assertEquals("Invalid rows count in the favorites table", TestDb.MOVIES_FAKE_DATA_ROWS / 2, c.getCount());
+        c.close();
+
+        c = mContext.getContentResolver().query(MoviesContract.Videos.CONTENT_URI, null, null, null, null);
+        assertNotNull("Cursor is null after query videos table.", c);
+        assertTrue("No next record in the cursor after query videos table.", c.moveToNext());
+        assertEquals("Invalid rows count in the videos table", TestDb.MOVIES_FAKE_DATA_ROWS / 4, c.getCount());
+        c.close();
+    }
+
     private void deleteAllRecordsFromProvider() {
         mContext.getContentResolver().delete(MoviesContract.Videos.CONTENT_URI, null, null);
         mContext.getContentResolver().delete(MoviesContract.Favorites.CONTENT_URI, null, null);
