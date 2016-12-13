@@ -160,10 +160,10 @@ public class MoviesProvider extends ContentProvider {
                         null, null,
                         sortOrder);
                 break;
-            case VIDEOS_WITH_VIDEO_ID_ID:
+            case VIDEOS_WITH_VIDEO_ID:
                 returnCursor = db.query(MoviesContract.Videos.TABLE_NAME,
                         projection,
-                        MoviesContract.Videos.COLUMN_NAME_VIDEO_ID_ID + "=?",
+                        MoviesContract.Videos.COLUMN_NAME_VIDEO_ID + "=?",
                         new String[]{uri.getLastPathSegment()},
                         null, null,
                         sortOrder);
