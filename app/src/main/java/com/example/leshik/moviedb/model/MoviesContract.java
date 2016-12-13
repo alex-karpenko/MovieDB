@@ -228,5 +228,9 @@ final class MoviesContract {
         public static Uri buildUri(String id) {
             return Uri.withAppendedPath(CONTENT_URI, id);
         }
+
+        public static Uri buildUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
     }
 }
