@@ -289,7 +289,24 @@ public class TestDb {
         db.close();
     }
 
-    @Test(expected = SQLiteConstraintException.class)
+    @Test
+    public void test06_VideosTable() {
+        MoviesDbHelper dbHelper = new MoviesDbHelper(mContext);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        insertTestData_intoMovies(db);
+        insertTestData_intoVideos(db);
+
+        Cursor c = db.query(MoviesContract.Videos.TABLE_NAME, new String[]{"COUNT(*)"}, null, null, null, null, null);
+        assertNotNull("Query to count rows in videos table failed.", c);
+        assertTrue("moveToNext() failed.", c.moveToNext());
+        assertEquals("Counted rows not equal to inserted.", MOVIES_FAKE_DATA_ROWS / 4, c.getInt(0));
+        c.close();
+
+        db.close();
+    }
+
+    @Test
     public void test07_ForeignKeys() {
         MoviesDbHelper dbHelper = new MoviesDbHelper(mContext);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -297,9 +314,46 @@ public class TestDb {
         insertTestData_intoMovies(db);
         insertTestData_intoToprated(db);
         insertTestData_intoPopular(db);
+        insertTestData_intoVideos(db);
 
-        db.delete(MoviesContract.Movies.TABLE_NAME, null, null);
-        assertTrue("Foreign key constrain failed - rows from movies table was deleted.", false);
+        try {
+            db.delete(MoviesContract.Movies.TABLE_NAME, null, null);
+            assertTrue("Foreign key constrain failed - rows from movies table was deleted.", false);
+        } catch (Exception e) {
+            assertTrue("Invalid exception type", e instanceof SQLiteConstraintException);
+        }
+
+        db.delete(MoviesContract.Videos.TABLE_NAME, null, null);
+        try {
+            db.delete(MoviesContract.Movies.TABLE_NAME, null, null);
+            assertTrue("Foreign key constrain failed - rows from movies table was deleted.", false);
+        } catch (Exception e) {
+            assertTrue("Invalid exception type", e instanceof SQLiteConstraintException);
+        }
+
+        db.delete(MoviesContract.Favorites.TABLE_NAME, null, null);
+        try {
+            db.delete(MoviesContract.Movies.TABLE_NAME, null, null);
+            assertTrue("Foreign key constrain failed - rows from movies table was deleted.", false);
+        } catch (Exception e) {
+            assertTrue("Invalid exception type", e instanceof SQLiteConstraintException);
+        }
+
+        db.delete(MoviesContract.TopRated.TABLE_NAME, null, null);
+        try {
+            db.delete(MoviesContract.Movies.TABLE_NAME, null, null);
+            assertTrue("Foreign key constrain failed - rows from movies table was deleted.", false);
+        } catch (Exception e) {
+            assertTrue("Invalid exception type", e instanceof SQLiteConstraintException);
+        }
+
+        db.delete(MoviesContract.Popular.TABLE_NAME, null, null);
+        try {
+            // Finally, there are no foreign references left
+            db.delete(MoviesContract.Movies.TABLE_NAME, null, null);
+        } catch (Exception e) {
+            assertTrue("Foreign key constrain failed - rows from movies table was deleted.", false);
+        }
 
         db.close();
     }
@@ -312,8 +366,16 @@ public class TestDb {
         insertTestData_intoMovies(db);
         insertTestData_intoToprated(db);
         insertTestData_intoPopular(db);
+        insertTestData_intoFavorites(db);
+        insertTestData_intoVideos(db);
 
-        Cursor c = db.query(MoviesContract.Popular.SELECT_STATEMENT, null, null, null, null, null, null);
+        Cursor c = db.query(MoviesContract.Movies.TABLE_NAME, null, null, null, null, null, null);
+        assertNotNull("Query to select movies data table failed.", c);
+        assertTrue("moveToNext() failed.", c.moveToNext());
+        assertEquals("Count of rows in the movies table is wrong", MOVIES_FAKE_DATA_ROWS, c.getCount());
+        c.close();
+
+        c = db.query(MoviesContract.Popular.SELECT_STATEMENT, null, null, null, null, null, null);
         assertNotNull("Query to select wide popular data table failed.", c);
         assertTrue("moveToNext() failed.", c.moveToNext());
         assertEquals("Count of rows in the wide popular table is wrong", MOVIES_FAKE_DATA_ROWS, c.getCount());
@@ -324,6 +386,19 @@ public class TestDb {
         assertTrue("moveToNext() failed.", c.moveToNext());
         assertEquals("Count of rows in the wide toprated table is wrong", MOVIES_FAKE_DATA_ROWS, c.getCount());
         c.close();
+
+        c = db.query(MoviesContract.Favorites.SELECT_STATEMENT, null, null, null, null, null, null);
+        assertNotNull("Query to select wide favorites data table failed.", c);
+        assertTrue("moveToNext() failed.", c.moveToNext());
+        assertEquals("Count of rows in the wide favorites table is wrong", MOVIES_FAKE_DATA_ROWS / 2, c.getCount());
+        c.close();
+
+        c = db.query(MoviesContract.Videos.TABLE_NAME, null, null, null, null, null, null);
+        assertNotNull("Query to select wide videos data table failed.", c);
+        assertTrue("moveToNext() failed.", c.moveToNext());
+        assertEquals("Count of rows in the videos table is wrong", MOVIES_FAKE_DATA_ROWS / 4, c.getCount());
+        c.close();
+
 
         db.close();
     }
@@ -353,7 +428,7 @@ public class TestDb {
     }
 
     void insertTestData_intoVideos(SQLiteDatabase db) {
-
+        insertTestData_Helper(db, MoviesContract.Videos.TABLE_NAME, videosFakeData());
     }
 
     // Methods to create fake data for our tables
@@ -418,6 +493,27 @@ public class TestDb {
             dataValues = new ContentValues();
             dataValues.put(MoviesContract.Favorites.COLUMN_NAME_SORT_ID, i);
             dataValues.put(MoviesContract.Favorites.COLUMN_NAME_MOVIE_ID, 100 + i * 2);
+
+            returnData.add(dataValues);
+        }
+        return returnData;
+    }
+
+    static List<ContentValues> videosFakeData() {
+        List<ContentValues> returnData = new ArrayList<>();
+        ContentValues dataValues;
+
+        for (int i = 0; i < MOVIES_FAKE_DATA_ROWS / 4; i++) {
+            dataValues = new ContentValues();
+            dataValues.put(MoviesContract.Videos.COLUMN_NAME_VIDEO_ID, "qwerty" +
+                    String.valueOf(i) + String.valueOf(i * 10) + String.valueOf(i * 100) +
+                    "asdfg");
+            dataValues.put(MoviesContract.Videos.COLUMN_NAME_MOVIE_ID, 100 + i * 2);
+            dataValues.put(MoviesContract.Videos.COLUMN_NAME_KEY, "qazwsx");
+            dataValues.put(MoviesContract.Videos.COLUMN_NAME_NAME, "Trailer");
+            dataValues.put(MoviesContract.Videos.COLUMN_NAME_SITE, "youtube");
+            dataValues.put(MoviesContract.Videos.COLUMN_NAME_SIZE, 123456);
+            dataValues.put(MoviesContract.Videos.COLUMN_NAME_TYPE, "trailer");
 
             returnData.add(dataValues);
         }
