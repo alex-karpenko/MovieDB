@@ -55,7 +55,7 @@ public class TestDb {
         final HashSet<String> tableNameHashSet = new HashSet<String>();
         tableNameHashSet.add(MoviesContract.Movies.TABLE_NAME);
         tableNameHashSet.add(MoviesContract.Popular.TABLE_NAME);
-        tableNameHashSet.add(MoviesContract.TopRated.TABLE_NAME);
+        tableNameHashSet.add(MoviesContract.Toprated.TABLE_NAME);
         tableNameHashSet.add(MoviesContract.Favorites.TABLE_NAME);
         tableNameHashSet.add(MoviesContract.Videos.TABLE_NAME);
 
@@ -139,7 +139,7 @@ public class TestDb {
         c.close();
 
         // 3. toprated
-        c = db.rawQuery("PRAGMA table_info(" + MoviesContract.TopRated.TABLE_NAME + ")",
+        c = db.rawQuery("PRAGMA table_info(" + MoviesContract.Toprated.TABLE_NAME + ")",
                 null);
 
         assertTrue("Error: This means that we were unable to query the database for table information.",
@@ -147,9 +147,9 @@ public class TestDb {
 
         // Build a HashSet of all of the column names we want to look for
         final HashSet<String> topratedColumnHashSet = new HashSet<String>();
-        topratedColumnHashSet.add(MoviesContract.TopRated._ID);
-        topratedColumnHashSet.add(MoviesContract.TopRated.COLUMN_NAME_SORT_ID);
-        topratedColumnHashSet.add(MoviesContract.TopRated.COLUMN_NAME_MOVIE_ID);
+        topratedColumnHashSet.add(MoviesContract.Toprated._ID);
+        topratedColumnHashSet.add(MoviesContract.Toprated.COLUMN_NAME_SORT_ID);
+        topratedColumnHashSet.add(MoviesContract.Toprated.COLUMN_NAME_MOVIE_ID);
 
         columnNameIndex = c.getColumnIndex("name");
         do {
@@ -263,7 +263,7 @@ public class TestDb {
         insertTestData_intoMovies(db);
         insertTestData_intoToprated(db);
 
-        Cursor c = db.query(MoviesContract.TopRated.TABLE_NAME, new String[]{"COUNT(*)"}, null, null, null, null, null);
+        Cursor c = db.query(MoviesContract.Toprated.TABLE_NAME, new String[]{"COUNT(*)"}, null, null, null, null, null);
         assertNotNull("Query to count rows in popular table failed.", c);
         assertTrue("moveToNext() failed.", c.moveToNext());
         assertEquals("Counted rows not equal to inserted.", MOVIES_FAKE_DATA_ROWS, c.getInt(0));
@@ -339,7 +339,7 @@ public class TestDb {
             assertTrue("Invalid exception type", e instanceof SQLiteConstraintException);
         }
 
-        db.delete(MoviesContract.TopRated.TABLE_NAME, null, null);
+        db.delete(MoviesContract.Toprated.TABLE_NAME, null, null);
         try {
             db.delete(MoviesContract.Movies.TABLE_NAME, null, null);
             assertTrue("Foreign key constrain failed - rows from movies table was deleted.", false);
@@ -389,7 +389,7 @@ public class TestDb {
         assertEquals("Count of rows in the wide popular table is wrong", MOVIES_FAKE_DATA_ROWS, c.getCount());
         c.close();
 
-        c = db.query(MoviesContract.TopRated.SELECT_STATEMENT, null, null, null, null, null, null);
+        c = db.query(MoviesContract.Toprated.SELECT_STATEMENT, null, null, null, null, null, null);
         assertNotNull("Query to select wide toprated data table failed.", c);
         assertTrue("moveToNext() failed.", c.moveToNext());
         assertEquals("Count of rows in the wide toprated table is wrong", MOVIES_FAKE_DATA_ROWS, c.getCount());
@@ -428,7 +428,7 @@ public class TestDb {
     }
 
     void insertTestData_intoToprated(SQLiteDatabase db) {
-        insertTestData_Helper(db, MoviesContract.TopRated.TABLE_NAME, topratedFakeData());
+        insertTestData_Helper(db, MoviesContract.Toprated.TABLE_NAME, topratedFakeData());
     }
 
     void insertTestData_intoFavorites(SQLiteDatabase db) {
@@ -485,8 +485,8 @@ public class TestDb {
 
         for (int i = 0; i < MOVIES_FAKE_DATA_ROWS; i++) {
             dataValues = new ContentValues();
-            dataValues.put(MoviesContract.TopRated.COLUMN_NAME_SORT_ID, MOVIES_FAKE_DATA_ROWS - i);
-            dataValues.put(MoviesContract.TopRated.COLUMN_NAME_MOVIE_ID, 100 + i * 2);
+            dataValues.put(MoviesContract.Toprated.COLUMN_NAME_SORT_ID, MOVIES_FAKE_DATA_ROWS - i);
+            dataValues.put(MoviesContract.Toprated.COLUMN_NAME_MOVIE_ID, 100 + i * 2);
 
             returnData.add(dataValues);
         }

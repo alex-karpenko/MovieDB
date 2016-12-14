@@ -24,8 +24,8 @@ public class TestUriMatcher {
     public static final Uri TEST_URI_POPULAR_DIR = MoviesContract.Popular.CONTENT_URI;
     public static final Uri TEST_URI_POPULAR_ITEM = Uri.withAppendedPath(MoviesContract.Popular.CONTENT_URI, "123");
 
-    public static final Uri TEST_URI_TOPRATED_DIR = MoviesContract.TopRated.CONTENT_URI;
-    public static final Uri TEST_URI_TOPRATED_ITEM = Uri.withAppendedPath(MoviesContract.TopRated.CONTENT_URI, "123");
+    public static final Uri TEST_URI_TOPRATED_DIR = MoviesContract.Toprated.CONTENT_URI;
+    public static final Uri TEST_URI_TOPRATED_ITEM = Uri.withAppendedPath(MoviesContract.Toprated.CONTENT_URI, "123");
 
     public static final Uri TEST_URI_FAVORITES_DIR = MoviesContract.Favorites.CONTENT_URI;
     public static final Uri TEST_URI_FAVORITES_ITEM = Uri.withAppendedPath(MoviesContract.Favorites.CONTENT_URI, "123");

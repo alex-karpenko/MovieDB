@@ -54,9 +54,9 @@ public class MoviesProvider extends ContentProvider {
             case POPULAR_WITH_SORT_ID:
                 return MoviesContract.Popular.CONTENT_ITEM_TYPE;
             case TOPRATED:
-                return MoviesContract.TopRated.CONTENT_TYPE;
+                return MoviesContract.Toprated.CONTENT_TYPE;
             case TOPRATED_WITH_SORT_ID:
-                return MoviesContract.TopRated.CONTENT_ITEM_TYPE;
+                return MoviesContract.Toprated.CONTENT_ITEM_TYPE;
             case FAVORITES:
                 return MoviesContract.Favorites.CONTENT_TYPE;
             case FAVORITES_WITH_SORT_ID:
@@ -114,7 +114,7 @@ public class MoviesProvider extends ContentProvider {
                         sortOrder);
                 break;
             case TOPRATED:
-                returnCursor = db.query(MoviesContract.TopRated.SELECT_STATEMENT,
+                returnCursor = db.query(MoviesContract.Toprated.SELECT_STATEMENT,
                         projection,
                         selection,
                         selectionArgs,
@@ -122,9 +122,9 @@ public class MoviesProvider extends ContentProvider {
                         sortOrder);
                 break;
             case TOPRATED_WITH_SORT_ID:
-                returnCursor = db.query(MoviesContract.TopRated.SELECT_STATEMENT,
+                returnCursor = db.query(MoviesContract.Toprated.SELECT_STATEMENT,
                         projection,
-                        MoviesContract.TopRated.COLUMN_NAME_SORT_ID + "=?",
+                        MoviesContract.Toprated.COLUMN_NAME_SORT_ID + "=?",
                         new String[]{String.valueOf(ContentUris.parseId(uri))},
                         null, null,
                         sortOrder);
@@ -203,10 +203,10 @@ public class MoviesProvider extends ContentProvider {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             case TOPRATED:
-                id = recordInsertOrUpdateHelper_integerId(db, values, MoviesContract.TopRated.TABLE_NAME,
-                        MoviesContract.TopRated.COLUMN_NAME_SORT_ID);
+                id = recordInsertOrUpdateHelper_integerId(db, values, MoviesContract.Toprated.TABLE_NAME,
+                        MoviesContract.Toprated.COLUMN_NAME_SORT_ID);
                 if (id >= 0)
-                    returnUri = MoviesContract.TopRated.buildUri(id);
+                    returnUri = MoviesContract.Toprated.buildUri(id);
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
@@ -282,7 +282,7 @@ public class MoviesProvider extends ContentProvider {
                 result = bulkInsertHelper_integerId(db, values, MoviesContract.Popular.TABLE_NAME, MoviesContract.Popular.COLUMN_NAME_SORT_ID);
                 break;
             case TOPRATED:
-                result = bulkInsertHelper_integerId(db, values, MoviesContract.TopRated.TABLE_NAME, MoviesContract.TopRated.COLUMN_NAME_SORT_ID);
+                result = bulkInsertHelper_integerId(db, values, MoviesContract.Toprated.TABLE_NAME, MoviesContract.Toprated.COLUMN_NAME_SORT_ID);
                 break;
             case FAVORITES:
                 result = bulkInsertHelper_integerId(db, values, MoviesContract.Favorites.TABLE_NAME, MoviesContract.Favorites.COLUMN_NAME_SORT_ID);
@@ -321,11 +321,11 @@ public class MoviesProvider extends ContentProvider {
                         new String[]{String.valueOf(ContentUris.parseId(uri))});
                 break;
             case TOPRATED:
-                result = db.delete(MoviesContract.TopRated.TABLE_NAME, selection, selectionArgs);
+                result = db.delete(MoviesContract.Toprated.TABLE_NAME, selection, selectionArgs);
                 break;
             case TOPRATED_WITH_SORT_ID:
-                result = db.delete(MoviesContract.TopRated.TABLE_NAME,
-                        MoviesContract.TopRated.COLUMN_NAME_SORT_ID + "=?",
+                result = db.delete(MoviesContract.Toprated.TABLE_NAME,
+                        MoviesContract.Toprated.COLUMN_NAME_SORT_ID + "=?",
                         new String[]{String.valueOf(ContentUris.parseId(uri))});
                 break;
             case FAVORITES:
@@ -389,15 +389,15 @@ public class MoviesProvider extends ContentProvider {
                         new String[]{String.valueOf(ContentUris.parseId(uri))});
                 break;
             case TOPRATED:
-                result = db.update(MoviesContract.TopRated.TABLE_NAME,
+                result = db.update(MoviesContract.Toprated.TABLE_NAME,
                         values,
                         selection,
                         selectionArgs);
                 break;
             case TOPRATED_WITH_SORT_ID:
-                result = db.update(MoviesContract.TopRated.TABLE_NAME,
+                result = db.update(MoviesContract.Toprated.TABLE_NAME,
                         values,
-                        MoviesContract.TopRated.COLUMN_NAME_SORT_ID + "=?",
+                        MoviesContract.Toprated.COLUMN_NAME_SORT_ID + "=?",
                         new String[]{String.valueOf(ContentUris.parseId(uri))});
                 break;
             case FAVORITES:

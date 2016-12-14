@@ -108,7 +108,7 @@ final class MoviesContract {
     }
 
     // Class to describe movies by popularity
-    static abstract class TopRated implements BaseColumns {
+    static abstract class Toprated implements BaseColumns {
         // Table name
         static final String TABLE_NAME = "toprated";
         // Constants for content provider interface

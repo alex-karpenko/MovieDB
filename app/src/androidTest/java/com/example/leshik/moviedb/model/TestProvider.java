@@ -54,7 +54,7 @@ public class TestProvider {
         assertEquals("Inserted wrong number of rows into popular table", values.length, result);
 
         values = new ContentValues[topratedData.size()];
-        result = mContext.getContentResolver().bulkInsert(MoviesContract.TopRated.CONTENT_URI, topratedData.toArray(values));
+        result = mContext.getContentResolver().bulkInsert(MoviesContract.Toprated.CONTENT_URI, topratedData.toArray(values));
         assertEquals("Inserted wrong number of rows into toprated table", values.length, result);
 
         values = new ContentValues[favoritesData.size()];
@@ -88,9 +88,9 @@ public class TestProvider {
                 MoviesContract.Popular.buildUri(popularData.get(1).getAsInteger(MoviesContract.Popular.COLUMN_NAME_SORT_ID)),
                 resultPopular);
 
-        Uri resultToprated = mContext.getContentResolver().insert(MoviesContract.TopRated.CONTENT_URI, topratedData.get(2));
+        Uri resultToprated = mContext.getContentResolver().insert(MoviesContract.Toprated.CONTENT_URI, topratedData.get(2));
         assertEquals("Inserted wrong number of rows into toprated table",
-                MoviesContract.TopRated.buildUri(topratedData.get(2).getAsInteger(MoviesContract.TopRated.COLUMN_NAME_SORT_ID)),
+                MoviesContract.Toprated.buildUri(topratedData.get(2).getAsInteger(MoviesContract.Toprated.COLUMN_NAME_SORT_ID)),
                 resultToprated);
 
         Uri resultFavorites = mContext.getContentResolver().insert(MoviesContract.Favorites.CONTENT_URI, favoritesData.get(3));
@@ -117,8 +117,8 @@ public class TestProvider {
         assertTrue("Cannot moveToNext() - no rows or error while selecting toprated table.", c.moveToNext());
         assertEquals("Rows count is not 1 while selecting toprated table.", 1, c.getCount());
         assertEquals("Wrong data in the toprated table.",
-                (long) topratedData.get(2).getAsInteger(MoviesContract.TopRated.COLUMN_NAME_SORT_ID),
-                c.getInt(c.getColumnIndex(MoviesContract.TopRated.COLUMN_NAME_SORT_ID)));
+                (long) topratedData.get(2).getAsInteger(MoviesContract.Toprated.COLUMN_NAME_SORT_ID),
+                c.getInt(c.getColumnIndex(MoviesContract.Toprated.COLUMN_NAME_SORT_ID)));
         c.close();
 
         c = mContext.getContentResolver().query(resultFavorites, null, null, null, null);
@@ -180,18 +180,18 @@ public class TestProvider {
         assertTrue("Deleted wrong number of rows from favorites table", result == TestDb.MOVIES_FAKE_DATA_ROWS / 2 - 1);
 
         // Get one record from toprated table ...
-        c = mContext.getContentResolver().query(MoviesContract.TopRated.CONTENT_URI,
-                new String[]{MoviesContract.TopRated.COLUMN_NAME_SORT_ID},
+        c = mContext.getContentResolver().query(MoviesContract.Toprated.CONTENT_URI,
+                new String[]{MoviesContract.Toprated.COLUMN_NAME_SORT_ID},
                 null, null, null);
         assertNotNull("Cursor is null after query toprated table.", c);
         assertTrue("No next record in the cursor after query toprated table.", c.moveToNext());
-        sort_id = c.getInt(c.getColumnIndex(MoviesContract.TopRated.COLUMN_NAME_SORT_ID));
+        sort_id = c.getInt(c.getColumnIndex(MoviesContract.Toprated.COLUMN_NAME_SORT_ID));
         c.close();
         // ... and delete it ...
         assertEquals("Can not delete one record from toprated table.",
-                mContext.getContentResolver().delete(MoviesContract.TopRated.buildUri(sort_id), null, null), 1);
+                mContext.getContentResolver().delete(MoviesContract.Toprated.buildUri(sort_id), null, null), 1);
         // ... and delete all the rest.
-        result = mContext.getContentResolver().delete(MoviesContract.TopRated.CONTENT_URI, null, null);
+        result = mContext.getContentResolver().delete(MoviesContract.Toprated.CONTENT_URI, null, null);
         assertTrue("Deleted wrong number of rows from toprated table", result == TestDb.MOVIES_FAKE_DATA_ROWS - 1);
 
         // Get one record from popular table ...
@@ -241,7 +241,7 @@ public class TestProvider {
         assertEquals("Invalid rows count in the popular table", TestDb.MOVIES_FAKE_DATA_ROWS, c.getCount());
         c.close();
 
-        c = mContext.getContentResolver().query(MoviesContract.TopRated.CONTENT_URI, null, null, null, null);
+        c = mContext.getContentResolver().query(MoviesContract.Toprated.CONTENT_URI, null, null, null, null);
         assertNotNull("Cursor is null after query toprated table.", c);
         assertTrue("No next record in the cursor after query toprated table.", c.moveToNext());
         assertEquals("Invalid rows count in the toprated table", TestDb.MOVIES_FAKE_DATA_ROWS, c.getCount());
@@ -263,7 +263,7 @@ public class TestProvider {
     private void deleteAllRecordsFromProvider() {
         mContext.getContentResolver().delete(MoviesContract.Videos.CONTENT_URI, null, null);
         mContext.getContentResolver().delete(MoviesContract.Favorites.CONTENT_URI, null, null);
-        mContext.getContentResolver().delete(MoviesContract.TopRated.CONTENT_URI, null, null);
+        mContext.getContentResolver().delete(MoviesContract.Toprated.CONTENT_URI, null, null);
         mContext.getContentResolver().delete(MoviesContract.Popular.CONTENT_URI, null, null);
         mContext.getContentResolver().delete(MoviesContract.Movies.CONTENT_URI, null, null);
     }
