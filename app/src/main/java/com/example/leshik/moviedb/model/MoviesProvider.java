@@ -8,6 +8,7 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.provider.BaseColumns;
 import android.support.annotation.Nullable;
 
 /**
@@ -182,41 +183,46 @@ public class MoviesProvider extends ContentProvider {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
         Uri returnUri;
-        long _id;
+        int id;
 
         switch (match) {
             case MOVIES:
-                int movieId = moviesRecordInsertOrUpdate(db, values);
-                if (movieId > 0)
-                    returnUri = MoviesContract.Movies.buildUri(movieId);
+                id = recordInsertOrUpdateHelper_integerId(db, values, MoviesContract.Movies.TABLE_NAME,
+                        MoviesContract.Movies.COLUMN_NAME_MOVIE_ID);
+                if (id >= 0)
+                    returnUri = MoviesContract.Movies.buildUri(id);
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             case POPULAR:
-                _id = db.insert(MoviesContract.Popular.TABLE_NAME, null, values);
-                if (_id > 0)
-                    returnUri = MoviesContract.Popular.buildUri(values.getAsLong(MoviesContract.Popular.COLUMN_NAME_SORT_ID));
+                id = recordInsertOrUpdateHelper_integerId(db, values, MoviesContract.Popular.TABLE_NAME,
+                        MoviesContract.Popular.COLUMN_NAME_SORT_ID);
+                if (id >= 0)
+                    returnUri = MoviesContract.Popular.buildUri(id);
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             case TOPRATED:
-                _id = db.insert(MoviesContract.TopRated.TABLE_NAME, null, values);
-                if (_id > 0)
-                    returnUri = MoviesContract.TopRated.buildUri(values.getAsLong(MoviesContract.TopRated.COLUMN_NAME_SORT_ID));
+                id = recordInsertOrUpdateHelper_integerId(db, values, MoviesContract.TopRated.TABLE_NAME,
+                        MoviesContract.TopRated.COLUMN_NAME_SORT_ID);
+                if (id >= 0)
+                    returnUri = MoviesContract.TopRated.buildUri(id);
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             case FAVORITES:
-                _id = db.insert(MoviesContract.Favorites.TABLE_NAME, null, values);
-                if (_id > 0)
-                    returnUri = MoviesContract.Favorites.buildUri(values.getAsLong(MoviesContract.Favorites.COLUMN_NAME_SORT_ID));
+                id = recordInsertOrUpdateHelper_integerId(db, values, MoviesContract.Favorites.TABLE_NAME,
+                        MoviesContract.Favorites.COLUMN_NAME_SORT_ID);
+                if (id >= 0)
+                    returnUri = MoviesContract.Favorites.buildUri(id);
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             case VIDEOS:
-                _id = db.insert(MoviesContract.Videos.TABLE_NAME, null, values);
-                if (_id > 0)
-                    returnUri = MoviesContract.Videos.buildUri(values.getAsString(MoviesContract.Videos.COLUMN_NAME_VIDEO_ID));
+                String videoId = recordInsertOrUpdateHelper_stringId(db, values, MoviesContract.Videos.TABLE_NAME,
+                        MoviesContract.Videos.COLUMN_NAME_VIDEO_ID);
+                if (videoId != null)
+                    returnUri = MoviesContract.Videos.buildUri(videoId);
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
@@ -228,15 +234,31 @@ public class MoviesProvider extends ContentProvider {
         return returnUri;
     }
 
-    private int bulkInsertHelper(SQLiteDatabase db, String table, ContentValues[] values) {
-        int result=0;
-        long _id;
+    private int bulkInsertHelper_integerId(SQLiteDatabase db, ContentValues[] values, String tableName, String idName) {
+        int result = 0;
 
         db.beginTransaction();
         try {
             for (ContentValues v : values) {
-                _id = db.insert(table, null, v);
-                if (_id>0) result++;
+                int r = recordInsertOrUpdateHelper_integerId(db, v, tableName, idName);
+                if (r >= 0) result++;
+            }
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+
+        return result;
+    }
+
+    private int bulkInsertHelper_stringId(SQLiteDatabase db, ContentValues[] values, String tableName, String idName) {
+        int result = 0;
+
+        db.beginTransaction();
+        try {
+            for (ContentValues v : values) {
+                String r = recordInsertOrUpdateHelper_stringId(db, v, tableName, idName);
+                if (r != null) result++;
             }
             db.setTransactionSuccessful();
         } finally {
@@ -248,34 +270,25 @@ public class MoviesProvider extends ContentProvider {
 
     @Override
     public int bulkInsert(Uri uri, ContentValues[] values) {
-        int result = 0;
+        int result;
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
 
         switch (match) {
             case MOVIES:
-                db.beginTransaction();
-                try {
-                    for (ContentValues v : values) {
-                        int r = moviesRecordInsertOrUpdate(db, v);
-                        if (r != -1) result++;
-                    }
-                    db.setTransactionSuccessful();
-                } finally {
-                    db.endTransaction();
-                }
+                result = bulkInsertHelper_integerId(db, values, MoviesContract.Movies.TABLE_NAME, MoviesContract.Movies.COLUMN_NAME_MOVIE_ID);
                 break;
             case POPULAR:
-                result=bulkInsertHelper(db, MoviesContract.Popular.TABLE_NAME, values);
+                result = bulkInsertHelper_integerId(db, values, MoviesContract.Popular.TABLE_NAME, MoviesContract.Popular.COLUMN_NAME_SORT_ID);
                 break;
             case TOPRATED:
-                result=bulkInsertHelper(db, MoviesContract.TopRated.TABLE_NAME, values);
+                result = bulkInsertHelper_integerId(db, values, MoviesContract.TopRated.TABLE_NAME, MoviesContract.TopRated.COLUMN_NAME_SORT_ID);
                 break;
             case FAVORITES:
-                result=bulkInsertHelper(db, MoviesContract.Favorites.TABLE_NAME, values);
+                result = bulkInsertHelper_integerId(db, values, MoviesContract.Favorites.TABLE_NAME, MoviesContract.Favorites.COLUMN_NAME_SORT_ID);
                 break;
             case VIDEOS:
-                result=bulkInsertHelper(db, MoviesContract.Videos.TABLE_NAME, values);
+                result = bulkInsertHelper_stringId(db, values, MoviesContract.Videos.TABLE_NAME, MoviesContract.Videos.COLUMN_NAME_VIDEO_ID);
                 break;
             default:
                 return super.bulkInsert(uri, values);
@@ -456,44 +469,70 @@ public class MoviesProvider extends ContentProvider {
         return matcher;
     }
 
-    // Check existence of Movies record by movie_id
-    // return _ID
-    private long checkMoviesRecordExistence(SQLiteDatabase db, int movieId) {
-        long _id = -1;
+    // this method checks existence of record in the table by idName
+    // and insert new record if record not exist, or update existent record else
+    private int recordInsertOrUpdateHelper_integerId(SQLiteDatabase db, ContentValues values, String tableName, String idName) {
+        int movieId;
+        long result = -1;
+
+        movieId = values.getAsInteger(idName);
+        // Check if record exist
         // cursor to select _ID where movie_id from table equal to movieId from parameters
-        Cursor cursor = db.query(MoviesContract.Movies.TABLE_NAME, // table
-                new String[]{MoviesContract.Movies._ID},  // column
-                MoviesContract.Movies.COLUMN_NAME_MOVIE_ID + "=?", // where
+        Cursor cursor = db.query(tableName, // table
+                new String[]{BaseColumns._ID},  // column
+                idName + "=?", // where
                 new String[]{String.valueOf(movieId)}, // where values
                 null, null, null); // group by, having, sort
 
-        if (cursor == null) return -1;
-        if (cursor.moveToNext()) _id = cursor.getLong(0);
+        if (cursor != null) {
+            if (cursor.moveToNext()) result = cursor.getLong(0);
+            cursor.close();
+        }
 
-        cursor.close();
-        return _id;
-    }
-
-    // this method checks existence of record in the movies table by movie_id
-    // and insert new record if record not exist, or update existent record else
-    private int moviesRecordInsertOrUpdate(SQLiteDatabase db, ContentValues values) {
-        int movieId;
-        long result;
-
-        movieId = values.getAsInteger(MoviesContract.Movies.COLUMN_NAME_MOVIE_ID);
-        // Check if movies record exist
-        result = checkMoviesRecordExistence(db, movieId);
         if (result <= 0)
             // new record - insert
-            result = db.insert(MoviesContract.Movies.TABLE_NAME, null, values);
+            result = db.insert(tableName, null, values);
         else
             // existent - update
-            result = db.update(MoviesContract.Movies.TABLE_NAME, values,
-                    MoviesContract.Movies._ID + "=?", new String[]{String.valueOf(result)});
+            result = db.update(tableName, values,
+                    BaseColumns._ID + "=?", new String[]{String.valueOf(result)});
         if (result > 0)
             return movieId;
         else
             return 0;
+    }
+
+    // this method checks existence of record in the table by video_id
+    // and insert new record if record not exist, or update existent record else
+    private String recordInsertOrUpdateHelper_stringId(SQLiteDatabase db, ContentValues values, String tableName, String idName) {
+        String id;
+        long result = -1;
+
+        id = values.getAsString(idName);
+        // Check if record exist
+        // cursor to select _ID where movie_id from table equal to movieId from parameters
+        Cursor cursor = db.query(tableName, // table
+                new String[]{BaseColumns._ID},  // column
+                idName + "=?", // where
+                new String[]{id}, // where values
+                null, null, null); // group by, having, sort
+
+        if (cursor != null) {
+            if (cursor.moveToNext()) result = cursor.getLong(0);
+            cursor.close();
+        }
+
+        if (result <= 0)
+            // new record - insert
+            result = db.insert(tableName, null, values);
+        else
+            // existent - update
+            result = db.update(tableName, values,
+                    BaseColumns._ID + "=?", new String[]{String.valueOf(result)});
+        if (result > 0)
+            return id;
+        else
+            return null;
     }
 
 }
