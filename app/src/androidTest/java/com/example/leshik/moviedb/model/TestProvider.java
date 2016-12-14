@@ -3,6 +3,7 @@ package com.example.leshik.moviedb.model;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
@@ -64,6 +65,81 @@ public class TestProvider {
         result = mContext.getContentResolver().bulkInsert(MoviesContract.Videos.CONTENT_URI, videosData.toArray(values));
         assertEquals("Inserted wrong number of rows into videos table", values.length, result);
     }
+
+    @Test
+    public void test02_insert() {
+        List<ContentValues> moviesData = TestDb.moviesFakeData();
+        List<ContentValues> topratedData = TestDb.topratedFakeData();
+        List<ContentValues> popularData = TestDb.popularFakeData();
+        List<ContentValues> favoritesData = TestDb.favoritesFakeData();
+        List<ContentValues> videosData = TestDb.videosFakeData();
+
+        Uri resultMovies = mContext.getContentResolver().insert(MoviesContract.Movies.CONTENT_URI, moviesData.get(0));
+        assertEquals("Inserted wrong number of rows into movies table",
+                MoviesContract.Movies.buildUri(moviesData.get(0).getAsInteger(MoviesContract.Movies.COLUMN_NAME_MOVIE_ID)),
+                resultMovies);
+        // bulk insert for testing rest of the tables (foreign keys must by present)
+        ContentValues[] values = new ContentValues[moviesData.size()];
+        int rows = mContext.getContentResolver().bulkInsert(MoviesContract.Movies.CONTENT_URI, moviesData.toArray(values));
+        assertEquals("Inserted wrong number of rows into movies table", values.length, rows);
+
+        Uri resultPopular = mContext.getContentResolver().insert(MoviesContract.Popular.CONTENT_URI, popularData.get(1));
+        assertEquals("Inserted wrong number of rows into popular table",
+                MoviesContract.Popular.buildUri(popularData.get(1).getAsInteger(MoviesContract.Popular.COLUMN_NAME_SORT_ID)),
+                resultPopular);
+
+        Uri resultToprated = mContext.getContentResolver().insert(MoviesContract.TopRated.CONTENT_URI, topratedData.get(2));
+        assertEquals("Inserted wrong number of rows into toprated table",
+                MoviesContract.TopRated.buildUri(topratedData.get(2).getAsInteger(MoviesContract.TopRated.COLUMN_NAME_SORT_ID)),
+                resultToprated);
+
+        Uri resultFavorites = mContext.getContentResolver().insert(MoviesContract.Favorites.CONTENT_URI, favoritesData.get(3));
+        assertEquals("Inserted wrong number of rows into favorites table",
+                MoviesContract.Favorites.buildUri(favoritesData.get(3).getAsInteger(MoviesContract.Favorites.COLUMN_NAME_SORT_ID)),
+                resultFavorites);
+
+        Uri resultVideos = mContext.getContentResolver().insert(MoviesContract.Videos.CONTENT_URI, videosData.get(4));
+        assertEquals("Inserted wrong number of rows into videos table",
+                MoviesContract.Videos.buildUri(videosData.get(4).getAsString(MoviesContract.Videos.COLUMN_NAME_VIDEO_ID)),
+                resultVideos);
+
+        Cursor c = mContext.getContentResolver().query(resultPopular, null, null, null, null);
+        assertNotNull("Cursor is null - no rows or error while selecting popular table.", c);
+        assertTrue("Cannot moveToNext() - no rows or error while selecting popular table.", c.moveToNext());
+        assertEquals("Rows count is not 1 while selecting popular table.", 1, c.getCount());
+        assertEquals("Wrong data in the popular table.",
+                (long) popularData.get(1).getAsInteger(MoviesContract.Popular.COLUMN_NAME_SORT_ID),
+                c.getInt(c.getColumnIndex(MoviesContract.Popular.COLUMN_NAME_SORT_ID)));
+        c.close();
+
+        c = mContext.getContentResolver().query(resultToprated, null, null, null, null);
+        assertNotNull("Cursor is null - no rows or error while selecting toprated table.", c);
+        assertTrue("Cannot moveToNext() - no rows or error while selecting toprated table.", c.moveToNext());
+        assertEquals("Rows count is not 1 while selecting toprated table.", 1, c.getCount());
+        assertEquals("Wrong data in the toprated table.",
+                (long) topratedData.get(2).getAsInteger(MoviesContract.TopRated.COLUMN_NAME_SORT_ID),
+                c.getInt(c.getColumnIndex(MoviesContract.TopRated.COLUMN_NAME_SORT_ID)));
+        c.close();
+
+        c = mContext.getContentResolver().query(resultFavorites, null, null, null, null);
+        assertNotNull("Cursor is null - no rows or error while selecting favorites table.", c);
+        assertTrue("Cannot moveToNext() - no rows or error while selecting favorites table.", c.moveToNext());
+        assertEquals("Rows count is not 1 while selecting favorites table.", 1, c.getCount());
+        assertEquals("Wrong data in the favorites table.",
+                (long) favoritesData.get(3).getAsInteger(MoviesContract.Favorites.COLUMN_NAME_SORT_ID),
+                c.getInt(c.getColumnIndex(MoviesContract.Favorites.COLUMN_NAME_SORT_ID)));
+        c.close();
+
+        c = mContext.getContentResolver().query(resultVideos, null, null, null, null);
+        assertNotNull("Cursor is null - no rows or error while selecting videos table.", c);
+        assertTrue("Cannot moveToNext() - no rows or error while selecting videos table.", c.moveToNext());
+        assertEquals("Rows count is not 1 while selecting videos table.", 1, c.getCount());
+        assertEquals("Wrong data in the videos table.",
+                videosData.get(4).getAsString(MoviesContract.Videos.COLUMN_NAME_VIDEO_ID),
+                c.getString(c.getColumnIndex(MoviesContract.Videos.COLUMN_NAME_VIDEO_ID)));
+        c.close();
+    }
+
 
     @Test
     public void test03_delete() {
