@@ -347,6 +347,14 @@ public class TestDb {
             assertTrue("Invalid exception type", e instanceof SQLiteConstraintException);
         }
 
+        db.delete(MoviesContract.Videos.TABLE_NAME, null, null);
+        try {
+            db.delete(MoviesContract.Movies.TABLE_NAME, null, null);
+            assertTrue("Foreign key constrain failed - rows from movies table was deleted.", false);
+        } catch (Exception e) {
+            assertTrue("Invalid exception type", e instanceof SQLiteConstraintException);
+        }
+
         db.delete(MoviesContract.Popular.TABLE_NAME, null, null);
         try {
             // Finally, there are no foreign references left
