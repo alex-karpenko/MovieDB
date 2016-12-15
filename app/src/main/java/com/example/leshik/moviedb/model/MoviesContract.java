@@ -13,7 +13,7 @@ final class MoviesContract {
     private MoviesContract() {
     }
 
-    // Base URI
+    // Base URIs
     public static final String CONTENT_AUTHORITY = "com.example.leshik.moviedb";
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
     // Table paths
