@@ -30,19 +30,19 @@ public class MoviesDbHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // In first time we have to delete tables with foreign indexes on movies table
-        db.execSQL(MoviesContract.Popular.DROP_TABLE_STATEMENT);
-        db.execSQL(MoviesContract.Toprated.DROP_TABLE_STATEMENT);
-        db.execSQL(MoviesContract.Favorites.DROP_TABLE_STATEMENT);
-        db.execSQL(MoviesContract.Videos.DROP_TABLE_STATEMENT);
+//        db.execSQL(MoviesContract.Popular.DROP_TABLE_STATEMENT);
+//        db.execSQL(MoviesContract.Toprated.DROP_TABLE_STATEMENT);
+//        db.execSQL(MoviesContract.Favorites.DROP_TABLE_STATEMENT);
+//        db.execSQL(MoviesContract.Videos.DROP_TABLE_STATEMENT);
         // and drop movies table after all
-        db.execSQL(MoviesContract.Movies.DROP_TABLE_STATEMENT);
-        onCreate(db);
+//        db.execSQL(MoviesContract.Movies.DROP_TABLE_STATEMENT);
+//        onCreate(db);
     }
 
     @Override
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // :))
-        onUpgrade(db, oldVersion, newVersion);
+//        onUpgrade(db, oldVersion, newVersion);
     }
 
     @Override
