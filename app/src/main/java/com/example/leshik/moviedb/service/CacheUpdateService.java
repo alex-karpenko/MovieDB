@@ -62,7 +62,7 @@ public class CacheUpdateService extends IntentService {
     }
 
     /**
-     * Handle action Foo in the provided background thread with the provided
+     * Handle action UpdatePopular in the provided background thread with the provided
      * parameters.
      */
     private void handleActionUpdatePopular(int page) {
@@ -71,7 +71,7 @@ public class CacheUpdateService extends IntentService {
     }
 
     /**
-     * Handle action Baz in the provided background thread with the provided
+     * Handle action UpdateToprated in the provided background thread with the provided
      * parameters.
      */
     private void handleActionUpdateToprated(int page) {

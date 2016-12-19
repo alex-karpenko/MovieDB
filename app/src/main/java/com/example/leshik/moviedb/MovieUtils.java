@@ -14,7 +14,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 /**
- * Utility class for provide some common (proejct-wide) methods, variables and constants
+ * Utility class for provide some common (project-wide) methods, variables and constants
  */
 
 public final class MovieUtils {
