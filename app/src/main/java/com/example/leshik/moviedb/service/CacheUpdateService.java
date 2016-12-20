@@ -6,6 +6,7 @@ import android.content.Intent;
 
 import com.example.leshik.moviedb.BuildConfig;
 import com.example.leshik.moviedb.MovieUtils;
+import com.example.leshik.moviedb.model.MoviesContract;
 
 import java.io.IOException;
 
@@ -91,8 +92,26 @@ public class CacheUpdateService extends IntentService {
      * parameters.
      */
     private void handleActionUpdatePopular(int page) {
-        // TODO: Handle action UpdatePopular
-        throw new UnsupportedOperationException("Not yet implemented");
+        int requestPage = page <= 0 ? 1 : page;
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(MovieUtils.baseApiSecureUrl)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        TmdbApiService service = retrofit.create(TmdbApiService.class);
+        Call<TmdbListPage> popularCall = service.getPopular(BuildConfig.THE_MOVIE_DB_API_KEY, requestPage);
+        TmdbListPage listPage = null;
+        try {
+            listPage = popularCall.execute().body();
+        } catch (IOException e) {
+            // TODO: show network error activity
+            e.printStackTrace();
+            return;
+        }
+
+        // TODO: store values into database via content provider
+        if (page <= 0) getContentResolver().delete(MoviesContract.BASE_CONTENT_URI, null, null);
     }
 
     /**
@@ -126,6 +145,7 @@ public class CacheUpdateService extends IntentService {
         } catch (IOException e) {
             // TODO: show network error activity
             e.printStackTrace();
+            return;
         }
 
         // TODO: store config values into shared preferences
