@@ -9,7 +9,7 @@ import android.provider.BaseColumns;
  * Created by Leshik on 06.12.2016.
  */
 
-final class MoviesContract {
+public final class MoviesContract {
     private MoviesContract() {
     }
 
