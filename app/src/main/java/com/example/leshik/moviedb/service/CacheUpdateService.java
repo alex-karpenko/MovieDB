@@ -99,8 +99,19 @@ public class CacheUpdateService extends IntentService {
      * parameters.
      */
     private void handleActionUpdateConfiguration() {
-        // TODO: Handle action UpdateConfiguration
-        throw new UnsupportedOperationException("Not yet implemented");
+        Retrofit retrofit= new Retrofit.builder()
+            .baseUrl(MovieUtil.baseApiSecureUrl)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build();
+        
+        TmdbApiService service=new retrofit.create(TmdbApiService.class);
+        Call<TmdbConfiguration> config=service.getConfiguration(BuildConfig.THE_MOVIE_DB_API_KEY);
+        
+        MovieUtil.basePosterUrl=config.images.baseUrl;
+        MovieUtil.basePosterSecureUrl=config.images.secureBaseUrl;
+        MovieUtil.posterSizes=config.images.posterSizes.toArray();
+        
+        // TODO: add storing config values into shared preferences
     }
 
 }
