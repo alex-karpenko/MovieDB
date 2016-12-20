@@ -13,8 +13,8 @@ public interface TmdbApiService {
   Call<TmdbMovie> getMovie(@Path("movie_id") Integer movie_id, @Query("api_key") String apiKey);
   
   @GET("movie/popular")
-  Call<TmdbMovie> getPopular(@Query("api_key") String apiKey, @Query("page") Integer page);
+  Call<TmdbListPage> getPopular(@Query("api_key") String apiKey, @Query("page") Integer page);
   
   @GET("movie/top_rated")
-  Call<TmdbMovie> getToprated(@Query("api_key") String apiKey, @Query("page") Integer page);
+  Call<TmdbListPage> getToprated(@Query("api_key") String apiKey, @Query("page") Integer page);
 }
