@@ -20,12 +20,13 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * helper methods.
  */
 public class CacheUpdateService extends IntentService {
+    private static final String LOG_TAG = CacheUpdateService.class.getSimpleName();
     // IntentService can perform
-    private static final String ACTION_UPDATE_POPULAR = "com.example.leshik.moviedb.service.action.UPDATE_POPULAR";
-    private static final String ACTION_UPDATE_TOPRATED = "com.example.leshik.moviedb.service.action.UPDATE_TOPRATED";
-    private static final String ACTION_UPDATE_CONFIGURATION = "com.example.leshik.moviedb.service.action.UPDATE_CONFIGURATION";
+    static final String ACTION_UPDATE_POPULAR = "com.example.leshik.moviedb.service.action.UPDATE_POPULAR";
+    static final String ACTION_UPDATE_TOPRATED = "com.example.leshik.moviedb.service.action.UPDATE_TOPRATED";
+    static final String ACTION_UPDATE_CONFIGURATION = "com.example.leshik.moviedb.service.action.UPDATE_CONFIGURATION";
 
-    private static final String EXTRA_PARAM_PAGE = "com.example.leshik.moviedb.service.extra.PAGE";
+    static final String EXTRA_PARAM_PAGE = "com.example.leshik.moviedb.service.extra.PAGE";
 
     public CacheUpdateService() {
         super("CacheUpdateService");
@@ -119,12 +120,15 @@ public class CacheUpdateService extends IntentService {
             TmdbConfiguration config = configCall.execute().body();
             MovieUtils.basePosterUrl = config.images.baseUrl;
             MovieUtils.basePosterSecureUrl = config.images.secureBaseUrl;
-            MovieUtils.posterSizes = (String[]) config.images.posterSizes.toArray();
+            MovieUtils.posterSizes = new String[config.images.posterSizes.size()];
+            for (int i = 0; i < config.images.posterSizes.size(); i++)
+                MovieUtils.posterSizes[i] = config.images.posterSizes.get(i);
         } catch (IOException e) {
             // TODO: show network error activity
+            e.printStackTrace();
         }
 
-        // TODO: add storing config values into shared preferences
+        // TODO: store config values into shared preferences
     }
 
 }
