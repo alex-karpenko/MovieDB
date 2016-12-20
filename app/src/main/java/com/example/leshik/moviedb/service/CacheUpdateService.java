@@ -1,8 +1,17 @@
 package com.example.leshik.moviedb.service;
 
 import android.app.IntentService;
-import android.content.Intent;
 import android.content.Context;
+import android.content.Intent;
+
+import com.example.leshik.moviedb.BuildConfig;
+import com.example.leshik.moviedb.MovieUtils;
+
+import java.io.IOException;
+
+import retrofit2.Call;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -47,7 +56,7 @@ public class CacheUpdateService extends IntentService {
         intent.putExtra(EXTRA_PARAM_PAGE, page);
         context.startService(intent);
     }
-    
+
     /**
      * Starts this service to perform action UpdateConfiguration with the given parameters. If
      * the service is already performing a task this action will be queued.
@@ -99,18 +108,22 @@ public class CacheUpdateService extends IntentService {
      * parameters.
      */
     private void handleActionUpdateConfiguration() {
-        Retrofit retrofit= new Retrofit.builder()
-            .baseUrl(MovieUtil.baseApiSecureUrl)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build();
-        
-        TmdbApiService service=new retrofit.create(TmdbApiService.class);
-        Call<TmdbConfiguration> config=service.getConfiguration(BuildConfig.THE_MOVIE_DB_API_KEY);
-        
-        MovieUtil.basePosterUrl=config.images.baseUrl;
-        MovieUtil.basePosterSecureUrl=config.images.secureBaseUrl;
-        MovieUtil.posterSizes=config.images.posterSizes.toArray();
-        
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(MovieUtils.baseApiSecureUrl)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        TmdbApiService service = retrofit.create(TmdbApiService.class);
+        Call<TmdbConfiguration> configCall = service.getConfiguration(BuildConfig.THE_MOVIE_DB_API_KEY);
+        try {
+            TmdbConfiguration config = configCall.execute().body();
+            MovieUtils.basePosterUrl = config.images.baseUrl;
+            MovieUtils.basePosterSecureUrl = config.images.secureBaseUrl;
+            MovieUtils.posterSizes = (String[]) config.images.posterSizes.toArray();
+        } catch (IOException e) {
+            // TODO: show network error activity
+        }
+
         // TODO: add storing config values into shared preferences
     }
 
