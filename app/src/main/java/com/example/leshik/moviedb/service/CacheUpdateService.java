@@ -14,6 +14,7 @@ public class CacheUpdateService extends IntentService {
     // IntentService can perform
     private static final String ACTION_UPDATE_POPULAR = "com.example.leshik.moviedb.service.action.UPDATE_POPULAR";
     private static final String ACTION_UPDATE_TOPRATED = "com.example.leshik.moviedb.service.action.UPDATE_TOPRATED";
+    private static final String ACTION_UPDATE_CONFIGURATION = "com.example.leshik.moviedb.service.action.UPDATE_CONFIGURATION";
 
     private static final String EXTRA_PARAM_PAGE = "com.example.leshik.moviedb.service.extra.PAGE";
 
@@ -22,7 +23,7 @@ public class CacheUpdateService extends IntentService {
     }
 
     /**
-     * Starts this service to perform action Foo with the given parameters. If
+     * Starts this service to perform action UpdatePopular with the given parameters. If
      * the service is already performing a task this action will be queued.
      *
      * @see IntentService
@@ -35,7 +36,7 @@ public class CacheUpdateService extends IntentService {
     }
 
     /**
-     * Starts this service to perform action Baz with the given parameters. If
+     * Starts this service to perform action UpdateToprated with the given parameters. If
      * the service is already performing a task this action will be queued.
      *
      * @see IntentService
@@ -44,6 +45,18 @@ public class CacheUpdateService extends IntentService {
         Intent intent = new Intent(context, CacheUpdateService.class);
         intent.setAction(ACTION_UPDATE_TOPRATED);
         intent.putExtra(EXTRA_PARAM_PAGE, page);
+        context.startService(intent);
+    }
+    
+    /**
+     * Starts this service to perform action UpdateConfiguration with the given parameters. If
+     * the service is already performing a task this action will be queued.
+     *
+     * @see IntentService
+     */
+    public static void startActionUpdateConfiguration(Context context) {
+        Intent intent = new Intent(context, CacheUpdateService.class);
+        intent.setAction(ACTION_UPDATE_CONFIGURATION);
         context.startService(intent);
     }
 
@@ -57,6 +70,8 @@ public class CacheUpdateService extends IntentService {
             } else if (ACTION_UPDATE_TOPRATED.equals(action)) {
                 final int page = intent.getIntExtra(EXTRA_PARAM_PAGE, -1);
                 handleActionUpdateToprated(page);
+            } else if (ACTION_UPDATE_CONFIGURATION.equals(action)) {
+                handleActionUpdateConfiguration();
             }
         }
     }
@@ -78,4 +93,14 @@ public class CacheUpdateService extends IntentService {
         // TODO: Handle action UpdateToprated
         throw new UnsupportedOperationException("Not yet implemented");
     }
+
+    /**
+     * Handle action UpdateConfiguration in the provided background thread with the provided
+     * parameters.
+     */
+    private void handleActionUpdateConfiguration() {
+        // TODO: Handle action UpdateConfiguration
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
 }
