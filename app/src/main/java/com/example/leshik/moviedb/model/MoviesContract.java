@@ -25,7 +25,7 @@ public final class MoviesContract {
 
 
     // Class to describe movies table
-    static abstract class Movies implements BaseColumns {
+    public static abstract class Movies implements BaseColumns {
         // Table name
         static final String TABLE_NAME = "movies";
         // Constants for content provider interface
@@ -36,16 +36,16 @@ public final class MoviesContract {
         public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIES;
         // Table columns
-        static final String COLUMN_NAME_MOVIE_ID = "movie_id";
-        static final String COLUMN_NAME_ORIGINAL_TITLE = "original_title";
-        static final String COLUMN_NAME_OVERVIEW = "overview";
-        static final String COLUMN_NAME_RELEASE_DATE = "release_date";
-        static final String COLUMN_NAME_VOTE_AVERAGE = "vote_average";
-        static final String COLUMN_NAME_POPULARITY = "popularity";
-        static final String COLUMN_NAME_POSTER_PATH = "poster_path";
-        static final String COLUMN_NAME_HOMEPAGE = "homepage";
-        static final String COLUMN_NAME_ADULT = "adult";
-        static final String COLUMN_NAME_VIDEO = "video";
+        public static final String COLUMN_NAME_MOVIE_ID = "movie_id";
+        public static final String COLUMN_NAME_ORIGINAL_TITLE = "original_title";
+        public static final String COLUMN_NAME_OVERVIEW = "overview";
+        public static final String COLUMN_NAME_RELEASE_DATE = "release_date";
+        public static final String COLUMN_NAME_VOTE_AVERAGE = "vote_average";
+        public static final String COLUMN_NAME_POPULARITY = "popularity";
+        public static final String COLUMN_NAME_POSTER_PATH = "poster_path";
+        public static final String COLUMN_NAME_HOMEPAGE = "homepage";
+        public static final String COLUMN_NAME_ADULT = "adult";
+        public static final String COLUMN_NAME_VIDEO = "video";
         // Create table sql-statement
         static final String CREATE_TABLE_STATEMENT = "CREATE TABLE " + TABLE_NAME + " (" +
                 _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -69,7 +69,7 @@ public final class MoviesContract {
     }
 
     // Class to describe movies by popularity
-    static abstract class Popular implements BaseColumns {
+    public static abstract class Popular implements BaseColumns {
         // Table name
         static final String TABLE_NAME = "popular";
         // Constants for content provider interface
@@ -80,8 +80,8 @@ public final class MoviesContract {
         public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_POPULAR;
         // Columns
-        static final String COLUMN_NAME_SORT_ID = "sort_id";
-        static final String COLUMN_NAME_MOVIE_ID = "movie_id";
+        public static final String COLUMN_NAME_SORT_ID = "sort_id";
+        public static final String COLUMN_NAME_MOVIE_ID = "movie_id";
         // Create statement
         static final String CREATE_TABLE_STATEMENT = "CREATE TABLE " + TABLE_NAME + " (" +
                 _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -108,7 +108,7 @@ public final class MoviesContract {
     }
 
     // Class to describe movies by popularity
-    static abstract class Toprated implements BaseColumns {
+    public static abstract class Toprated implements BaseColumns {
         // Table name
         static final String TABLE_NAME = "toprated";
         // Constants for content provider interface
@@ -119,8 +119,8 @@ public final class MoviesContract {
         public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_TOPRATED;
         // Columns
-        static final String COLUMN_NAME_SORT_ID = "sort_id";
-        static final String COLUMN_NAME_MOVIE_ID = "movie_id";
+        public static final String COLUMN_NAME_SORT_ID = "sort_id";
+        public static final String COLUMN_NAME_MOVIE_ID = "movie_id";
         // Create statement
         static final String CREATE_TABLE_STATEMENT = "CREATE TABLE " + TABLE_NAME + " (" +
                 _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
