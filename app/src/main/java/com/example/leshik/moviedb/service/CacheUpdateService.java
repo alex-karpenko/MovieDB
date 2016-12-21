@@ -101,7 +101,7 @@ public class CacheUpdateService extends IntentService {
 
         TmdbApiService service = retrofit.create(TmdbApiService.class);
         Call<TmdbListPage> popularCall = service.getPopular(BuildConfig.THE_MOVIE_DB_API_KEY, requestPage);
-        TmdbListPage listPage = null;
+        TmdbListPage listPage;
         try {
             listPage = popularCall.execute().body();
         } catch (IOException e) {
@@ -110,8 +110,10 @@ public class CacheUpdateService extends IntentService {
             return;
         }
 
-        // TODO: store values into database via content provider
-        if (page <= 0) getContentResolver().delete(MoviesContract.BASE_CONTENT_URI, null, null);
+        // If page number is not positive - first delete all data from popular table
+        if (page <= 0) getContentResolver().delete(MoviesContract.Popular.CONTENT_URI, null, null);
+        getContentResolver().bulkInsert(MoviesContract.Movies.CONTENT_URI, listPage.getMoviesContentValues());
+        getContentResolver().bulkInsert(MoviesContract.Popular.CONTENT_URI, listPage.getPopularContentValues());
     }
 
     /**
