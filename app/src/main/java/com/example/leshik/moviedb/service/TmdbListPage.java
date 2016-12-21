@@ -116,7 +116,6 @@ public class TmdbListPage {
         int resultsSize = results.size();
         if (resultsSize == 0) return null;
 
-        int basePage = (page - 1) * resultsSize;
         ContentValues[] returnValues = new ContentValues[results.size()];
 
         for (int i = 0; i < resultsSize; i++) {

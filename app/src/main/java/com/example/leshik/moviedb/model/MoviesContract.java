@@ -159,8 +159,8 @@ public final class MoviesContract {
         public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_FAVORITES;
         // Columns
-        static final String COLUMN_NAME_SORT_ID = "sort_id";
-        static final String COLUMN_NAME_MOVIE_ID = "movie_id";
+        public static final String COLUMN_NAME_SORT_ID = "sort_id";
+        public static final String COLUMN_NAME_MOVIE_ID = "movie_id";
         // Create statement
         static final String CREATE_TABLE_STATEMENT = "CREATE TABLE " + TABLE_NAME + " (" +
                 _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
