@@ -23,14 +23,29 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class CacheUpdateService extends IntentService {
     private static final String LOG_TAG = CacheUpdateService.class.getSimpleName();
     // IntentService can perform
+    static final String ACTION_UPDATE_MOVIE = "com.example.leshik.moviedb.service.action.UPDATE_MOVIE";
     static final String ACTION_UPDATE_POPULAR = "com.example.leshik.moviedb.service.action.UPDATE_POPULAR";
     static final String ACTION_UPDATE_TOPRATED = "com.example.leshik.moviedb.service.action.UPDATE_TOPRATED";
     static final String ACTION_UPDATE_CONFIGURATION = "com.example.leshik.moviedb.service.action.UPDATE_CONFIGURATION";
 
     static final String EXTRA_PARAM_PAGE = "com.example.leshik.moviedb.service.extra.PAGE";
+    static final String EXTRA_PARAM_MOVIE_ID = "com.example.leshik.moviedb.service.extra.MOVIE_ID";
 
     public CacheUpdateService() {
         super("CacheUpdateService");
+    }
+
+    /**
+     * Starts this service to perform action UpdateMovie with the given parameters. If
+     * the service is already performing a task this action will be queued.
+     *
+     * @see IntentService
+     */
+    public static void startActionUpdateMovie(Context context, int movie_id) {
+        Intent intent = new Intent(context, CacheUpdateService.class);
+        intent.setAction(ACTION_UPDATE_MOVIE);
+        intent.putExtra(EXTRA_PARAM_MOVIE_ID, movie_id);
+        context.startService(intent);
     }
 
     /**
@@ -75,7 +90,11 @@ public class CacheUpdateService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
             final String action = intent.getAction();
-            if (ACTION_UPDATE_POPULAR.equals(action)) {
+            
+            if (ACTION_UPDATE_MOVIE.equals(action)) {
+                final int movie_id = intent.getIntExtra(EXTRA_PARAM_MOVIE_ID, -1);
+                handleActionUpdateMovie(movie_id);
+            } else if (ACTION_UPDATE_POPULAR.equals(action)) {
                 final int page = intent.getIntExtra(EXTRA_PARAM_PAGE, -1);
                 handleActionUpdatePopular(page);
             } else if (ACTION_UPDATE_TOPRATED.equals(action)) {
@@ -85,6 +104,32 @@ public class CacheUpdateService extends IntentService {
                 handleActionUpdateConfiguration();
             }
         }
+    }
+
+    /**
+     * Handle action UpdateMovie in the provided background thread with the provided
+     * parameters.
+     */
+    private void handleActionUpdateMovie(int movie_id) {
+        if(movie_id<=0) return;
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(MovieUtils.baseApiSecureUrl)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        TmdbApiService service = retrofit.create(TmdbApiService.class);
+        Call<TmdbMovie> movieCall = service.getMovie(movie_id, BuildConfig.THE_MOVIE_DB_API_KEY);
+        TmdbMovie movie;
+        try {
+            movie = movieCall.execute().body();
+        } catch (IOException e) {
+            // TODO: show network error activity
+            e.printStackTrace();
+            return;
+        }
+        
+        getContentResolver().insert(MoviesContract.Movies.CONTENT_URI, movie.getMovieContentValues());
     }
 
     /**
