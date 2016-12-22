@@ -1,16 +1,24 @@
 package com.example.leshik.moviedb.service;
 
 import android.content.Context;
-import android.content.Intent;
+import android.database.Cursor;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ServiceTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.example.leshik.moviedb.model.MoviesContract;
+
+import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.MethodSorters;
 
 import java.util.concurrent.TimeUnit;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -18,6 +26,7 @@ import java.util.concurrent.TimeUnit;
  */
 
 @RunWith(AndroidJUnit4.class)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestCacheUpdateService {
     public static final String LOG_TAG = TestCacheUpdateService.class.getSimpleName();
 
@@ -28,25 +37,33 @@ public class TestCacheUpdateService {
 
     @Test
     public void test01_UpdateConfiguration() throws Throwable {
-        Intent intent = new Intent(mContext, CacheUpdateService.class);
-        intent.setAction(CacheUpdateService.ACTION_UPDATE_CONFIGURATION);
-        mServiceRule.startService(intent);
+        CacheUpdateService.startActionUpdateConfiguration(mContext);
+        TimeUnit.SECONDS.sleep(5);
     }
 
     @Test
     public void test02_UpdatePopular_test_with_clear_all_data() throws Throwable {
-        Intent intent = new Intent(mContext, CacheUpdateService.class);
-        intent.setAction(CacheUpdateService.ACTION_UPDATE_POPULAR);
-        intent.putExtra(CacheUpdateService.EXTRA_PARAM_PAGE, -1);
-        mContext.startService(intent);
-        TimeUnit.SECONDS.sleep(5);
+        CacheUpdateService.startActionUpdatePopular(mContext, -1);
+        CacheUpdateService.startActionUpdatePopular(mContext, 2);
+        CacheUpdateService.startActionUpdatePopular(mContext, 3);
+        TimeUnit.SECONDS.sleep(10);
 
-        intent = new Intent(mContext, CacheUpdateService.class);
-        intent.setAction(CacheUpdateService.ACTION_UPDATE_POPULAR);
-        intent.putExtra(CacheUpdateService.EXTRA_PARAM_PAGE, 3);
-        mContext.startService(intent);
-        TimeUnit.SECONDS.sleep(5);
-
+        Cursor c = mContext.getContentResolver().query(MoviesContract.Popular.CONTENT_URI, null, null, null, null);
+        assertNotNull(c);
+        assertTrue(c.moveToNext());
+        assertEquals(60, c.getCount());
     }
 
+    @Test
+    public void test03_UpdateToprated_test_with_clear_all_data() throws Throwable {
+        CacheUpdateService.startActionUpdateToprated(mContext, -1);
+        CacheUpdateService.startActionUpdateToprated(mContext, 2);
+        CacheUpdateService.startActionUpdateToprated(mContext, 3);
+        TimeUnit.SECONDS.sleep(10);
+
+        Cursor c = mContext.getContentResolver().query(MoviesContract.Toprated.CONTENT_URI, null, null, null, null);
+        assertNotNull(c);
+        assertTrue(c.moveToNext());
+        assertEquals(60, c.getCount());
+    }
 }
