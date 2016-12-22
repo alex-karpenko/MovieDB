@@ -30,13 +30,15 @@ public class CacheUpdateService extends IntentService {
     static final String ACTION_UPDATE_POPULAR = "com.example.leshik.moviedb.service.action.UPDATE_POPULAR";
     static final String ACTION_UPDATE_TOPRATED = "com.example.leshik.moviedb.service.action.UPDATE_TOPRATED";
     static final String ACTION_UPDATE_CONFIGURATION = "com.example.leshik.moviedb.service.action.UPDATE_CONFIGURATION";
-
+    // Parameters for actions
+    // page number for update popular or toprated
     static final String EXTRA_PARAM_PAGE = "com.example.leshik.moviedb.service.extra.PAGE";
+    // movie_id for update movies
     static final String EXTRA_PARAM_MOVIE_ID = "com.example.leshik.moviedb.service.extra.MOVIE_ID";
-
+    // File name to store shared preferences by cache update service
     public static final String CACHE_PREFS_NAME = "cache_prefs";
 
-
+    // Default constructor
     public CacheUpdateService() {
         super("CacheUpdateService");
     }
@@ -97,6 +99,7 @@ public class CacheUpdateService extends IntentService {
         if (intent != null) {
             final String action = intent.getAction();
 
+            // Simple if-else-if selector for choose action
             if (ACTION_UPDATE_MOVIE.equals(action)) {
                 final int movie_id = intent.getIntExtra(EXTRA_PARAM_MOVIE_ID, -1);
                 handleActionUpdateMovie(movie_id);
@@ -119,15 +122,19 @@ public class CacheUpdateService extends IntentService {
     private void handleActionUpdateMovie(int movie_id) {
         if (movie_id <= 0) return;
 
+        // Create retrofit object...
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(MovieUtils.baseApiSecureUrl)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
+        // ... create service and call ....
         TmdbApiService service = retrofit.create(TmdbApiService.class);
         Call<TmdbMovie> movieCall = service.getMovie(movie_id, BuildConfig.THE_MOVIE_DB_API_KEY);
         TmdbMovie movie;
+
         try {
+            // Execute and insert(a-la update) movies table via content provider call
             movie = movieCall.execute().body();
             getContentResolver().insert(MoviesContract.Movies.CONTENT_URI, movie.getMovieContentValues());
         } catch (IOException e) {
@@ -142,21 +149,26 @@ public class CacheUpdateService extends IntentService {
     private void handleActionUpdatePopular(int page) {
         int requestPage = page <= 0 ? 1 : page;
 
+        // Create retrofit object...
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(MovieUtils.baseApiSecureUrl)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-
+        // ... create service and call ....
         TmdbApiService service = retrofit.create(TmdbApiService.class);
         Call<TmdbListPage> popularCall = service.getPopular(BuildConfig.THE_MOVIE_DB_API_KEY, requestPage);
         TmdbListPage listPage;
+
         try {
             listPage = popularCall.execute().body();
-            // If page number is not positive - first delete all data from popular table
+
             if (page <= 0) {
+                // If page number is not positive - first delete all data from popular table
+                // and update last_update_time in the preferences
                 getContentResolver().delete(MoviesContract.Popular.CONTENT_URI, null, null);
                 updateCachePreference(R.string.last_popular_update_time, Calendar.getInstance().getTimeInMillis());
             }
+            // Insert movies and popular tables via content provider calls
             getContentResolver().bulkInsert(MoviesContract.Movies.CONTENT_URI, listPage.getMoviesContentValues());
             getContentResolver().bulkInsert(MoviesContract.Popular.CONTENT_URI, listPage.getPopularContentValues());
         } catch (IOException e) {
@@ -171,22 +183,24 @@ public class CacheUpdateService extends IntentService {
     private void handleActionUpdateToprated(int page) {
         int requestPage = page <= 0 ? 1 : page;
 
+        // Create retrofit object...
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(MovieUtils.baseApiSecureUrl)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-
+        // ... create service and call ....
         TmdbApiService service = retrofit.create(TmdbApiService.class);
         Call<TmdbListPage> topratedCall = service.getToprated(BuildConfig.THE_MOVIE_DB_API_KEY, requestPage);
         TmdbListPage listPage;
         try {
             listPage = topratedCall.execute().body();
-            // If page number is not positive - first delete all data from popular table
-            // and update last_update_time in the preferences
             if (page <= 0) {
+                // If page number is not positive - first delete all data from popular table
+                // and update last_update_time in the preferences
                 getContentResolver().delete(MoviesContract.Toprated.CONTENT_URI, null, null);
                 updateCachePreference(R.string.last_toprated_update_time, Calendar.getInstance().getTimeInMillis());
             }
+            // Insert movies and toprated tables via content provider calls
             getContentResolver().bulkInsert(MoviesContract.Movies.CONTENT_URI, listPage.getMoviesContentValues());
             getContentResolver().bulkInsert(MoviesContract.Toprated.CONTENT_URI, listPage.getTopratedContentValues());
         } catch (IOException e) {
@@ -207,6 +221,7 @@ public class CacheUpdateService extends IntentService {
         TmdbApiService service = retrofit.create(TmdbApiService.class);
         Call<TmdbConfiguration> configCall = service.getConfiguration(BuildConfig.THE_MOVIE_DB_API_KEY);
         try {
+            // Execute call and update values in the helper class
             TmdbConfiguration config = configCall.execute().body();
             MovieUtils.basePosterUrl = config.images.baseUrl;
             MovieUtils.basePosterSecureUrl = config.images.secureBaseUrl;
@@ -221,6 +236,7 @@ public class CacheUpdateService extends IntentService {
         }
     }
 
+    // Helper method to update shared preferences by string value
     public void updateCachePreference(int key, String value) {
         SharedPreferences prefs = getSharedPreferences(CACHE_PREFS_NAME, 0);
         SharedPreferences.Editor editor = prefs.edit();
@@ -228,6 +244,7 @@ public class CacheUpdateService extends IntentService {
         editor.commit();
     }
 
+    // Helper method to update shared preferences by long value
     public void updateCachePreference(int key, long value) {
         SharedPreferences prefs = getSharedPreferences(CACHE_PREFS_NAME, 0);
         SharedPreferences.Editor editor = prefs.edit();
