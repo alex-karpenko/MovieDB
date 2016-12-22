@@ -3,13 +3,12 @@ package com.example.leshik.moviedb.service;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.test.InstrumentationRegistry;
-import android.support.test.rule.ServiceTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.example.leshik.moviedb.model.MoviesContract;
 
+import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
@@ -32,8 +31,10 @@ public class TestCacheUpdateService {
 
     private static final Context mContext = InstrumentationRegistry.getTargetContext();
 
-    @Rule
-    public final ServiceTestRule mServiceRule = new ServiceTestRule();
+    @BeforeClass
+    public void setUp() {
+        deleteAllRecordsFromProvider();
+    }
 
     @Test
     public void test01_UpdateConfiguration() throws Throwable {
@@ -66,4 +67,13 @@ public class TestCacheUpdateService {
         assertTrue(c.moveToNext());
         assertEquals(60, c.getCount());
     }
+
+    private void deleteAllRecordsFromProvider() {
+        mContext.getContentResolver().delete(MoviesContract.Videos.CONTENT_URI, null, null);
+        mContext.getContentResolver().delete(MoviesContract.Favorites.CONTENT_URI, null, null);
+        mContext.getContentResolver().delete(MoviesContract.Toprated.CONTENT_URI, null, null);
+        mContext.getContentResolver().delete(MoviesContract.Popular.CONTENT_URI, null, null);
+        mContext.getContentResolver().delete(MoviesContract.Movies.CONTENT_URI, null, null);
+    }
+
 }
