@@ -36,9 +36,13 @@
         </activity>
 
         <provider
-            android:authorities="@string/content_authority"
             android:name=".model.MoviesProvider"
+            android:authorities="@string/content_authority"
             android:exported="false" />
+
+        <service
+            android:name=".service.CacheUpdateService"
+            android:exported="false"></service>
     </application>
 
 </manifest>
