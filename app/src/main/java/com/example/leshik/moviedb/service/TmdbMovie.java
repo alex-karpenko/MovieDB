@@ -148,4 +148,20 @@ public class TmdbMovie {
     @Expose
     public Integer voteCount;
 
+    public ContentValues getMovieContentValues() {
+        ContentValues returnValues = new ContentValues();
+
+        returnValues.put(MoviesContract.Movies.COLUMN_NAME_MOVIE_ID, id);
+        returnValues.put(MoviesContract.Movies.COLUMN_NAME_ORIGINAL_TITLE, originalTitle);
+        returnValues.put(MoviesContract.Movies.COLUMN_NAME_OVERVIEW, overview);
+        returnValues.put(MoviesContract.Movies.COLUMN_NAME_RELEASE_DATE, releaseDate);
+        returnValues.put(MoviesContract.Movies.COLUMN_NAME_VOTE_AVERAGE, voteAverage);
+        returnValues.put(MoviesContract.Movies.COLUMN_NAME_POPULARITY, popularity);
+        returnValues.put(MoviesContract.Movies.COLUMN_NAME_POSTER_PATH, posterPath);
+        returnValues.put(MoviesContract.Movies.COLUMN_NAME_HOMEPAGE, homepage);
+        returnValues.put(MoviesContract.Movies.COLUMN_NAME_ADULT, adult);
+        returnValues.put(MoviesContract.Movies.COLUMN_NAME_VIDEO, video);
+
+        return returnValues;
+    }
 }
