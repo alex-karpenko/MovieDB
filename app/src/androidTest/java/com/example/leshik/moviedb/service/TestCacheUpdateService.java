@@ -32,7 +32,7 @@ public class TestCacheUpdateService {
     private static final Context mContext = InstrumentationRegistry.getTargetContext();
 
     @BeforeClass
-    public void setUp() {
+    public static void setUp() {
         deleteAllRecordsFromProvider();
     }
 
@@ -68,7 +68,7 @@ public class TestCacheUpdateService {
         assertEquals(60, c.getCount());
     }
 
-    private void deleteAllRecordsFromProvider() {
+    private static void deleteAllRecordsFromProvider() {
         mContext.getContentResolver().delete(MoviesContract.Videos.CONTENT_URI, null, null);
         mContext.getContentResolver().delete(MoviesContract.Favorites.CONTENT_URI, null, null);
         mContext.getContentResolver().delete(MoviesContract.Toprated.CONTENT_URI, null, null);

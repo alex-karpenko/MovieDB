@@ -3,12 +3,15 @@ package com.example.leshik.moviedb.service;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 
 import com.example.leshik.moviedb.BuildConfig;
 import com.example.leshik.moviedb.MovieUtils;
+import com.example.leshik.moviedb.R;
 import com.example.leshik.moviedb.model.MoviesContract;
 
 import java.io.IOException;
+import java.util.Calendar;
 
 import retrofit2.Call;
 import retrofit2.Retrofit;
@@ -30,6 +33,9 @@ public class CacheUpdateService extends IntentService {
 
     static final String EXTRA_PARAM_PAGE = "com.example.leshik.moviedb.service.extra.PAGE";
     static final String EXTRA_PARAM_MOVIE_ID = "com.example.leshik.moviedb.service.extra.MOVIE_ID";
+
+    public static final String CACHE_PREFS_NAME = "cache_prefs";
+
 
     public CacheUpdateService() {
         super("CacheUpdateService");
@@ -147,8 +153,10 @@ public class CacheUpdateService extends IntentService {
         try {
             listPage = popularCall.execute().body();
             // If page number is not positive - first delete all data from popular table
-            if (page <= 0)
+            if (page <= 0) {
                 getContentResolver().delete(MoviesContract.Popular.CONTENT_URI, null, null);
+                updateCachePreference(R.string.last_popular_update_time, Calendar.getInstance().getTimeInMillis());
+            }
             getContentResolver().bulkInsert(MoviesContract.Movies.CONTENT_URI, listPage.getMoviesContentValues());
             getContentResolver().bulkInsert(MoviesContract.Popular.CONTENT_URI, listPage.getPopularContentValues());
         } catch (IOException e) {
@@ -174,8 +182,11 @@ public class CacheUpdateService extends IntentService {
         try {
             listPage = topratedCall.execute().body();
             // If page number is not positive - first delete all data from popular table
-            if (page <= 0)
+            // and update last_update_time in the preferences
+            if (page <= 0) {
                 getContentResolver().delete(MoviesContract.Toprated.CONTENT_URI, null, null);
+                updateCachePreference(R.string.last_toprated_update_time, Calendar.getInstance().getTimeInMillis());
+            }
             getContentResolver().bulkInsert(MoviesContract.Movies.CONTENT_URI, listPage.getMoviesContentValues());
             getContentResolver().bulkInsert(MoviesContract.Toprated.CONTENT_URI, listPage.getTopratedContentValues());
         } catch (IOException e) {
@@ -202,10 +213,26 @@ public class CacheUpdateService extends IntentService {
             MovieUtils.posterSizes = new String[config.images.posterSizes.size()];
             for (int i = 0; i < config.images.posterSizes.size(); i++)
                 MovieUtils.posterSizes[i] = config.images.posterSizes.get(i);
-            // TODO: store config values into shared preferences
+            // Store config values into shared preferences
+            updateCachePreference(R.string.base_potser_url, config.images.baseUrl);
+            updateCachePreference(R.string.base_potser_secure_url, config.images.secureBaseUrl);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    public void updateCachePreference(int key, String value) {
+        SharedPreferences prefs = getSharedPreferences(CACHE_PREFS_NAME, 0);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(getString(key), value);
+        editor.commit();
+    }
+
+    public void updateCachePreference(int key, long value) {
+        SharedPreferences prefs = getSharedPreferences(CACHE_PREFS_NAME, 0);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putLong(getString(key), value);
+        editor.commit();
+    }
 }
+

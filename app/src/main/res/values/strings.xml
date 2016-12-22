@@ -15,4 +15,10 @@
     <string name="pref_sortorder_label_rating">By rating</string>
     <string name="network_error_brief_notify">Network error, try later...</string>
 
+    <!-- Strings related to misc preferences values -->
+    <string name="last_popular_update_time" translatable="false">last_popular_update_time</string>
+    <string name="last_toprated_update_time" translatable="false">last_toprated_update_time</string>
+    <string name="base_potser_url" translatable="false">base_poster_url</string>
+    <string name="base_potser_secure_url" translatable="false">base_poster_secure_url</string>
+
 </resources>
