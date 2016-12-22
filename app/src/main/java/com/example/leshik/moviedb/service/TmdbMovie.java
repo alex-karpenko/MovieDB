@@ -4,6 +4,9 @@ package com.example.leshik.moviedb.service;
  * Created by Leshik on 19.12.2016.
  */
 
+import android.content.ContentValues;
+
+import com.example.leshik.moviedb.model.MoviesContract;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 

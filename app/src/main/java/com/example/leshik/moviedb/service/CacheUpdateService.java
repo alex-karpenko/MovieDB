@@ -90,7 +90,7 @@ public class CacheUpdateService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
             final String action = intent.getAction();
-            
+
             if (ACTION_UPDATE_MOVIE.equals(action)) {
                 final int movie_id = intent.getIntExtra(EXTRA_PARAM_MOVIE_ID, -1);
                 handleActionUpdateMovie(movie_id);
@@ -111,7 +111,7 @@ public class CacheUpdateService extends IntentService {
      * parameters.
      */
     private void handleActionUpdateMovie(int movie_id) {
-        if(movie_id<=0) return;
+        if (movie_id <= 0) return;
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(MovieUtils.baseApiSecureUrl)
@@ -123,13 +123,10 @@ public class CacheUpdateService extends IntentService {
         TmdbMovie movie;
         try {
             movie = movieCall.execute().body();
+            getContentResolver().insert(MoviesContract.Movies.CONTENT_URI, movie.getMovieContentValues());
         } catch (IOException e) {
-            // TODO: show network error activity
             e.printStackTrace();
-            return;
         }
-        
-        getContentResolver().insert(MoviesContract.Movies.CONTENT_URI, movie.getMovieContentValues());
     }
 
     /**
@@ -149,16 +146,14 @@ public class CacheUpdateService extends IntentService {
         TmdbListPage listPage;
         try {
             listPage = popularCall.execute().body();
+            // If page number is not positive - first delete all data from popular table
+            if (page <= 0)
+                getContentResolver().delete(MoviesContract.Popular.CONTENT_URI, null, null);
+            getContentResolver().bulkInsert(MoviesContract.Movies.CONTENT_URI, listPage.getMoviesContentValues());
+            getContentResolver().bulkInsert(MoviesContract.Popular.CONTENT_URI, listPage.getPopularContentValues());
         } catch (IOException e) {
-            // TODO: show network error activity
             e.printStackTrace();
-            return;
         }
-
-        // If page number is not positive - first delete all data from popular table
-        if (page <= 0) getContentResolver().delete(MoviesContract.Popular.CONTENT_URI, null, null);
-        getContentResolver().bulkInsert(MoviesContract.Movies.CONTENT_URI, listPage.getMoviesContentValues());
-        getContentResolver().bulkInsert(MoviesContract.Popular.CONTENT_URI, listPage.getPopularContentValues());
     }
 
     /**
@@ -166,8 +161,26 @@ public class CacheUpdateService extends IntentService {
      * parameters.
      */
     private void handleActionUpdateToprated(int page) {
-        // TODO: Handle action UpdateToprated
-        throw new UnsupportedOperationException("Not yet implemented");
+        int requestPage = page <= 0 ? 1 : page;
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(MovieUtils.baseApiSecureUrl)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        TmdbApiService service = retrofit.create(TmdbApiService.class);
+        Call<TmdbListPage> topratedCall = service.getToprated(BuildConfig.THE_MOVIE_DB_API_KEY, requestPage);
+        TmdbListPage listPage;
+        try {
+            listPage = topratedCall.execute().body();
+            // If page number is not positive - first delete all data from popular table
+            if (page <= 0)
+                getContentResolver().delete(MoviesContract.Toprated.CONTENT_URI, null, null);
+            getContentResolver().bulkInsert(MoviesContract.Movies.CONTENT_URI, listPage.getMoviesContentValues());
+            getContentResolver().bulkInsert(MoviesContract.Toprated.CONTENT_URI, listPage.getTopratedContentValues());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -189,13 +202,10 @@ public class CacheUpdateService extends IntentService {
             MovieUtils.posterSizes = new String[config.images.posterSizes.size()];
             for (int i = 0; i < config.images.posterSizes.size(); i++)
                 MovieUtils.posterSizes[i] = config.images.posterSizes.get(i);
+            // TODO: store config values into shared preferences
         } catch (IOException e) {
-            // TODO: show network error activity
             e.printStackTrace();
-            return;
         }
-
-        // TODO: store config values into shared preferences
     }
 
 }
