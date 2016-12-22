@@ -148,7 +148,7 @@ public final class MoviesContract {
     }
 
     // Class to describe favorites table
-    static abstract class Favorites implements BaseColumns {
+    public static abstract class Favorites implements BaseColumns {
         // Table name
         static final String TABLE_NAME = "favorites";
         // Constants for content provider interface
@@ -189,11 +189,11 @@ public final class MoviesContract {
 
 
     // Class videos
-    static abstract class Videos implements BaseColumns {
+    public static abstract class Videos implements BaseColumns {
         // Table name
         static final String TABLE_NAME = "videos";
         // Constants for content provider interface
-        static final Uri CONTENT_URI =
+        public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_VIDEOS).build();
         public static final String CONTENT_TYPE =
                 ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_VIDEOS;
