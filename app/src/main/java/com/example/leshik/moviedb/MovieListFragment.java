@@ -20,8 +20,6 @@ import com.example.leshik.moviedb.service.CacheUpdateService;
 
 import java.util.Calendar;
 
-import static com.example.leshik.moviedb.service.CacheUpdateService.CACHE_PREFS_NAME;
-
 
 /**
  * Main screen fragment with list of movie's posters,
@@ -97,27 +95,17 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
     private void updateMoviesCache() {
         long currentTime = Calendar.getInstance().getTimeInMillis();
 
-        if (currentTime - getLongCachePreference(R.string.last_popular_update_time) >= CACHE_UPDATE_INTERVAL) {
+        if (currentTime - MovieUtils.getLongCachePreference(getActivity(), R.string.last_popular_update_time) >= CACHE_UPDATE_INTERVAL) {
             CacheUpdateService.startActionUpdatePopular(getActivity(), -1);
             for (int i = 2; i <= CACHE_PRELOAD_PAGES; i++)
                 CacheUpdateService.startActionUpdatePopular(getActivity(), i);
         }
 
-        if (currentTime - getLongCachePreference(R.string.last_toprated_update_time) >= CACHE_UPDATE_INTERVAL) {
+        if (currentTime - MovieUtils.getLongCachePreference(getActivity(), R.string.last_toprated_update_time) >= CACHE_UPDATE_INTERVAL) {
             CacheUpdateService.startActionUpdateToprated(getActivity(), -1);
             for (int i = 2; i <= CACHE_PRELOAD_PAGES; i++)
                 CacheUpdateService.startActionUpdateToprated(getActivity(), i);
         }
-    }
-
-    long getLongCachePreference(int key) {
-        SharedPreferences prefs = getActivity().getSharedPreferences(CACHE_PREFS_NAME, 0);
-        return prefs.getLong(getString(key), -1);
-    }
-
-    String getStringCachePreference(int key) {
-        SharedPreferences prefs = getActivity().getSharedPreferences(CACHE_PREFS_NAME, 0);
-        return prefs.getString(getString(key), null);
     }
 
     @Override
@@ -129,7 +117,7 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
         String sortOrder = prefs.getString(getString(R.string.pref_sortorder_key),
                 getString(R.string.pref_sortorder_default));
 
-        if (sortOrder.equals(R.string.pref_sortorder_rating)) {
+        if (sortOrder.equals(getString(R.string.pref_sortorder_rating))) {
             baseProjection = MoviesContract.Toprated.shortListProjection;
             baseUri = MoviesContract.Toprated.CONTENT_URI;
         }

@@ -1,6 +1,7 @@
 package com.example.leshik.moviedb;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -12,6 +13,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
+import static com.example.leshik.moviedb.service.CacheUpdateService.CACHE_PREFS_NAME;
 
 /**
  * Utility class for provide some common (project-wide) methods, variables and constants
@@ -114,6 +117,16 @@ public final class MovieUtils {
         }
 
         return resultJsonStr;
+    }
+
+    static long getLongCachePreference(Context context, int key) {
+        SharedPreferences prefs = context.getSharedPreferences(CACHE_PREFS_NAME, 0);
+        return prefs.getLong(context.getString(key), -1);
+    }
+
+    static String getStringCachePreference(Context context, int key) {
+        SharedPreferences prefs = context.getSharedPreferences(CACHE_PREFS_NAME, 0);
+        return prefs.getString(context.getString(key), null);
     }
 
 }
