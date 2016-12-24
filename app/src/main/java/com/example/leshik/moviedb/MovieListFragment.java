@@ -79,6 +79,7 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        CacheUpdateService.startActionUpdateConfiguration(getActivity());
         getLoaderManager().initLoader(FRAGMENT_LIST_LOADER_ID, null, this);
     }
 
@@ -94,8 +95,6 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
      * Method to update list of movies
      */
     private void updateMoviesCache() {
-        CacheUpdateService.startActionUpdateConfiguration(getActivity());
-
         long currentTime = Calendar.getInstance().getTimeInMillis();
 
         if (currentTime - getLongCachePreference(R.string.last_popular_update_time) >= CACHE_UPDATE_INTERVAL) {
