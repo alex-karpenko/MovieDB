@@ -18,6 +18,10 @@ import android.widget.GridView;
 import com.example.leshik.moviedb.model.MoviesContract;
 import com.example.leshik.moviedb.service.CacheUpdateService;
 
+import java.util.Calendar;
+
+import static com.example.leshik.moviedb.service.CacheUpdateService.CACHE_PREFS_NAME;
+
 
 /**
  * Main screen fragment with list of movie's posters,
@@ -30,6 +34,11 @@ import com.example.leshik.moviedb.service.CacheUpdateService;
  */
 public class MovieListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final int FRAGMENT_LIST_LOADER_ID = 1;
+    // cache update interval in milliseconds
+    // 5 sec for debug
+    private static final long CACHE_UPDATE_INTERVAL = 1000 * 5;
+    // Number of pages to preload
+    private static final int CACHE_PRELOAD_PAGES = 5;
     private MoviesListAdapter mCursorAdapter;
 
     @Override
@@ -87,12 +96,29 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
     private void updateMoviesCache() {
         CacheUpdateService.startActionUpdateConfiguration(getActivity());
 
-        CacheUpdateService.startActionUpdatePopular(getActivity(), -1);
-        CacheUpdateService.startActionUpdateToprated(getActivity(), -1);
-        CacheUpdateService.startActionUpdatePopular(getActivity(), 2);
-        CacheUpdateService.startActionUpdateToprated(getActivity(), 2);
-        CacheUpdateService.startActionUpdatePopular(getActivity(), 3);
-        CacheUpdateService.startActionUpdateToprated(getActivity(), 3);
+        long currentTime = Calendar.getInstance().getTimeInMillis();
+
+        if (currentTime - getLongCachePreference(R.string.last_popular_update_time) >= CACHE_UPDATE_INTERVAL) {
+            CacheUpdateService.startActionUpdatePopular(getActivity(), -1);
+            for (int i = 2; i <= CACHE_PRELOAD_PAGES; i++)
+                CacheUpdateService.startActionUpdatePopular(getActivity(), i);
+        }
+
+        if (currentTime - getLongCachePreference(R.string.last_toprated_update_time) >= CACHE_UPDATE_INTERVAL) {
+            CacheUpdateService.startActionUpdateToprated(getActivity(), -1);
+            for (int i = 2; i <= CACHE_PRELOAD_PAGES; i++)
+                CacheUpdateService.startActionUpdateToprated(getActivity(), i);
+        }
+    }
+
+    long getLongCachePreference(int key) {
+        SharedPreferences prefs = getActivity().getSharedPreferences(CACHE_PREFS_NAME, 0);
+        return prefs.getLong(getString(key), -1);
+    }
+
+    String getStringCachePreference(int key) {
+        SharedPreferences prefs = getActivity().getSharedPreferences(CACHE_PREFS_NAME, 0);
+        return prefs.getString(getString(key), null);
     }
 
     @Override
