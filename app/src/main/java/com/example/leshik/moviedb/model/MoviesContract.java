@@ -23,6 +23,10 @@ public final class MoviesContract {
     public static final String PATH_FAVORITES = "favorites";
     public static final String PATH_VIDEOS = "videos";
 
+    public static final int SHORT_PROJECTION_INDEX_ID = 0;
+    public static final int SHORT_PROJECTION_INDEX_SORT_ID = 1;
+    public static final int SHORT_PROJECTION_INDEX_MOVIE_ID = 2;
+    public static final int SHORT_PROJECTION_INDEX_POSTER_PATH = 3;
 
     // Class to describe movies table
     public static abstract class Movies implements BaseColumns {
@@ -62,6 +66,7 @@ public final class MoviesContract {
                 ");";
         // Delete table sql-statement
         static final String DROP_TABLE_STATEMENT = "DROP TABLE " + TABLE_NAME + ";";
+
         // URI build method
         public static Uri buildUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
@@ -101,6 +106,12 @@ public final class MoviesContract {
                 " WHERE " + Movies.TABLE_NAME + "." + Movies.COLUMN_NAME_MOVIE_ID + "=" +
                 TABLE_NAME + "." + COLUMN_NAME_MOVIE_ID +
                 ")";
+        // Projection for list fragment
+        public static final String[] shortListProjection = {_ID,
+                COLUMN_NAME_SORT_ID,
+                COLUMN_NAME_MOVIE_ID,
+                Movies.COLUMN_NAME_POSTER_PATH};
+
         // URI build method
         public static Uri buildUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
@@ -140,6 +151,12 @@ public final class MoviesContract {
                 " WHERE " + Movies.TABLE_NAME + "." + Movies.COLUMN_NAME_MOVIE_ID + "=" +
                 TABLE_NAME + "." + COLUMN_NAME_MOVIE_ID +
                 ")";
+        // Projection for list fragment
+        public static final String[] shortListProjection = {_ID,
+                COLUMN_NAME_SORT_ID,
+                COLUMN_NAME_MOVIE_ID,
+                Movies.COLUMN_NAME_POSTER_PATH};
+
 
         // URI build method
         public static Uri buildUri(long id) {
@@ -180,6 +197,12 @@ public final class MoviesContract {
                 " WHERE " + Movies.TABLE_NAME + "." + Movies.COLUMN_NAME_MOVIE_ID + "=" +
                 TABLE_NAME + "." + COLUMN_NAME_MOVIE_ID +
                 ")";
+        // Projection for list fragment
+        public static final String[] shortListProjection = {_ID,
+                COLUMN_NAME_SORT_ID,
+                COLUMN_NAME_MOVIE_ID,
+                Movies.COLUMN_NAME_POSTER_PATH};
+
 
         // URI build method
         public static Uri buildUri(long id) {
