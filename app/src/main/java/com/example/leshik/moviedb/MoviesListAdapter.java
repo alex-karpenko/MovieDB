@@ -33,7 +33,7 @@ class MoviesListAdapter extends CursorAdapter {
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         View view = LayoutInflater.from(context).inflate(R.layout.movielist_item, parent, false);
-        ViewHolder viewHolder = new ViewHolder(view, cursor.getInt(MoviesContract.SHORT_PROJECTION_INDEX_MOVIE_ID));
+        ViewHolder viewHolder = new ViewHolder(view, cursor.getInt(MoviesContract.SHORT_LIST_PROJECTION_INDEX_MOVIE_ID));
         view.setTag(viewHolder);
 
         return view;
@@ -43,12 +43,12 @@ class MoviesListAdapter extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
 
-        viewHolder.movie_id = cursor.getInt(MoviesContract.SHORT_PROJECTION_INDEX_MOVIE_ID);
+        viewHolder.movie_id = cursor.getInt(MoviesContract.SHORT_LIST_PROJECTION_INDEX_MOVIE_ID);
 
         Picasso.with(context)
                 .load(MovieUtils.basePosterUrl
                         + "w185" // TODO: we have to think to adopt width of image, mayby
-                        + cursor.getString(MoviesContract.SHORT_PROJECTION_INDEX_POSTER_PATH))
+                        + cursor.getString(MoviesContract.SHORT_LIST_PROJECTION_INDEX_POSTER_PATH))
                 .into(viewHolder.posterImage);
     }
 }
