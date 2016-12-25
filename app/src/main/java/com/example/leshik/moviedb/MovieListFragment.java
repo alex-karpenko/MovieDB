@@ -34,7 +34,7 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
     private static final int FRAGMENT_LIST_LOADER_ID = 1;
     // cache update interval in milliseconds
     // 5 sec for debug
-    private static final long CACHE_UPDATE_INTERVAL = 1000 * 5;
+    private static final long CACHE_UPDATE_INTERVAL = 1000 * 60 * 5; // 5 minutes
     // Number of pages to preload
     private static final int CACHE_PRELOAD_PAGES = 5;
     private MoviesListAdapter mCursorAdapter;
