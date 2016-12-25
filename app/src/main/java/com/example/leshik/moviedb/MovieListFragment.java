@@ -38,6 +38,19 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
     // Number of pages to preload
     private static final int CACHE_PRELOAD_PAGES = 5;
     private MoviesListAdapter mCursorAdapter;
+    private int mPosition;
+
+    /**
+     * A callback interface that all activities containing this fragment must
+     * implement. This mechanism allows activities to be notified of item
+     * selections.
+     */
+    public interface Callback {
+        /**
+         * DetailFragmentCallback for when an item has been selected.
+         */
+        void onItemSelected(Uri movieUri);
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -61,13 +74,12 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 // TODO: call detail activity with cursor data
-                // Get MovieInfo instance related to clicked item
-//                MovieInfo movieInfo = mMoviesAdapter.getItem(position);
-                //Place MovieInfo into Intent (MovieInfo class implements Parelable interface)
-//                Intent intent = new Intent(getActivity(), DetailActivity.class)
-//                        .putExtra(MovieUtils.EXTRA_MOVIE_INFO, movieInfo);
-                // Start
-//                startActivity(intent);
+                Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
+                if (cursor != null) {
+                    ((Callback) getActivity()).
+                            onItemSelected(MoviesContract.Movies.buildUri(cursor.getLong(MoviesContract.SHORT_LIST_PROJECTION_INDEX_MOVIE_ID)));
+                }
+                mPosition = position;
             }
 
         });
