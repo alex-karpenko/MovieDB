@@ -38,7 +38,8 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
     // Number of pages to preload
     private static final int CACHE_PRELOAD_PAGES = 5;
     private MoviesListAdapter mCursorAdapter;
-    private int mPosition;
+    private int mPosition = GridView.INVALID_POSITION;
+    private GridView mGridView;
 
     /**
      * A callback interface that all activities containing this fragment must
@@ -66,11 +67,11 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
         // Construct empty cursor adapter ...
         mCursorAdapter = new MoviesListAdapter(getActivity(), null, 0);
         // ... and set it to gridview
-        GridView gridView = (GridView) rootView.findViewById(R.id.movie_grid);
-        gridView.setAdapter(mCursorAdapter);
+        mGridView = (GridView) rootView.findViewById(R.id.movie_grid);
+        mGridView.setAdapter(mCursorAdapter);
 
         // Listener for handling clicks on poster image
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 // TODO: call detail activity with cursor data
@@ -140,6 +141,12 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mCursorAdapter.swapCursor(data);
+        if (mPosition != GridView.INVALID_POSITION) {
+            // If we don't need to restart the loader, and there's a desired position to restore
+            // to, do so now.
+            mGridView.smoothScrollToPosition(mPosition);
+
+        }
     }
 
     @Override
