@@ -64,7 +64,7 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
 
         // Create layout manager and attach it to recycle view
         mLayoutManager = new GridLayoutManager(getActivity(),
-                GridLayoutManager.DEFAULT_SPAN_COUNT,
+                2,
                 GridLayoutManager.VERTICAL,
                 false);
         mRecyclerView.setLayoutManager(mLayoutManager);
