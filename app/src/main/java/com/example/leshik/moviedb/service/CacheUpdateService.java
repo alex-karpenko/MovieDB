@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 
 import com.example.leshik.moviedb.BuildConfig;
-import com.example.leshik.moviedb.MovieUtils;
+import com.example.leshik.moviedb.Utils;
 import com.example.leshik.moviedb.R;
 import com.example.leshik.moviedb.model.MoviesContract;
 
@@ -124,7 +124,7 @@ public class CacheUpdateService extends IntentService {
 
         // Create retrofit object...
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(MovieUtils.baseApiSecureUrl)
+                .baseUrl(Utils.baseApiSecureUrl)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
@@ -151,7 +151,7 @@ public class CacheUpdateService extends IntentService {
 
         // Create retrofit object...
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(MovieUtils.baseApiSecureUrl)
+                .baseUrl(Utils.baseApiSecureUrl)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         // ... create service and call ....
@@ -185,7 +185,7 @@ public class CacheUpdateService extends IntentService {
 
         // Create retrofit object...
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(MovieUtils.baseApiSecureUrl)
+                .baseUrl(Utils.baseApiSecureUrl)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         // ... create service and call ....
@@ -214,7 +214,7 @@ public class CacheUpdateService extends IntentService {
      */
     private void handleActionUpdateConfiguration() {
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(MovieUtils.baseApiSecureUrl)
+                .baseUrl(Utils.baseApiSecureUrl)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
@@ -223,11 +223,11 @@ public class CacheUpdateService extends IntentService {
         try {
             // Execute call and update values in the helper class
             TmdbConfiguration config = configCall.execute().body();
-            MovieUtils.basePosterUrl = config.images.baseUrl;
-            MovieUtils.basePosterSecureUrl = config.images.secureBaseUrl;
-            MovieUtils.posterSizes = new String[config.images.posterSizes.size()];
+            Utils.basePosterUrl = config.images.baseUrl;
+            Utils.basePosterSecureUrl = config.images.secureBaseUrl;
+            Utils.posterSizes = new String[config.images.posterSizes.size()];
             for (int i = 0; i < config.images.posterSizes.size(); i++)
-                MovieUtils.posterSizes[i] = config.images.posterSizes.get(i);
+                Utils.posterSizes[i] = config.images.posterSizes.get(i);
             // Store config values into shared preferences
             updateCachePreference(R.string.base_potser_url, config.images.baseUrl);
             updateCachePreference(R.string.base_potser_secure_url, config.images.secureBaseUrl);

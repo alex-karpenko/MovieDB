@@ -23,6 +23,10 @@ public final class MoviesContract {
     public static final String PATH_FAVORITES = "favorites";
     public static final String PATH_VIDEOS = "videos";
 
+    public static final int SHORT_LIST_PROJECTION_INDEX_ID = 0;
+    public static final int SHORT_LIST_PROJECTION_INDEX_SORT_ID = 1;
+    public static final int SHORT_LIST_PROJECTION_INDEX_MOVIE_ID = 2;
+    public static final int SHORT_LIST_PROJECTION_INDEX_POSTER_PATH = 3;
 
     // Class to describe movies table
     public static abstract class Movies implements BaseColumns {
@@ -46,6 +50,23 @@ public final class MoviesContract {
         public static final String COLUMN_NAME_HOMEPAGE = "homepage";
         public static final String COLUMN_NAME_ADULT = "adult";
         public static final String COLUMN_NAME_VIDEO = "video";
+        // Default projection
+        public static final String[] DETAIL_PROJECTION = {
+                _ID,
+                COLUMN_NAME_MOVIE_ID,
+                COLUMN_NAME_ORIGINAL_TITLE,
+                COLUMN_NAME_OVERVIEW,
+                COLUMN_NAME_POSTER_PATH,
+                COLUMN_NAME_RELEASE_DATE,
+                COLUMN_NAME_VOTE_AVERAGE
+        };
+        public static final int DETAIL_PROJECTION_INDEX_ID = 0;
+        public static final int DETAIL_PROJECTION_INDEX_MOVIE_ID = 1;
+        public static final int DETAIL_PROJECTION_INDEX_ORIGINAL_TITLE = 2;
+        public static final int DETAIL_PROJECTION_INDEX_OVERVIEW = 3;
+        public static final int DETAIL_PROJECTION_INDEX_POSTER_PATH = 4;
+        public static final int DETAIL_PROJECTION_INDEX_RELEASE_DATE = 5;
+        public static final int DETAIL_PROJECTION_INDEX_VOTE_AVERAGE = 6;
         // Create table sql-statement
         static final String CREATE_TABLE_STATEMENT = "CREATE TABLE " + TABLE_NAME + " (" +
                 _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -62,6 +83,7 @@ public final class MoviesContract {
                 ");";
         // Delete table sql-statement
         static final String DROP_TABLE_STATEMENT = "DROP TABLE " + TABLE_NAME + ";";
+
         // URI build method
         public static Uri buildUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
@@ -101,6 +123,12 @@ public final class MoviesContract {
                 " WHERE " + Movies.TABLE_NAME + "." + Movies.COLUMN_NAME_MOVIE_ID + "=" +
                 TABLE_NAME + "." + COLUMN_NAME_MOVIE_ID +
                 ")";
+        // Projection for list fragment
+        public static final String[] shortListProjection = {_ID,
+                COLUMN_NAME_SORT_ID,
+                COLUMN_NAME_MOVIE_ID,
+                Movies.COLUMN_NAME_POSTER_PATH};
+
         // URI build method
         public static Uri buildUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
@@ -140,6 +168,12 @@ public final class MoviesContract {
                 " WHERE " + Movies.TABLE_NAME + "." + Movies.COLUMN_NAME_MOVIE_ID + "=" +
                 TABLE_NAME + "." + COLUMN_NAME_MOVIE_ID +
                 ")";
+        // Projection for list fragment
+        public static final String[] shortListProjection = {_ID,
+                COLUMN_NAME_SORT_ID,
+                COLUMN_NAME_MOVIE_ID,
+                Movies.COLUMN_NAME_POSTER_PATH};
+
 
         // URI build method
         public static Uri buildUri(long id) {
@@ -180,6 +214,12 @@ public final class MoviesContract {
                 " WHERE " + Movies.TABLE_NAME + "." + Movies.COLUMN_NAME_MOVIE_ID + "=" +
                 TABLE_NAME + "." + COLUMN_NAME_MOVIE_ID +
                 ")";
+        // Projection for list fragment
+        public static final String[] shortListProjection = {_ID,
+                COLUMN_NAME_SORT_ID,
+                COLUMN_NAME_MOVIE_ID,
+                Movies.COLUMN_NAME_POSTER_PATH};
+
 
         // URI build method
         public static Uri buildUri(long id) {
