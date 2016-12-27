@@ -24,11 +24,7 @@ import java.util.Calendar;
 /**
  * Main screen fragment with list of movie's posters,
  * placed in a GridView.
- * We get information about movies from TMBD as a JSON object,
- * parse it and place into list of MovieInfo objects.
- * And construct adapter to handle list.
  * <p>
- * TODO: more accurate error handling on network operations
  */
 public class MovieListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final int FRAGMENT_LIST_LOADER_ID = 1;
@@ -74,7 +70,7 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                // TODO: call detail activity with cursor data
+                // Call callback interface method to start detail activity with cursor data
                 Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
                 if (cursor != null) {
                     ((Callback) getActivity()).
@@ -90,7 +86,9 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        // Every time when activity created - update configuration
         CacheUpdateService.startActionUpdateConfiguration(getActivity());
+        // and create content loader
         getLoaderManager().initLoader(FRAGMENT_LIST_LOADER_ID, null, this);
     }
 
@@ -98,7 +96,7 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
     public void onStart() {
         super.onStart();
         // Every time, when fragment appears on the screen, we have to update contents
-        // (after start activity, returning from details or settings, etc.
+        // (after start activity, returning from details or settings, etc.)
         updateMoviesCache();
     }
 
@@ -108,12 +106,15 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
     private void updateMoviesCache() {
         long currentTime = Calendar.getInstance().getTimeInMillis();
 
+        // Check difference of current time and last cache update time
+        // and start update services if needed
+        // 1. for popular
         if (currentTime - Utils.getLongCachePreference(getActivity(), R.string.last_popular_update_time) >= CACHE_UPDATE_INTERVAL) {
             CacheUpdateService.startActionUpdatePopular(getActivity(), -1);
             for (int i = 2; i <= CACHE_PRELOAD_PAGES; i++)
                 CacheUpdateService.startActionUpdatePopular(getActivity(), i);
         }
-
+        // 2. for top rated
         if (currentTime - Utils.getLongCachePreference(getActivity(), R.string.last_toprated_update_time) >= CACHE_UPDATE_INTERVAL) {
             CacheUpdateService.startActionUpdateToprated(getActivity(), -1);
             for (int i = 2; i <= CACHE_PRELOAD_PAGES; i++)
@@ -141,11 +142,11 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mCursorAdapter.swapCursor(data);
+
         if (mPosition != GridView.INVALID_POSITION) {
             // If we don't need to restart the loader, and there's a desired position to restore
             // to, do so now.
             mGridView.smoothScrollToPosition(mPosition);
-
         }
     }
 

@@ -16,6 +16,7 @@ public class DetailActivity extends AppCompatActivity {
 
         if (savedInstanceState == null) {
             Bundle args = new Bundle();
+            // put URI from intent to fragment's Data
             args.putParcelable(DetailFragment.MOVIE_URI, getIntent().getData());
 
             DetailFragment fragment = new DetailFragment();

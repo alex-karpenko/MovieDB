@@ -19,12 +19,11 @@ import com.squareup.picasso.Picasso;
 
 /**
  * Fragment class with detail info about movie
- * Information (MovieInfo instance) gets from Intent
- * In future maybe will be necessary to get some information via HTTP request to TMDB,
- * with movie referenced by ID (take it from MovieInfo)
+ * Information. From intent gets URI with movie
  */
 public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> {
     private static final String LOG_TAG = DetailFragment.class.getSimpleName();
+    // data tag to pass data via intent
     public static final String MOVIE_URI = "MOVIE_URI";
     private static final int DETAIL_FRAGMENT_LOADER = 2;
     private Uri mUri;
@@ -43,7 +42,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
         if (args != null) mUri = args.getParcelable(MOVIE_URI);
         // Inflate fragment
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
-
+        // Store views references for faster access during updates
         posterView = (ImageView) rootView.findViewById(R.id.poster_image);
         title = (TextView) rootView.findViewById(R.id.detail_title);
         released = (TextView) rootView.findViewById(R.id.detail_released);
@@ -56,6 +55,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        // create loader
         getLoaderManager().initLoader(DETAIL_FRAGMENT_LOADER, null, this);
     }
 
@@ -73,6 +73,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data != null && data.moveToFirst()) {
+            // Setting all view's content
             Picasso.with(getActivity())
                     .load(Utils.basePosterUrl
                             + "w185" // TODO: we have to think to adopt width on image
@@ -87,6 +88,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+        // Nothing to do
     }
 
 

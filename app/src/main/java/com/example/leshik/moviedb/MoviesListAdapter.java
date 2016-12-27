@@ -20,6 +20,7 @@ class MoviesListAdapter extends CursorAdapter {
         super(context, c, flags);
     }
 
+    // Simple view holder class
     static class ViewHolder {
         final ImageView posterImage;
         int movie_id;
@@ -44,7 +45,6 @@ class MoviesListAdapter extends CursorAdapter {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
 
         viewHolder.movie_id = cursor.getInt(MoviesContract.SHORT_LIST_PROJECTION_INDEX_MOVIE_ID);
-
         Picasso.with(context)
                 .load(Utils.basePosterUrl
                         + "w185" // TODO: we have to think to adopt width of image, mayby
