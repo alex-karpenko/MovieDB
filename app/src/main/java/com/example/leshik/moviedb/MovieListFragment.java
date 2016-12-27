@@ -9,11 +9,11 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.GridView;
 
 import com.example.leshik.moviedb.model.MoviesContract;
 import com.example.leshik.moviedb.service.CacheUpdateService;
@@ -33,9 +33,10 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
     private static final long CACHE_UPDATE_INTERVAL = 1000 * 60 * 5; // 5 minutes
     // Number of pages to preload
     private static final int CACHE_PRELOAD_PAGES = 5;
-    private MoviesListAdapter mCursorAdapter;
-    private int mPosition = GridView.INVALID_POSITION;
-    private GridView mGridView;
+    private MoviesRecycleListAdapter mAdapter;
+    private int mPosition = RecyclerView.NO_POSITION;
+    private RecyclerView mRecyclerView;
+    private RecyclerView.LayoutManager mLayoutManager;
 
     /**
      * A callback interface that all activities containing this fragment must
@@ -58,28 +59,21 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate fragment
-        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_main_recycleview, container, false);
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.movies_list);
+
+        // Create layout manager and attach it to recycle view
+        mLayoutManager = new GridLayoutManager(getActivity(),
+                GridLayoutManager.DEFAULT_SPAN_COUNT,
+                GridLayoutManager.VERTICAL,
+                false);
+        mRecyclerView.setLayoutManager(mLayoutManager);
 
         // Construct empty cursor adapter ...
-        mCursorAdapter = new MoviesListAdapter(getActivity(), null, 0);
-        // ... and set it to gridview
-        mGridView = (GridView) rootView.findViewById(R.id.movie_grid);
-        mGridView.setAdapter(mCursorAdapter);
+        mAdapter = new MoviesRecycleListAdapter(getActivity(), null);
+        // ... and set it to recycle view
+        mRecyclerView.setAdapter(mAdapter);
 
-        // Listener for handling clicks on poster image
-        mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                // Call callback interface method to start detail activity with cursor data
-                Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
-                if (cursor != null) {
-                    ((Callback) getActivity()).
-                            onItemSelected(MoviesContract.Movies.buildUri(cursor.getLong(MoviesContract.SHORT_LIST_PROJECTION_INDEX_MOVIE_ID)));
-                }
-                mPosition = position;
-            }
-
-        });
         return rootView;
     }
 
@@ -141,17 +135,21 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mCursorAdapter.swapCursor(data);
+        mAdapter.swapCursor(data);
 
-        if (mPosition != GridView.INVALID_POSITION) {
+        if (mPosition != RecyclerView.NO_POSITION) {
             // If we don't need to restart the loader, and there's a desired position to restore
             // to, do so now.
-            mGridView.smoothScrollToPosition(mPosition);
+            mRecyclerView.smoothScrollToPosition(mPosition);
         }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        mCursorAdapter.swapCursor(null);
+        mAdapter.swapCursor(null);
+    }
+
+    public void setPosition(int position) {
+        mPosition = position;
     }
 }
