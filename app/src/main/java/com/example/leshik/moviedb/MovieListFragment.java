@@ -34,7 +34,6 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
     // Number of pages to preload
     private static final int CACHE_PRELOAD_PAGES = 5;
     private MoviesRecycleListAdapter mAdapter;
-    private int mPosition = RecyclerView.NO_POSITION;
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
 
@@ -136,20 +135,10 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mAdapter.swapCursor(data);
-
-        if (mPosition != RecyclerView.NO_POSITION) {
-            // If we don't need to restart the loader, and there's a desired position to restore
-            // to, do so now.
-            mRecyclerView.smoothScrollToPosition(mPosition);
-        }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mAdapter.swapCursor(null);
-    }
-
-    public void setPosition(int position) {
-        mPosition = position;
     }
 }

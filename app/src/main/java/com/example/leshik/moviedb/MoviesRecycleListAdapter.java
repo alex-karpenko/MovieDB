@@ -38,7 +38,6 @@ public class MoviesRecycleListAdapter extends CursorRecyclerViewAdapter<MoviesRe
                 // Call callback interface method to start detail activity with cursor data
                 ((MovieListFragment.Callback) getContext()).
                         onItemSelected(movieUri);
-                // mPosition = position;
             }
         });
     }
