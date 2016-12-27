@@ -46,7 +46,7 @@ class MoviesListAdapter extends CursorAdapter {
         viewHolder.movie_id = cursor.getInt(MoviesContract.SHORT_LIST_PROJECTION_INDEX_MOVIE_ID);
 
         Picasso.with(context)
-                .load(MovieUtils.basePosterUrl
+                .load(Utils.basePosterUrl
                         + "w185" // TODO: we have to think to adopt width of image, mayby
                         + cursor.getString(MoviesContract.SHORT_LIST_PROJECTION_INDEX_POSTER_PATH))
                 .into(viewHolder.posterImage);

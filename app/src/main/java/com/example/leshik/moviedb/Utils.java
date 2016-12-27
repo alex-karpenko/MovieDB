@@ -9,7 +9,7 @@ import static com.example.leshik.moviedb.service.CacheUpdateService.CACHE_PREFS_
  * Utility class for provide some common (project-wide) methods, variables and constants
  */
 
-public final class MovieUtils {
+public final class Utils {
     // Base URLs to deal with TMBD API
     public static final String baseApiUrl = "http://api.themoviedb.org/3/";
     public static final String baseApiSecureUrl = "https://api.themoviedb.org/3/";

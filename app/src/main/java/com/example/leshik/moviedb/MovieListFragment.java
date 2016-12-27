@@ -108,13 +108,13 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
     private void updateMoviesCache() {
         long currentTime = Calendar.getInstance().getTimeInMillis();
 
-        if (currentTime - MovieUtils.getLongCachePreference(getActivity(), R.string.last_popular_update_time) >= CACHE_UPDATE_INTERVAL) {
+        if (currentTime - Utils.getLongCachePreference(getActivity(), R.string.last_popular_update_time) >= CACHE_UPDATE_INTERVAL) {
             CacheUpdateService.startActionUpdatePopular(getActivity(), -1);
             for (int i = 2; i <= CACHE_PRELOAD_PAGES; i++)
                 CacheUpdateService.startActionUpdatePopular(getActivity(), i);
         }
 
-        if (currentTime - MovieUtils.getLongCachePreference(getActivity(), R.string.last_toprated_update_time) >= CACHE_UPDATE_INTERVAL) {
+        if (currentTime - Utils.getLongCachePreference(getActivity(), R.string.last_toprated_update_time) >= CACHE_UPDATE_INTERVAL) {
             CacheUpdateService.startActionUpdateToprated(getActivity(), -1);
             for (int i = 2; i <= CACHE_PRELOAD_PAGES; i++)
                 CacheUpdateService.startActionUpdateToprated(getActivity(), i);

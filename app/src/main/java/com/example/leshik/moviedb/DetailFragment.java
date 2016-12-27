@@ -74,7 +74,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data != null && data.moveToFirst()) {
             Picasso.with(getActivity())
-                    .load(MovieUtils.basePosterUrl
+                    .load(Utils.basePosterUrl
                             + "w185" // TODO: we have to think to adopt width on image
                             + data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_POSTER_PATH))
                     .into(posterView);
