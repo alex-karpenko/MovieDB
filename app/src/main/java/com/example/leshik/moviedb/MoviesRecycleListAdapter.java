@@ -46,8 +46,7 @@ public class MoviesRecycleListAdapter extends CursorRecyclerViewAdapter<MoviesRe
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.list_item, parent, false);
-        ViewHolder vh = new ViewHolder(itemView);
-        return vh;
+        return new ViewHolder(itemView);
     }
 
 
