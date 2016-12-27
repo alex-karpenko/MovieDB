@@ -58,7 +58,7 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate fragment
-        View rootView = inflater.inflate(R.layout.fragment_main_recycleview, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.movies_list);
 
         // Create layout manager and attach it to recycle view

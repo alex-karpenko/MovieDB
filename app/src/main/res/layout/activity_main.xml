@@ -4,4 +4,4 @@
     android:name="com.example.leshik.moviedb.MovieListFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:layout="@layout/fragment_main_recycleview" />
+    tools:layout="@layout/fragment_main" />
