@@ -4,6 +4,7 @@
     android:id="@+id/poster_card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    card_view:contentPadding="4dp"
     card_view:cardCornerRadius="4dp">
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
