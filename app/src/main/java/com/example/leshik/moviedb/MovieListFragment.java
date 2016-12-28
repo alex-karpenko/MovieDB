@@ -9,9 +9,13 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -26,7 +30,8 @@ import java.util.Calendar;
  * placed in a GridView.
  * <p>
  */
-public class MovieListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class MovieListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,
+        SwipeRefreshLayout.OnRefreshListener {
     private static final int FRAGMENT_LIST_LOADER_ID = 1;
     // cache update interval in milliseconds
     // 5 sec for debug
@@ -35,7 +40,14 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
     private static final int CACHE_PRELOAD_PAGES = 5;
     private MoviesRecycleListAdapter mAdapter;
     private RecyclerView mRecyclerView;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView.LayoutManager mLayoutManager;
+
+    @Override
+    public void onRefresh() {
+        updatePopularCache();
+        updateTopratedCache();
+    }
 
     /**
      * A callback interface that all activities containing this fragment must
@@ -52,6 +64,7 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 
 
@@ -60,6 +73,9 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
         // Inflate fragment
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.movies_list);
+
+        mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swiperefresh);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
 
         // Create layout manager and attach it to recycle view
         mLayoutManager = new GridLayoutManager(getActivity(), Utils.calculateNoOfColumns(getActivity()));
@@ -75,11 +91,12 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
         // Every time when activity created - update configuration
         CacheUpdateService.startActionUpdateConfiguration(getActivity());
         // and create content loader
         getLoaderManager().initLoader(FRAGMENT_LIST_LOADER_ID, null, this);
+
+        super.onActivityCreated(savedInstanceState);
     }
 
     @Override
@@ -87,29 +104,55 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
         super.onStart();
         // Every time, when fragment appears on the screen, we have to update contents
         // (after start activity, returning from details or settings, etc.)
-        updateMoviesCache();
+        updateAllCacheIfNeed();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.main_fragment, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_refresh) {
+            mSwipeRefreshLayout.setRefreshing(true);
+            updatePopularCache();
+            updatePopularCache();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     /**
      * Method to update list of movies
      */
-    private void updateMoviesCache() {
+    private void updateAllCacheIfNeed() {
         long currentTime = Calendar.getInstance().getTimeInMillis();
 
         // Check difference of current time and last cache update time
         // and start update services if needed
         // 1. for popular
         if (currentTime - Utils.getLongCachePreference(getActivity(), R.string.last_popular_update_time) >= CACHE_UPDATE_INTERVAL) {
-            CacheUpdateService.startActionUpdatePopular(getActivity(), -1);
-            for (int i = 2; i <= CACHE_PRELOAD_PAGES; i++)
-                CacheUpdateService.startActionUpdatePopular(getActivity(), i);
+            updatePopularCache();
         }
         // 2. for top rated
         if (currentTime - Utils.getLongCachePreference(getActivity(), R.string.last_toprated_update_time) >= CACHE_UPDATE_INTERVAL) {
-            CacheUpdateService.startActionUpdateToprated(getActivity(), -1);
-            for (int i = 2; i <= CACHE_PRELOAD_PAGES; i++)
-                CacheUpdateService.startActionUpdateToprated(getActivity(), i);
+            updateTopratedCache();
         }
+    }
+
+    private void updatePopularCache() {
+        CacheUpdateService.startActionUpdatePopular(getActivity(), -1);
+        for (int i = 2; i <= CACHE_PRELOAD_PAGES; i++)
+            CacheUpdateService.startActionUpdatePopular(getActivity(), i);
+    }
+
+    private void updateTopratedCache() {
+        CacheUpdateService.startActionUpdateToprated(getActivity(), -1);
+        for (int i = 2; i <= CACHE_PRELOAD_PAGES; i++)
+            CacheUpdateService.startActionUpdateToprated(getActivity(), i);
     }
 
     @Override
@@ -132,6 +175,7 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mAdapter.changeCursor(data);
+        mSwipeRefreshLayout.setRefreshing(false);
     }
 
     @Override

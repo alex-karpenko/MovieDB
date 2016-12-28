@@ -4,6 +4,7 @@
     <string name="content_authority">com.example.leshik.moviedb</string>
 
     <!-- Strings related to Settings -->
+    <string name="action_refresh">Refresh</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_settings">Settings</string>
     <string name="pref_sortorder_popular" translatable="false">popular</string>
