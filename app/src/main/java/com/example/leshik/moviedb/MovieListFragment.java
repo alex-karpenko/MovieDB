@@ -62,7 +62,7 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.movies_list);
 
         // Create layout manager and attach it to recycle view
-        mLayoutManager = new GridLayoutManager(getActivity(), 2);
+        mLayoutManager = new GridLayoutManager(getActivity(), Utils.calculateNoOfColumns(getActivity()));
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         // Construct empty cursor adapter ...
