@@ -45,8 +45,7 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public void onRefresh() {
-        updatePopularCache();
-        updateTopratedCache();
+        updateCurentPageCache();
     }
 
     /**
@@ -117,8 +116,8 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
             mSwipeRefreshLayout.setRefreshing(true);
-            updatePopularCache();
-            updatePopularCache();
+            updateCurentPageCache();
+
             return true;
         }
 
@@ -155,14 +154,18 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
             CacheUpdateService.startActionUpdateToprated(getActivity(), i);
     }
 
+    private void updateCurentPageCache() {
+        String sortOrder = getSortOrder();
+        if (sortOrder.equals(getString(R.string.pref_sortorder_rating))) updateTopratedCache();
+        else if (sortOrder.equals(getString(R.string.pref_sortorder_popular))) updatePopularCache();
+    }
+
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Uri baseUri = MoviesContract.Popular.CONTENT_URI;
         String[] baseProjection = MoviesContract.Popular.shortListProjection;
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String sortOrder = prefs.getString(getString(R.string.pref_sortorder_key),
-                getString(R.string.pref_sortorder_default));
+        String sortOrder = getSortOrder();
 
         if (sortOrder.equals(getString(R.string.pref_sortorder_rating))) {
             baseProjection = MoviesContract.Toprated.shortListProjection;
@@ -181,5 +184,12 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mAdapter.changeCursor(null);
+    }
+
+    private String getSortOrder() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String sortOrder = prefs.getString(getString(R.string.pref_sortorder_key),
+                getString(R.string.pref_sortorder_default));
+        return sortOrder;
     }
 }
