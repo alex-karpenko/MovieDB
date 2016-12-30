@@ -32,12 +32,13 @@ public class MoviesRecycleListAdapter extends CursorRecyclerViewAdapter<MoviesRe
 
         // set item click listener
         final Uri movieUri = MoviesContract.Movies.buildUri(cursor.getLong(MoviesContract.SHORT_LIST_PROJECTION_INDEX_MOVIE_ID));
+        final ImageView posterView = viewHolder.mPosterView;
         viewHolder.mPosterView.setOnClickListener(new AdapterView.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Call callback interface method to start detail activity with cursor data
                 ((MovieListFragment.Callback) getContext()).
-                        onItemSelected(movieUri);
+                        onItemSelected(movieUri, posterView);
             }
         });
     }
