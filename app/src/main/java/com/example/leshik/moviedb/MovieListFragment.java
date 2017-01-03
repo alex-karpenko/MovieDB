@@ -28,7 +28,7 @@ import java.util.Calendar;
 
 /**
  * Main screen fragment with list of movie's posters,
- * placed in a GridView.
+ * placed in a RecycleView.
  * <p>
  */
 public class MovieListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,
@@ -37,8 +37,6 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
     // cache update interval in milliseconds
     // 5 sec for debug
     private static final long CACHE_UPDATE_INTERVAL = 1000 * 60 * 5; // 5 minutes
-    // Number of pages to preload
-    private static final int CACHE_PRELOAD_PAGES = 5;
     private MoviesRecycleListAdapter mAdapter;
     private RecyclerView mRecyclerView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
@@ -97,14 +95,15 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
         getLoaderManager().initLoader(FRAGMENT_LIST_LOADER_ID, null, this);
 
         super.onActivityCreated(savedInstanceState);
+
+        // Every time, when fragment appears on the screen, we have to update contents
+        // (after start activity, returning from details or settings, etc.)
+        updateAllCacheIfNeed();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        // Every time, when fragment appears on the screen, we have to update contents
-        // (after start activity, returning from details or settings, etc.)
-        updateAllCacheIfNeed();
     }
 
     @Override
@@ -145,13 +144,13 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
 
     private void updatePopularCache() {
         CacheUpdateService.startActionUpdatePopular(getActivity(), -1);
-        for (int i = 2; i <= CACHE_PRELOAD_PAGES; i++)
+        for (int i = 2; i <= Utils.CACHE_PRELOAD_PAGES; i++)
             CacheUpdateService.startActionUpdatePopular(getActivity(), i);
     }
 
     private void updateTopratedCache() {
         CacheUpdateService.startActionUpdateToprated(getActivity(), -1);
-        for (int i = 2; i <= CACHE_PRELOAD_PAGES; i++)
+        for (int i = 2; i <= Utils.CACHE_PRELOAD_PAGES; i++)
             CacheUpdateService.startActionUpdateToprated(getActivity(), i);
     }
 

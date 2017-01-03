@@ -37,6 +37,8 @@ public class CacheUpdateService extends IntentService {
     static final String EXTRA_PARAM_MOVIE_ID = "com.example.leshik.moviedb.service.extra.MOVIE_ID";
     // File name to store shared preferences by cache update service
     public static final String CACHE_PREFS_NAME = "cache_prefs";
+    // Default page size of the popular and top rated responses
+    public static final int DEFAULT_PAGE_SIZE = 20;
 
     // Default constructor
     public CacheUpdateService() {
@@ -165,7 +167,10 @@ public class CacheUpdateService extends IntentService {
             if (page <= 0) {
                 // If page number is not positive - first delete all data from popular table
                 // and update last_update_time in the preferences
-                getContentResolver().delete(MoviesContract.Popular.CONTENT_URI, null, null);
+                getContentResolver().
+                        delete(MoviesContract.Popular.CONTENT_URI,
+                                MoviesContract.Popular.COLUMN_NAME_SORT_ID + ">?",
+                                new String[]{String.valueOf(DEFAULT_PAGE_SIZE)});
                 updateCachePreference(R.string.last_popular_update_time, Calendar.getInstance().getTimeInMillis());
             }
             // Insert movies and popular tables via content provider calls
@@ -197,7 +202,10 @@ public class CacheUpdateService extends IntentService {
             if (page <= 0) {
                 // If page number is not positive - first delete all data from popular table
                 // and update last_update_time in the preferences
-                getContentResolver().delete(MoviesContract.Toprated.CONTENT_URI, null, null);
+                getContentResolver()
+                        .delete(MoviesContract.Toprated.CONTENT_URI,
+                                MoviesContract.Toprated.COLUMN_NAME_SORT_ID + ">?",
+                                new String[]{String.valueOf(DEFAULT_PAGE_SIZE)});
                 updateCachePreference(R.string.last_toprated_update_time, Calendar.getInstance().getTimeInMillis());
             }
             // Insert movies and toprated tables via content provider calls

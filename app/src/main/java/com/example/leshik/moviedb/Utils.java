@@ -14,6 +14,8 @@ public final class Utils {
     // Base URLs to deal with TMBD API
     public static final String baseApiUrl = "http://api.themoviedb.org/3/";
     public static final String baseApiSecureUrl = "https://api.themoviedb.org/3/";
+    // Number of pages to preload
+    public static final int CACHE_PRELOAD_PAGES = 5;
 
     // Common variables, we fill its by fetching configuration from TMDB (in MovieListFragment class)
     public static String basePosterUrl = null;
