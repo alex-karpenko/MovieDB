@@ -1,11 +1,13 @@
 package com.example.leshik.moviedb;
 
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
 
 public class MainActivity extends AppCompatActivity implements MovieListFragment.Callback {
 
@@ -37,9 +39,17 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
     }
 
     @Override
-    public void onItemSelected(Uri movieUri) {
+    public void onItemSelected(Uri movieUri, ImageView posterView) {
         Intent intent = new Intent(this, DetailActivity.class)
                 .setData(movieUri);
-        startActivity(intent);
+        // If Lollipop or higher - start activity with image animation
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            ActivityOptions options = ActivityOptions
+                    .makeSceneTransitionAnimation(this, posterView, getString(R.string.poster_image));
+            startActivity(intent, options.toBundle());
+        } else {
+            // If lower then Lollipop - simple start detail activity
+            startActivity(intent);
+        }
     }
 }

@@ -9,11 +9,16 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.GridView;
+import android.widget.ImageView;
 
 import com.example.leshik.moviedb.model.MoviesContract;
 import com.example.leshik.moviedb.service.CacheUpdateService;
@@ -23,19 +28,24 @@ import java.util.Calendar;
 
 /**
  * Main screen fragment with list of movie's posters,
- * placed in a GridView.
+ * placed in a RecycleView.
  * <p>
  */
-public class MovieListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class MovieListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,
+        SwipeRefreshLayout.OnRefreshListener {
     private static final int FRAGMENT_LIST_LOADER_ID = 1;
     // cache update interval in milliseconds
     // 5 sec for debug
     private static final long CACHE_UPDATE_INTERVAL = 1000 * 60 * 5; // 5 minutes
-    // Number of pages to preload
-    private static final int CACHE_PRELOAD_PAGES = 5;
-    private MoviesListAdapter mCursorAdapter;
-    private int mPosition = GridView.INVALID_POSITION;
-    private GridView mGridView;
+    private MoviesRecycleListAdapter mAdapter;
+    private RecyclerView mRecyclerView;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+    private RecyclerView.LayoutManager mLayoutManager;
+
+    @Override
+    public void onRefresh() {
+        updateCurentPageCache();
+    }
 
     /**
      * A callback interface that all activities containing this fragment must
@@ -46,12 +56,13 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
         /**
          * DetailFragmentCallback for when an item has been selected.
          */
-        void onItemSelected(Uri movieUri);
+        void onItemSelected(Uri movieUri, ImageView posterView);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 
 
@@ -59,67 +70,94 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate fragment
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.movies_list);
+
+        mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swiperefresh);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+
+        // Create layout manager and attach it to recycle view
+        mLayoutManager = new GridLayoutManager(getActivity(), Utils.calculateNoOfColumns(getActivity()));
+        mRecyclerView.setLayoutManager(mLayoutManager);
 
         // Construct empty cursor adapter ...
-        mCursorAdapter = new MoviesListAdapter(getActivity(), null, 0);
-        // ... and set it to gridview
-        mGridView = (GridView) rootView.findViewById(R.id.movie_grid);
-        mGridView.setAdapter(mCursorAdapter);
+        mAdapter = new MoviesRecycleListAdapter(getActivity(), null);
+        // ... and set it to recycle view
+        mRecyclerView.setAdapter(mAdapter);
 
-        // Listener for handling clicks on poster image
-        mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                // Call callback interface method to start detail activity with cursor data
-                Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
-                if (cursor != null) {
-                    ((Callback) getActivity()).
-                            onItemSelected(MoviesContract.Movies.buildUri(cursor.getLong(MoviesContract.SHORT_LIST_PROJECTION_INDEX_MOVIE_ID)));
-                }
-                mPosition = position;
-            }
-
-        });
         return rootView;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
         // Every time when activity created - update configuration
         CacheUpdateService.startActionUpdateConfiguration(getActivity());
         // and create content loader
         getLoaderManager().initLoader(FRAGMENT_LIST_LOADER_ID, null, this);
+
+        super.onActivityCreated(savedInstanceState);
+
+        // Every time, when fragment appears on the screen, we have to update contents
+        // (after start activity, returning from details or settings, etc.)
+        updateAllCacheIfNeed();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        // Every time, when fragment appears on the screen, we have to update contents
-        // (after start activity, returning from details or settings, etc.)
-        updateMoviesCache();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.main_fragment, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_refresh) {
+            mSwipeRefreshLayout.setRefreshing(true);
+            updateCurentPageCache();
+
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     /**
      * Method to update list of movies
      */
-    private void updateMoviesCache() {
+    private void updateAllCacheIfNeed() {
         long currentTime = Calendar.getInstance().getTimeInMillis();
 
         // Check difference of current time and last cache update time
         // and start update services if needed
         // 1. for popular
         if (currentTime - Utils.getLongCachePreference(getActivity(), R.string.last_popular_update_time) >= CACHE_UPDATE_INTERVAL) {
-            CacheUpdateService.startActionUpdatePopular(getActivity(), -1);
-            for (int i = 2; i <= CACHE_PRELOAD_PAGES; i++)
-                CacheUpdateService.startActionUpdatePopular(getActivity(), i);
+            updatePopularCache();
         }
         // 2. for top rated
         if (currentTime - Utils.getLongCachePreference(getActivity(), R.string.last_toprated_update_time) >= CACHE_UPDATE_INTERVAL) {
-            CacheUpdateService.startActionUpdateToprated(getActivity(), -1);
-            for (int i = 2; i <= CACHE_PRELOAD_PAGES; i++)
-                CacheUpdateService.startActionUpdateToprated(getActivity(), i);
+            updateTopratedCache();
         }
+    }
+
+    private void updatePopularCache() {
+        CacheUpdateService.startActionUpdatePopular(getActivity(), -1);
+        for (int i = 2; i <= Utils.CACHE_PRELOAD_PAGES; i++)
+            CacheUpdateService.startActionUpdatePopular(getActivity(), i);
+    }
+
+    private void updateTopratedCache() {
+        CacheUpdateService.startActionUpdateToprated(getActivity(), -1);
+        for (int i = 2; i <= Utils.CACHE_PRELOAD_PAGES; i++)
+            CacheUpdateService.startActionUpdateToprated(getActivity(), i);
+    }
+
+    private void updateCurentPageCache() {
+        String sortOrder = getSortOrder();
+        if (sortOrder.equals(getString(R.string.pref_sortorder_rating))) updateTopratedCache();
+        else if (sortOrder.equals(getString(R.string.pref_sortorder_popular))) updatePopularCache();
     }
 
     @Override
@@ -127,9 +165,7 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
         Uri baseUri = MoviesContract.Popular.CONTENT_URI;
         String[] baseProjection = MoviesContract.Popular.shortListProjection;
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String sortOrder = prefs.getString(getString(R.string.pref_sortorder_key),
-                getString(R.string.pref_sortorder_default));
+        String sortOrder = getSortOrder();
 
         if (sortOrder.equals(getString(R.string.pref_sortorder_rating))) {
             baseProjection = MoviesContract.Toprated.shortListProjection;
@@ -141,17 +177,19 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mCursorAdapter.swapCursor(data);
-
-        if (mPosition != GridView.INVALID_POSITION) {
-            // If we don't need to restart the loader, and there's a desired position to restore
-            // to, do so now.
-            mGridView.smoothScrollToPosition(mPosition);
-        }
+        mAdapter.changeCursor(data);
+        mSwipeRefreshLayout.setRefreshing(false);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        mCursorAdapter.swapCursor(null);
+        mAdapter.changeCursor(null);
+    }
+
+    private String getSortOrder() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String sortOrder = prefs.getString(getString(R.string.pref_sortorder_key),
+                getString(R.string.pref_sortorder_default));
+        return sortOrder;
     }
 }

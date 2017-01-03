@@ -16,18 +16,16 @@
             android:id="@+id/detail_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorDetailTitleBackground"
             android:paddingBottom="@dimen/detail_title_vertical_margin"
             android:paddingEnd="@dimen/detail_right_margin"
             android:paddingLeft="@dimen/detail_left_margin"
             android:paddingRight="@dimen/detail_right_margin"
             android:paddingStart="@dimen/detail_left_margin"
             android:paddingTop="@dimen/detail_title_vertical_margin"
-            android:textColor="@color/colorDetailTitleForeground"
             android:textSize="24sp"
             tools:text="Original title" />
 
-        <!-- Image, rlease date, rating -->
+        <!-- Image, release date, rating -->
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -43,7 +41,7 @@
                 android:cropToPadding="true"
                 android:paddingLeft="@dimen/detail_left_margin"
                 android:paddingTop="@dimen/detail_interviews_padding"
-                app:srcCompat="@mipmap/interstellar" />
+                android:transitionName="@string/poster_image" />
 
             <!-- text info (release date, rating) -->
             <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -76,7 +74,7 @@
                     android:text="8.1/10"
                     android:textSize="14sp" />
 
-                <!-- end of etxt info block -->
+                <!-- end of text info block -->
             </LinearLayout>
             <!-- end of middle block (poster + info) -->
         </LinearLayout>
@@ -92,8 +90,7 @@
             android:paddingRight="@dimen/detail_right_margin"
             android:paddingStart="@dimen/detail_left_margin"
             android:paddingTop="@dimen/detail_title_vertical_margin"
-            android:text="Overview text"
-            android:textColor="@color/colorOverviewForeground" />
+            android:text="Overview text" />
         <!-- End of main block -->
     </LinearLayout>
 
