@@ -35,6 +35,12 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
     TextView overview;
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Get bundle with args (URI)

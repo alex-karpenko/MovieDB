@@ -2,6 +2,7 @@ package com.example.leshik.moviedb;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 
 /**
  * Activity class for deal with detail movie information
@@ -13,6 +14,9 @@ public class DetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
+
+        Toolbar mToolbar = (Toolbar) findViewById(R.id.detail_toolbar);
+        setSupportActionBar(mToolbar);
 
         if (savedInstanceState == null) {
             Bundle args = new Bundle();
