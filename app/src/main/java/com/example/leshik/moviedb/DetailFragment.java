@@ -9,6 +9,9 @@ import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -34,6 +37,9 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
     TextView rating;
     TextView overview;
 
+    boolean isFavorite;
+    Menu mMenu;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +61,8 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
         rating = (TextView) rootView.findViewById(R.id.detail_rating);
         overview = (TextView) rootView.findViewById(R.id.detail_overview);
 
+        isFavorite = false;
+
         return rootView;
     }
 
@@ -63,6 +71,29 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
         super.onActivityCreated(savedInstanceState);
         // create loader
         getLoaderManager().initLoader(DETAIL_FRAGMENT_LOADER, null, this);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.detail_fragment, menu);
+        setFavoriteIcon(isFavorite);
+        mMenu = menu;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_refresh) {
+            // TODO: implement movie refreshing
+            return true;
+        }
+        if (id == R.id.action_favorite) {
+            // TODO: implement switching favorite flag and database update
+            isFavorite = !isFavorite;
+            setFavoriteIcon(isFavorite);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -89,6 +120,10 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
             released.setText(data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_RELEASE_DATE));
             rating.setText(String.format("%.1f/10", data.getFloat(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_VOTE_AVERAGE)));
             overview.setText(data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_OVERVIEW));
+
+            // TODO: set isFavorite variable from database
+            isFavorite = false;
+            setFavoriteIcon(isFavorite);
         }
     }
 
@@ -97,5 +132,14 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
         // Nothing to do
     }
 
+    void setFavoriteIcon(boolean flag) {
+        int favIcon;
+        if (flag) favIcon = R.drawable.ic_favorite_black;
+        else favIcon = R.drawable.ic_favorite_outline;
+        if (mMenu != null) {
+            MenuItem favMenuItem = mMenu.findItem(R.id.action_favorite);
+            favMenuItem.setIcon(favIcon);
+        }
 
+    }
 }
