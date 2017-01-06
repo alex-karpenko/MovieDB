@@ -44,7 +44,7 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public void onRefresh() {
-        updateCurentPageCache();
+        updateCurrentPageCache();
     }
 
     /**
@@ -89,9 +89,7 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        // Every time when activity created - update configuration
-        CacheUpdateService.startActionUpdateConfiguration(getActivity());
-        // and create content loader
+        // Create content loader for list data
         getLoaderManager().initLoader(FRAGMENT_LIST_LOADER_ID, null, this);
 
         super.onActivityCreated(savedInstanceState);
@@ -116,7 +114,7 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
             mSwipeRefreshLayout.setRefreshing(true);
-            updateCurentPageCache();
+            updateCurrentPageCache();
 
             return true;
         }
@@ -154,7 +152,7 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
             CacheUpdateService.startActionUpdateToprated(getActivity(), i);
     }
 
-    private void updateCurentPageCache() {
+    private void updateCurrentPageCache() {
         String sortOrder = getSortOrder();
         if (sortOrder.equals(getString(R.string.pref_sortorder_rating))) updateTopratedCache();
         else if (sortOrder.equals(getString(R.string.pref_sortorder_popular))) updatePopularCache();

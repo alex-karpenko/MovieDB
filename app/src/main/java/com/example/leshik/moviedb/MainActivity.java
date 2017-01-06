@@ -10,12 +10,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 
+import com.example.leshik.moviedb.service.CacheUpdateService;
+
 public class MainActivity extends AppCompatActivity implements MovieListFragment.Callback {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Every time when activity created - update configuration
+        CacheUpdateService.startActionUpdateConfiguration(this);
 
         Toolbar mToolbar = (Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(mToolbar);
