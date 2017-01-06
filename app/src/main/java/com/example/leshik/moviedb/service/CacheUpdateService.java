@@ -1,13 +1,14 @@
 package com.example.leshik.moviedb.service;
 
 import android.app.IntentService;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
 import com.example.leshik.moviedb.BuildConfig;
-import com.example.leshik.moviedb.Utils;
 import com.example.leshik.moviedb.R;
+import com.example.leshik.moviedb.Utils;
 import com.example.leshik.moviedb.model.MoviesContract;
 
 import java.io.IOException;
@@ -30,11 +31,13 @@ public class CacheUpdateService extends IntentService {
     static final String ACTION_UPDATE_POPULAR = "com.example.leshik.moviedb.service.action.UPDATE_POPULAR";
     static final String ACTION_UPDATE_TOPRATED = "com.example.leshik.moviedb.service.action.UPDATE_TOPRATED";
     static final String ACTION_UPDATE_CONFIGURATION = "com.example.leshik.moviedb.service.action.UPDATE_CONFIGURATION";
+    static final String ACTION_UPDATE_FAVORITE = "com.example.leshik.moviedb.service.action.UPDATE_FAVORITE";
     // Parameters for actions
     // page number for update popular or toprated
     static final String EXTRA_PARAM_PAGE = "com.example.leshik.moviedb.service.extra.PAGE";
     // movie_id for update movies
     static final String EXTRA_PARAM_MOVIE_ID = "com.example.leshik.moviedb.service.extra.MOVIE_ID";
+    static final String EXTRA_PARAM_FAVORITE_FLAG = "com.example.leshik.moviedb.service.extra.FAVORITE_FLAG";
     // File name to store shared preferences by cache update service
     public static final String CACHE_PREFS_NAME = "cache_prefs";
     // Default page size of the popular and top rated responses
@@ -55,6 +58,20 @@ public class CacheUpdateService extends IntentService {
         Intent intent = new Intent(context, CacheUpdateService.class);
         intent.setAction(ACTION_UPDATE_MOVIE);
         intent.putExtra(EXTRA_PARAM_MOVIE_ID, movie_id);
+        context.startService(intent);
+    }
+
+    /**
+     * Starts this service to perform action UpdateMovie with the given parameters. If
+     * the service is already performing a task this action will be queued.
+     *
+     * @see IntentService
+     */
+    public static void startActionUpdateFavorite(Context context, long movie_id, boolean isFavorite) {
+        Intent intent = new Intent(context, CacheUpdateService.class);
+        intent.setAction(ACTION_UPDATE_FAVORITE);
+        intent.putExtra(EXTRA_PARAM_MOVIE_ID, movie_id);
+        intent.putExtra(EXTRA_PARAM_FAVORITE_FLAG, isFavorite);
         context.startService(intent);
     }
 
@@ -113,6 +130,10 @@ public class CacheUpdateService extends IntentService {
                 handleActionUpdateToprated(page);
             } else if (ACTION_UPDATE_CONFIGURATION.equals(action)) {
                 handleActionUpdateConfiguration();
+            } else if (ACTION_UPDATE_FAVORITE.equals(action)) {
+                final long movie_id = intent.getLongExtra(EXTRA_PARAM_MOVIE_ID, -1);
+                final boolean isFavorite = intent.getBooleanExtra(EXTRA_PARAM_FAVORITE_FLAG, false);
+                handleActionUpdateFavorite(movie_id, isFavorite);
             }
         }
     }
@@ -141,6 +162,23 @@ public class CacheUpdateService extends IntentService {
             getContentResolver().insert(MoviesContract.Movies.CONTENT_URI, movie.getMovieContentValues());
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * Handle action UpdateMovie in the provided background thread with the provided
+     * parameters.
+     */
+    private void handleActionUpdateFavorite(long movie_id, boolean isFavorite) {
+        if (movie_id <= 0) return;
+
+        if (isFavorite) {
+            ContentValues values = new ContentValues();
+            values.put(MoviesContract.Favorites.COLUMN_NAME_MOVIE_ID, movie_id);
+            values.put(MoviesContract.Favorites.COLUMN_NAME_SORT_ID, -1);
+            getContentResolver().insert(MoviesContract.Favorites.CONTENT_URI, values);
+        } else {
+            getContentResolver().delete(MoviesContract.Favorites.buildUri(movie_id), null, null);
         }
     }
 
