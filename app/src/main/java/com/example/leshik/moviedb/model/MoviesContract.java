@@ -214,6 +214,10 @@ public final class MoviesContract {
                 " WHERE " + Movies.TABLE_NAME + "." + Movies.COLUMN_NAME_MOVIE_ID + "=" +
                 TABLE_NAME + "." + COLUMN_NAME_MOVIE_ID +
                 ")";
+        static final String MAX_SORT_ID_SELECT_STATEMENT = "(SELECT " +
+                "MAX(" + COLUMN_NAME_SORT_ID + ") + 1 " +
+                " FROM " + TABLE_NAME +
+                ")";
         // Projection for list fragment
         public static final String[] shortListProjection = {_ID,
                 COLUMN_NAME_SORT_ID,

@@ -56,7 +56,7 @@ public class TestUriMatcher {
         assertEquals("Error: the FAVORITES URI was matcher incorrectly.",
                 MoviesProvider.FAVORITES, testMatcher.match(TEST_URI_FAVORITES_DIR));
         assertEquals("Error: the FAVORITES WITH ID URI was matcher incorrectly.",
-                MoviesProvider.FAVORITES_WITH_SORT_ID, testMatcher.match(TEST_URI_FAVORITES_ITEM));
+                MoviesProvider.FAVORITES_WITH_MOVIE_ID, testMatcher.match(TEST_URI_FAVORITES_ITEM));
 
         assertEquals("Error: the VIDEOS URI was matcher incorrectly.",
                 MoviesProvider.VIDEOS, testMatcher.match(TEST_URI_VIDEOS_DIR));
