@@ -28,7 +28,7 @@ public class MoviesProvider extends ContentProvider {
     static final int TOPRATED = 300;
     static final int TOPRATED_WITH_SORT_ID = 301;
     static final int FAVORITES = 400;
-    static final int FAVORITES_WITH_SORT_ID = 401;
+    static final int FAVORITES_WITH_MOVIE_ID = 401;
     static final int VIDEOS = 500;
     static final int VIDEOS_WITH_MOVIE_ID = 501;
     static final int VIDEOS_WITH_VIDEO_ID = 502;
@@ -59,7 +59,7 @@ public class MoviesProvider extends ContentProvider {
                 return MoviesContract.Toprated.CONTENT_ITEM_TYPE;
             case FAVORITES:
                 return MoviesContract.Favorites.CONTENT_TYPE;
-            case FAVORITES_WITH_SORT_ID:
+            case FAVORITES_WITH_MOVIE_ID:
                 return MoviesContract.Favorites.CONTENT_ITEM_TYPE;
             case VIDEOS:
                 return MoviesContract.Videos.CONTENT_TYPE;
@@ -144,10 +144,10 @@ public class MoviesProvider extends ContentProvider {
                         null, null,
                         newSortOrder);
                 break;
-            case FAVORITES_WITH_SORT_ID:
+            case FAVORITES_WITH_MOVIE_ID:
                 returnCursor = db.query(MoviesContract.Favorites.SELECT_STATEMENT,
                         projection,
-                        MoviesContract.Favorites.COLUMN_NAME_SORT_ID + "=?",
+                        MoviesContract.Favorites.COLUMN_NAME_MOVIE_ID + "=?",
                         new String[]{String.valueOf(ContentUris.parseId(uri))},
                         null, null,
                         newSortOrder);
@@ -218,12 +218,22 @@ public class MoviesProvider extends ContentProvider {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             case FAVORITES:
-                id = recordInsertOrUpdateHelper_integerId(db, values, MoviesContract.Favorites.TABLE_NAME,
-                        MoviesContract.Favorites.COLUMN_NAME_SORT_ID);
-                if (id >= 0)
-                    returnUri = MoviesContract.Favorites.buildUri(id);
-                else
-                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                db.beginTransaction();
+                // if sort_id not defined (<=0)
+                if (values.getAsInteger(MoviesContract.Favorites.COLUMN_NAME_SORT_ID) <= 0) {
+                    // Get maximum value of sort_id and update it in values object
+                    Cursor c = db.query(MoviesContract.Favorites.MAX_SORT_ID_SELECT_STATEMENT,
+                            null, null, null, null, null, null);
+                    if (c != null && c.moveToFirst()) {
+                        values.remove(MoviesContract.Favorites.COLUMN_NAME_SORT_ID);
+                        values.put(MoviesContract.Favorites.COLUMN_NAME_SORT_ID, c.getInt(0));
+                    }
+                    if (c != null) c.close();
+                }
+                db.insert(MoviesContract.Favorites.TABLE_NAME, null, values);
+                db.setTransactionSuccessful();
+                db.endTransaction();
+                returnUri = MoviesContract.Favorites.buildUri(values.getAsInteger(MoviesContract.Favorites.COLUMN_NAME_MOVIE_ID));
                 break;
             case VIDEOS:
                 String videoId = recordInsertOrUpdateHelper_stringId(db, values, MoviesContract.Videos.TABLE_NAME,
@@ -292,7 +302,7 @@ public class MoviesProvider extends ContentProvider {
                 result = bulkInsertHelper_integerId(db, values, MoviesContract.Toprated.TABLE_NAME, MoviesContract.Toprated.COLUMN_NAME_SORT_ID);
                 break;
             case FAVORITES:
-                result = bulkInsertHelper_integerId(db, values, MoviesContract.Favorites.TABLE_NAME, MoviesContract.Favorites.COLUMN_NAME_SORT_ID);
+                result = bulkInsertHelper_integerId(db, values, MoviesContract.Favorites.TABLE_NAME, MoviesContract.Favorites.COLUMN_NAME_MOVIE_ID);
                 break;
             case VIDEOS:
                 result = bulkInsertHelper_stringId(db, values, MoviesContract.Videos.TABLE_NAME, MoviesContract.Videos.COLUMN_NAME_VIDEO_ID);
@@ -338,9 +348,9 @@ public class MoviesProvider extends ContentProvider {
             case FAVORITES:
                 result = db.delete(MoviesContract.Favorites.TABLE_NAME, selection, selectionArgs);
                 break;
-            case FAVORITES_WITH_SORT_ID:
+            case FAVORITES_WITH_MOVIE_ID:
                 result = db.delete(MoviesContract.Favorites.TABLE_NAME,
-                        MoviesContract.Favorites.COLUMN_NAME_SORT_ID + "=?",
+                        MoviesContract.Favorites.COLUMN_NAME_MOVIE_ID + "=?",
                         new String[]{String.valueOf(ContentUris.parseId(uri))});
                 break;
             case VIDEOS:
@@ -413,10 +423,10 @@ public class MoviesProvider extends ContentProvider {
                         selection,
                         selectionArgs);
                 break;
-            case FAVORITES_WITH_SORT_ID:
+            case FAVORITES_WITH_MOVIE_ID:
                 result = db.update(MoviesContract.Favorites.TABLE_NAME,
                         values,
-                        MoviesContract.Favorites.COLUMN_NAME_SORT_ID + "=?",
+                        MoviesContract.Favorites.COLUMN_NAME_MOVIE_ID + "=?",
                         new String[]{String.valueOf(ContentUris.parseId(uri))});
                 break;
             case VIDEOS:
@@ -467,7 +477,7 @@ public class MoviesProvider extends ContentProvider {
         matcher.addURI(authority, MoviesContract.PATH_TOPRATED + "/#", TOPRATED_WITH_SORT_ID);
 
         matcher.addURI(authority, MoviesContract.PATH_FAVORITES, FAVORITES);
-        matcher.addURI(authority, MoviesContract.PATH_FAVORITES + "/#", FAVORITES_WITH_SORT_ID);
+        matcher.addURI(authority, MoviesContract.PATH_FAVORITES + "/#", FAVORITES_WITH_MOVIE_ID);
 
         matcher.addURI(authority, MoviesContract.PATH_VIDEOS, VIDEOS);
         matcher.addURI(authority, MoviesContract.PATH_VIDEOS + "/#", VIDEOS_WITH_MOVIE_ID);
