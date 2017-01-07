@@ -23,6 +23,16 @@
     native <methods>;
 }
 
+# OkHttp
+-dontwarn com.squareup.okhttp.**
+-keep class com.squareup.okhttp.* { *;}
+-keepattributes Signature
+-keepattributes *Annotation*
+-keep class okhttp3.** { *; }
+-keep interface okhttp3.** { *; }
+-dontwarn okhttp3.**
+-dontwarn okio.**
+
 # Platform calls Class.forName on types which do not exist on Android to determine platform.
 -dontnote retrofit2.Platform
 # Platform used when running on RoboVM on iOS. Will not be used at runtime.
