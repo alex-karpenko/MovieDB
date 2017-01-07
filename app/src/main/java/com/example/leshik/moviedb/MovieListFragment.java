@@ -38,14 +38,10 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
     public static final int POPULAR_TAB_FRAGMENT = 0;
     public static final int TOPRATED_TAB_FRAGMENT = 1;
     public static final int FAVORITES_TAB_FRAGMENT = 2;
-    public static final String[] tabFragmentNames = {
-            "Popular",
-            "Top rated",
-            "Favorites"};
     // Current fragment type
     private int fragmentTabType = FAVORITES_TAB_FRAGMENT;
     // cache update interval in milliseconds
-    // 5 sec for debug
+    // 5 min for debug
     private static final long CACHE_UPDATE_INTERVAL = 1000 * 60 * 5; // 5 minutes
     private MoviesRecycleListAdapter mAdapter;
     private RecyclerView mRecyclerView;

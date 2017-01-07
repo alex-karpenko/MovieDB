@@ -31,6 +31,6 @@ class MainPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return MovieListFragment.tabFragmentNames[position];
+        return MainActivity.tabFragmentNames[position];
     }
 }
