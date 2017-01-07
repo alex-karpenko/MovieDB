@@ -17,10 +17,13 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
         // Every time when activity created - update configuration
+        Utils.basePosterUrl = Utils.getStringCachePreference(this, R.string.base_potser_url);
+        Utils.basePosterSecureUrl = Utils.getStringCachePreference(this, R.string.base_potser_secure_url);
         CacheUpdateService.startActionUpdateConfiguration(this);
+
+        setContentView(R.layout.activity_main);
 
         Toolbar mToolbar = (Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(mToolbar);
