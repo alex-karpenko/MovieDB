@@ -136,7 +136,7 @@ public class MoviesProvider extends ContentProvider {
                 break;
             case FAVORITES:
                 if (newSortOrder == null)
-                    newSortOrder = MoviesContract.Favorites.COLUMN_NAME_SORT_ID;
+                    newSortOrder = MoviesContract.Favorites.COLUMN_NAME_SORT_ID + " DESC";
                 returnCursor = db.query(MoviesContract.Favorites.SELECT_STATEMENT,
                         projection,
                         selection,

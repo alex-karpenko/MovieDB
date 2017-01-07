@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MovieDB</string>
+    <string name="app_name">Popular Movies</string>
     <string name="title_activity_detail">Movie details</string>
     <string name="content_authority">com.example.leshik.moviedb</string>
 
@@ -26,4 +26,8 @@
     <!-- Strings for identify transforms -->
     <string name="poster_image" translatable="false">poster_image</string>
 
+    <!-- Strings for tab switcher -->
+    <string name="popular_tab_title">Popular</string>
+    <string name="toprated_tab_title">Top rated</string>
+    <string name="favorites_tab_title">Favorites</string>
 </resources>

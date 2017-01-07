@@ -2,23 +2,49 @@ package com.example.leshik.moviedb;
 
 import android.app.ActivityOptions;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 
+import com.example.leshik.moviedb.service.CacheUpdateService;
+
 public class MainActivity extends AppCompatActivity implements MovieListFragment.Callback {
+    public static String[] tabFragmentNames;
+    MainPagerAdapter mPagerAdapter;
+    ViewPager mViewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Every time when activity created - update configuration from the TMDB
+        Utils.basePosterUrl = Utils.getStringCachePreference(this, R.string.base_potser_url);
+        Utils.basePosterSecureUrl = Utils.getStringCachePreference(this, R.string.base_potser_secure_url);
+        CacheUpdateService.startActionUpdateConfiguration(this);
+
         setContentView(R.layout.activity_main);
 
         Toolbar mToolbar = (Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(mToolbar);
+
+        mPagerAdapter = new MainPagerAdapter(getSupportFragmentManager());
+        mViewPager = (ViewPager) findViewById(R.id.main_pager);
+        mViewPager.setAdapter(mPagerAdapter);
+
+        // Get list of tab's titles from resources
+        Resources res = getResources();
+        tabFragmentNames = res.getStringArray(R.array.main_tab_names);
+
+        // Assign pager to tab layout
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.main_tabs);
+        tabLayout.setupWithViewPager(mViewPager);
     }
 
     @Override

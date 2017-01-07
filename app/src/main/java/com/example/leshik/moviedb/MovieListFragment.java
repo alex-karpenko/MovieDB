@@ -1,14 +1,12 @@
 package com.example.leshik.moviedb;
 
-import android.app.Fragment;
-import android.app.LoaderManager;
-import android.content.CursorLoader;
-import android.content.Loader;
-import android.content.SharedPreferences;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -33,9 +31,17 @@ import java.util.Calendar;
  */
 public class MovieListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,
         SwipeRefreshLayout.OnRefreshListener {
+    // Loader ID for movie's list
     private static final int FRAGMENT_LIST_LOADER_ID = 1;
+    // Fragment types, for PageAdapter
+    public static final String ARG_FRAGMENT_TYPE = "FRAGMENT_TAB_TYPE";
+    public static final int POPULAR_TAB_FRAGMENT = 0;
+    public static final int TOPRATED_TAB_FRAGMENT = 1;
+    public static final int FAVORITES_TAB_FRAGMENT = 2;
+    // Current fragment type
+    private int fragmentTabType = FAVORITES_TAB_FRAGMENT;
     // cache update interval in milliseconds
-    // 5 sec for debug
+    // 5 min for debug
     private static final long CACHE_UPDATE_INTERVAL = 1000 * 60 * 5; // 5 minutes
     private MoviesRecycleListAdapter mAdapter;
     private RecyclerView mRecyclerView;
@@ -44,7 +50,7 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public void onRefresh() {
-        updateCurentPageCache();
+        updateCurrentPageCache();
     }
 
     /**
@@ -68,6 +74,10 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        // Get bundle with args (fragment type)
+        Bundle args = getArguments();
+        if (args != null) fragmentTabType = args.getInt(ARG_FRAGMENT_TYPE, FAVORITES_TAB_FRAGMENT);
+
         // Inflate fragment
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.movies_list);
@@ -89,21 +99,15 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        // Every time when activity created - update configuration
-        CacheUpdateService.startActionUpdateConfiguration(getActivity());
-        // and create content loader
+        // Create content loader for list data
         getLoaderManager().initLoader(FRAGMENT_LIST_LOADER_ID, null, this);
 
         super.onActivityCreated(savedInstanceState);
 
         // Every time, when fragment appears on the screen, we have to update contents
         // (after start activity, returning from details or settings, etc.)
-        updateAllCacheIfNeed();
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
+        // TODO: !!!
+//        updateAllCacheIfNeed();
     }
 
     @Override
@@ -116,30 +120,12 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
             mSwipeRefreshLayout.setRefreshing(true);
-            updateCurentPageCache();
+            updateCurrentPageCache();
 
             return true;
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    /**
-     * Method to update list of movies
-     */
-    private void updateAllCacheIfNeed() {
-        long currentTime = Calendar.getInstance().getTimeInMillis();
-
-        // Check difference of current time and last cache update time
-        // and start update services if needed
-        // 1. for popular
-        if (currentTime - Utils.getLongCachePreference(getActivity(), R.string.last_popular_update_time) >= CACHE_UPDATE_INTERVAL) {
-            updatePopularCache();
-        }
-        // 2. for top rated
-        if (currentTime - Utils.getLongCachePreference(getActivity(), R.string.last_toprated_update_time) >= CACHE_UPDATE_INTERVAL) {
-            updateTopratedCache();
-        }
     }
 
     private void updatePopularCache() {
@@ -154,22 +140,60 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
             CacheUpdateService.startActionUpdateToprated(getActivity(), i);
     }
 
-    private void updateCurentPageCache() {
-        String sortOrder = getSortOrder();
-        if (sortOrder.equals(getString(R.string.pref_sortorder_rating))) updateTopratedCache();
-        else if (sortOrder.equals(getString(R.string.pref_sortorder_popular))) updatePopularCache();
+    private void updateCurrentPageCache() {
+        switch (fragmentTabType) {
+            case POPULAR_TAB_FRAGMENT:
+                updatePopularCache();
+                break;
+            case TOPRATED_TAB_FRAGMENT:
+                updateTopratedCache();
+                break;
+            case FAVORITES_TAB_FRAGMENT:
+                mSwipeRefreshLayout.setRefreshing(false);
+                break;
+        }
+    }
+
+    private void updateCurrentPageCacheIfNeed() {
+        long currentTime = Calendar.getInstance().getTimeInMillis();
+
+        switch (fragmentTabType) {
+            case POPULAR_TAB_FRAGMENT:
+                if (currentTime - Utils.getLongCachePreference(getActivity(), R.string.last_popular_update_time) >= CACHE_UPDATE_INTERVAL) {
+                    updatePopularCache();
+                }
+                break;
+            case TOPRATED_TAB_FRAGMENT:
+                if (currentTime - Utils.getLongCachePreference(getActivity(), R.string.last_toprated_update_time) >= CACHE_UPDATE_INTERVAL) {
+                    updateTopratedCache();
+                }
+                break;
+            case FAVORITES_TAB_FRAGMENT:
+                mSwipeRefreshLayout.setRefreshing(false);
+                break;
+        }
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Uri baseUri = MoviesContract.Popular.CONTENT_URI;
-        String[] baseProjection = MoviesContract.Popular.shortListProjection;
+        // Default URI and projection
+        Uri baseUri = MoviesContract.Favorites.CONTENT_URI;
+        String[] baseProjection = MoviesContract.Favorites.shortListProjection;
 
-        String sortOrder = getSortOrder();
-
-        if (sortOrder.equals(getString(R.string.pref_sortorder_rating))) {
-            baseProjection = MoviesContract.Toprated.shortListProjection;
-            baseUri = MoviesContract.Toprated.CONTENT_URI;
+        // Set URI and projection in order to fragment type
+        switch (fragmentTabType) {
+            case POPULAR_TAB_FRAGMENT:
+                baseUri = MoviesContract.Popular.CONTENT_URI;
+                baseProjection = MoviesContract.Popular.shortListProjection;
+                break;
+            case TOPRATED_TAB_FRAGMENT:
+                baseUri = MoviesContract.Toprated.CONTENT_URI;
+                baseProjection = MoviesContract.Toprated.shortListProjection;
+                break;
+            case FAVORITES_TAB_FRAGMENT:
+                baseUri = MoviesContract.Favorites.CONTENT_URI;
+                baseProjection = MoviesContract.Favorites.shortListProjection;
+                break;
         }
 
         return new CursorLoader(getActivity(), baseUri, baseProjection, null, null, null);
@@ -186,10 +210,4 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
         mAdapter.changeCursor(null);
     }
 
-    private String getSortOrder() {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String sortOrder = prefs.getString(getString(R.string.pref_sortorder_key),
-                getString(R.string.pref_sortorder_default));
-        return sortOrder;
-    }
 }
