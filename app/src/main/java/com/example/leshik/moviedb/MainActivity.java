@@ -4,6 +4,7 @@ import android.app.ActivityOptions;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -13,6 +14,8 @@ import android.widget.ImageView;
 import com.example.leshik.moviedb.service.CacheUpdateService;
 
 public class MainActivity extends AppCompatActivity implements MovieListFragment.Callback {
+    MainPagerAdapter mPagerAdapter;
+    ViewPager mViewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +30,10 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
 
         Toolbar mToolbar = (Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(mToolbar);
+
+        mPagerAdapter = new MainPagerAdapter(getSupportFragmentManager());
+        mViewPager = (ViewPager) findViewById(R.id.main_pager);
+        mViewPager.setAdapter(mPagerAdapter);
     }
 
     @Override
