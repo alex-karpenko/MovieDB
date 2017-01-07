@@ -1,9 +1,9 @@
 package com.example.leshik.moviedb;
 
-import android.app.Fragment;
-import android.app.LoaderManager;
-import android.content.CursorLoader;
-import android.content.Loader;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -38,6 +38,10 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
     public static final int POPULAR_TAB_FRAGMENT = 0;
     public static final int TOPRATED_TAB_FRAGMENT = 1;
     public static final int FAVORITES_TAB_FRAGMENT = 2;
+    public static final String[] tabFragmentNames = {
+            "Popular",
+            "Top rated",
+            "Favorites"};
     // Current fragment type
     private int fragmentTabType = FAVORITES_TAB_FRAGMENT;
     // cache update interval in milliseconds
