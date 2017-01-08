@@ -56,7 +56,7 @@ public class TmdbVideos {
         int resultsSize = videosResults.size();
         if (resultsSize == 0) return null;
 
-        ContentValues[] returnValues = new ContentValues[videosResults.size()];
+        ContentValues[] returnValues = new ContentValues[resultsSize];
 
         for (int i = 0; i < resultsSize; i++) {
             returnValues[i] = new ContentValues();

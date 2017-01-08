@@ -82,10 +82,11 @@ public class CacheUpdateService extends IntentService {
      *
      * @see IntentService
      */
-    public static void startActionUpdateReviews(Context context, int movie_id) {
+    public static void startActionUpdateReviews(Context context, int movie_id, int page) {
         Intent intent = new Intent(context, CacheUpdateService.class);
         intent.setAction(ACTION_UPDATE_REVIEWS);
         intent.putExtra(EXTRA_PARAM_MOVIE_ID, movie_id);
+        intent.putExtra(EXTRA_PARAM_PAGE, page);
         context.startService(intent);
     }
 
@@ -167,7 +168,8 @@ public class CacheUpdateService extends IntentService {
                 handleActionUpdateVideos(movie_id);
             } else if (ACTION_UPDATE_REVIEWS.equals(action)) {
                 final int movie_id = intent.getIntExtra(EXTRA_PARAM_MOVIE_ID, -1);
-                handleActionUpdateReviews(movie_id);
+                final int page = intent.getIntExtra(EXTRA_PARAM_PAGE, -1);
+                handleActionUpdateReviews(movie_id, page);
             }
         }
     }
@@ -234,8 +236,36 @@ public class CacheUpdateService extends IntentService {
      * Handle action UpdateReviews in the provided background thread with the provided
      * parameters.
      */
-    private void handleActionUpdateReviews(int movie_id) {
+    private void handleActionUpdateReviews(int movie_id, int page) {
+        // TODO: retrieve all pages
         if (movie_id <= 0) return;
+        int requestPage = page <= 0 ? 1 : page;
+
+        // Create retrofit object...
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(Utils.baseApiSecureUrl)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        // ... create service and call ....
+        TmdbApiService service = retrofit.create(TmdbApiService.class);
+        Call<TmdbReviews> reviewsCall = service.getReviews(movie_id, requestPage, BuildConfig.THE_MOVIE_DB_API_KEY);
+        TmdbReviews reviewsPage;
+
+        try {
+            reviewsPage = reviewsCall.execute().body();
+
+            if (page <= 0) {
+                // If page number is not positive - first delete all data from reviews table for specified movie
+                getContentResolver().
+                        delete(MoviesContract.Reviews.buildUri(movie_id),
+                                null,
+                                null);
+            }
+            // Insert reviews table via content provider calls
+            getContentResolver().bulkInsert(MoviesContract.Reviews.CONTENT_URI, reviewsPage.getReviewsContentValues());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

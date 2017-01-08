@@ -17,7 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
@@ -88,11 +87,21 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
         mReviewsList = (NonScrollListView) rootView.findViewById(R.id.reviews_list);
 
         mVideosListAdapter = new SimpleCursorAdapter(getContext(),
-                R.layout.videos_list_item, null,
+                R.layout.videos_list_item,
+                null, // cursor
                 new String[]{MoviesContract.Videos.COLUMN_NAME_NAME},
                 new int[]{R.id.videos_list_item_title},
                 0);
         mVideosList.setAdapter(mVideosListAdapter);
+
+        mReviewsListAdapter = new SimpleCursorAdapter(getContext(),
+                R.layout.reviews_list_item,
+                null, // cursor
+                new String[]{MoviesContract.Reviews.COLUMN_NAME_AUTHOR, MoviesContract.Reviews.COLUMN_NAME_CONTENT},
+                new int[]{R.id.reviews_list_item_author, R.id.reviews_list_item_content},
+                0);
+        mReviewsList.setAdapter(mReviewsListAdapter);
+
         isFavorite = false;
 
         return rootView;
@@ -152,12 +161,10 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
             case REVIEWS_LOADER:
                 mReviewsListLayout.setVisibility(View.GONE);
                 if (movieId > 0) {
-                    // TODO: develop reviews table and provider
-                    return null;
-//                    return new CursorLoader(getActivity(),
-//                            MoviesContract.Reviews.buildUri(movieId),
-//                            MoviesContract.Reviews.DETAIL_PROJECTION,
-//                            null, null, null);
+                    return new CursorLoader(getActivity(),
+                            MoviesContract.Reviews.buildUri(movieId),
+                            MoviesContract.Reviews.DETAIL_PROJECTION,
+                            null, null, null);
                 }
                 break;
             case FAVORITE_MARK_LOADER:
@@ -216,7 +223,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
                 break;
             case REVIEWS_LOADER:
                 if (data != null && data.moveToFirst() && data.getCount() > 0) {
-                    // TODO:  show reviews list
+                    mReviewsListAdapter.swapCursor(data);
                     mReviewsListLayout.setVisibility(View.VISIBLE);
                 } else mReviewsListLayout.setVisibility(View.GONE);
                 break;
@@ -248,6 +255,6 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
     void refreshCurrentMovie() {
         CacheUpdateService.startActionUpdateMovie(getActivity(), (int) movieId);
         CacheUpdateService.startActionUpdateVideos(getActivity(), (int) movieId);
-        CacheUpdateService.startActionUpdateReviews(getActivity(), (int) movieId);
+        CacheUpdateService.startActionUpdateReviews(getActivity(), (int) movieId, -1);
     }
 }

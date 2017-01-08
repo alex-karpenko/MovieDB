@@ -295,15 +295,17 @@ public class MoviesProvider extends ContentProvider {
     private int bulkInsertHelper_integerId(SQLiteDatabase db, ContentValues[] values, String tableName, String idName) {
         int result = 0;
 
-        db.beginTransaction();
-        try {
-            for (ContentValues v : values) {
-                int r = recordInsertOrUpdateHelper_integerId(db, v, tableName, idName);
-                if (r >= 0) result++;
+        if (values != null) {
+            db.beginTransaction();
+            try {
+                for (ContentValues v : values) {
+                    int r = recordInsertOrUpdateHelper_integerId(db, v, tableName, idName);
+                    if (r >= 0) result++;
+                }
+                db.setTransactionSuccessful();
+            } finally {
+                db.endTransaction();
             }
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
         }
 
         return result;
@@ -312,15 +314,17 @@ public class MoviesProvider extends ContentProvider {
     private int bulkInsertHelper_stringId(SQLiteDatabase db, ContentValues[] values, String tableName, String idName) {
         int result = 0;
 
-        db.beginTransaction();
-        try {
-            for (ContentValues v : values) {
-                String r = recordInsertOrUpdateHelper_stringId(db, v, tableName, idName);
-                if (r != null) result++;
+        if (values != null) {
+            db.beginTransaction();
+            try {
+                for (ContentValues v : values) {
+                    String r = recordInsertOrUpdateHelper_stringId(db, v, tableName, idName);
+                    if (r != null) result++;
+                }
+                db.setTransactionSuccessful();
+            } finally {
+                db.endTransaction();
             }
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
         }
 
         return result;
