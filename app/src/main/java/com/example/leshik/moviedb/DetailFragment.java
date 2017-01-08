@@ -156,8 +156,8 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
 
     void setFavoriteIcon(boolean flag) {
         int favIcon;
-        if (flag) favIcon = R.drawable.ic_favorite_black;
-        else favIcon = R.drawable.ic_favorite_outline;
+        if (flag) favIcon = R.drawable.ic_favorite_black_light;
+        else favIcon = R.drawable.ic_favorite_outline_light;
         if (mMenu != null) {
             MenuItem favMenuItem = mMenu.findItem(R.id.action_favorite);
             favMenuItem.setIcon(favIcon);
