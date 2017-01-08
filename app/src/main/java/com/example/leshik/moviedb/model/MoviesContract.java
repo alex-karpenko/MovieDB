@@ -22,6 +22,7 @@ public final class MoviesContract {
     public static final String PATH_TOPRATED = "toprated";
     public static final String PATH_FAVORITES = "favorites";
     public static final String PATH_VIDEOS = "videos";
+    public static final String PATH_REVIEWS = "reviews";
 
     public static final int SHORT_LIST_PROJECTION_INDEX_ID = 0;
     public static final int SHORT_LIST_PROJECTION_INDEX_SORT_ID = 1;
@@ -288,12 +289,12 @@ public final class MoviesContract {
         };
         public static final int DETAIL_PROJECTION_INDEX_ID = 0;
         public static final int DETAIL_PROJECTION_INDEX_MOVIE_ID = 1;
-        public static final int DETAIL_PROJECTION_VIDEO_ID = 2;
-        public static final int DETAIL_PROJECTION_KEY = 3;
-        public static final int DETAIL_PROJECTION_SITE = 4;
-        public static final int DETAIL_PROJECTION_SIZE = 5;
-        public static final int DETAIL_PROJECTION_TYPE = 6;
-        public static final int DETAIL_PROJECTION_NAME = 6;
+        public static final int DETAIL_PROJECTION_INDEX_VIDEO_ID = 2;
+        public static final int DETAIL_PROJECTION_INDEX_KEY = 3;
+        public static final int DETAIL_PROJECTION_INDEX_SITE = 4;
+        public static final int DETAIL_PROJECTION_INDEX_SIZE = 5;
+        public static final int DETAIL_PROJECTION_INDEX_TYPE = 6;
+        public static final int DETAIL_PROJECTION_INDEX_NAME = 6;
         // URI build method
         public static Uri buildUri(String id) {
             return Uri.withAppendedPath(CONTENT_URI, id);
@@ -303,4 +304,62 @@ public final class MoviesContract {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
     }
+
+    // Class reviews
+    public static abstract class Reviews implements BaseColumns {
+        // Table name
+        static final String TABLE_NAME = "reviews";
+        // Constants for content provider interface
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_REVIEWS).build();
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_REVIEWS;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_REVIEWS;
+        // Columns
+        public static final String COLUMN_NAME_MOVIE_ID = "movie_id";
+        public static final String COLUMN_NAME_REVIEW_ID = "review_id";
+        public static final String COLUMN_NAME_AUTHOR = "author";
+        public static final String COLUMN_NAME_CONTENT = "content";
+        public static final String COLUMN_NAME_URL = "url";
+        // Create statement
+        static final String CREATE_TABLE_STATEMENT = "CREATE TABLE " + TABLE_NAME + " (" +
+                _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COLUMN_NAME_REVIEW_ID + " TEXT NOT NULL UNIQUE, " +
+                COLUMN_NAME_MOVIE_ID + " INTEGER NOT NULL, " +
+                COLUMN_NAME_AUTHOR + " TEXT, " +
+                COLUMN_NAME_CONTENT + " TEXT, " +
+                COLUMN_NAME_URL + " TEXT, " +
+                "FOREIGN KEY (" + COLUMN_NAME_MOVIE_ID + ") " +
+                "REFERENCES " + Movies.TABLE_NAME + "(" + Movies.COLUMN_NAME_MOVIE_ID + ") " +
+                "ON DELETE RESTRICT ON UPDATE CASCADE " +
+                ");";
+        // Drop table statement
+        static final String DROP_TABLE_STATEMENT = "DROP TABLE " + TABLE_NAME + ";";
+        // Default projection
+        public static final String[] DETAIL_PROJECTION = {
+                _ID,
+                COLUMN_NAME_MOVIE_ID,
+                COLUMN_NAME_REVIEW_ID,
+                COLUMN_NAME_AUTHOR,
+                COLUMN_NAME_CONTENT,
+                COLUMN_NAME_URL
+        };
+        public static final int DETAIL_PROJECTION_INDEX_ID = 0;
+        public static final int DETAIL_PROJECTION_INDEX_MOVIE_ID = 1;
+        public static final int DETAIL_PROJECTION_INDEX_REVIEW_ID = 2;
+        public static final int DETAIL_PROJECTION_INDEX_AUTHOR = 3;
+        public static final int DETAIL_PROJECTION_INDEX_CONTENT = 4;
+        public static final int DETAIL_PROJECTION_INDEX_URL = 5;
+
+        // URI build method
+        public static Uri buildUri(String id) {
+            return Uri.withAppendedPath(CONTENT_URI, id);
+        }
+
+        public static Uri buildUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+    }
+
 }

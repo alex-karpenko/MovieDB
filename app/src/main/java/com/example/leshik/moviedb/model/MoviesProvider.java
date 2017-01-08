@@ -32,6 +32,9 @@ public class MoviesProvider extends ContentProvider {
     static final int VIDEOS = 500;
     static final int VIDEOS_WITH_MOVIE_ID = 501;
     static final int VIDEOS_WITH_VIDEO_ID = 502;
+    static final int REVIEWS = 600;
+    static final int REVIEWS_WITH_MOVIE_ID = 601;
+    static final int REVIEWS_WITH_REVIEW_ID = 602;
 
     @Override
     public boolean onCreate() {
@@ -67,6 +70,12 @@ public class MoviesProvider extends ContentProvider {
                 return MoviesContract.Videos.CONTENT_TYPE;
             case VIDEOS_WITH_VIDEO_ID:
                 return MoviesContract.Videos.CONTENT_ITEM_TYPE;
+            case REVIEWS:
+                return MoviesContract.Reviews.CONTENT_TYPE;
+            case REVIEWS_WITH_MOVIE_ID:
+                return MoviesContract.Reviews.CONTENT_TYPE;
+            case REVIEWS_WITH_REVIEW_ID:
+                return MoviesContract.Reviews.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown URI:" + uri);
         }
@@ -176,6 +185,30 @@ public class MoviesProvider extends ContentProvider {
                         null, null,
                         newSortOrder);
                 break;
+            case REVIEWS:
+                returnCursor = db.query(MoviesContract.Reviews.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null, null,
+                        newSortOrder);
+                break;
+            case REVIEWS_WITH_MOVIE_ID:
+                returnCursor = db.query(MoviesContract.Reviews.TABLE_NAME,
+                        projection,
+                        MoviesContract.Reviews.COLUMN_NAME_MOVIE_ID + "=?",
+                        new String[]{String.valueOf(ContentUris.parseId(uri))},
+                        null, null,
+                        newSortOrder);
+                break;
+            case REVIEWS_WITH_REVIEW_ID:
+                returnCursor = db.query(MoviesContract.Reviews.TABLE_NAME,
+                        projection,
+                        MoviesContract.Reviews.COLUMN_NAME_REVIEW_ID + "=?",
+                        new String[]{uri.getLastPathSegment()},
+                        null, null,
+                        newSortOrder);
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown URI: " + uri);
         }
@@ -243,6 +276,14 @@ public class MoviesProvider extends ContentProvider {
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
+            case REVIEWS:
+                String reviewId = recordInsertOrUpdateHelper_stringId(db, values, MoviesContract.Reviews.TABLE_NAME,
+                        MoviesContract.Reviews.COLUMN_NAME_REVIEW_ID);
+                if (reviewId != null)
+                    returnUri = MoviesContract.Reviews.buildUri(reviewId);
+                else
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown URI: " + uri);
         }
@@ -307,6 +348,9 @@ public class MoviesProvider extends ContentProvider {
             case VIDEOS:
                 result = bulkInsertHelper_stringId(db, values, MoviesContract.Videos.TABLE_NAME, MoviesContract.Videos.COLUMN_NAME_VIDEO_ID);
                 break;
+            case REVIEWS:
+                result = bulkInsertHelper_stringId(db, values, MoviesContract.Reviews.TABLE_NAME, MoviesContract.Reviews.COLUMN_NAME_REVIEW_ID);
+                break;
             default:
                 return super.bulkInsert(uri, values);
         }
@@ -364,6 +408,19 @@ public class MoviesProvider extends ContentProvider {
             case VIDEOS_WITH_VIDEO_ID:
                 result = db.delete(MoviesContract.Videos.TABLE_NAME,
                         MoviesContract.Videos.COLUMN_NAME_VIDEO_ID + "=?",
+                        new String[]{uri.getLastPathSegment()});
+                break;
+            case REVIEWS:
+                result = db.delete(MoviesContract.Reviews.TABLE_NAME, selection, selectionArgs);
+                break;
+            case REVIEWS_WITH_MOVIE_ID:
+                result = db.delete(MoviesContract.Reviews.TABLE_NAME,
+                        MoviesContract.Reviews.COLUMN_NAME_MOVIE_ID + "=?",
+                        new String[]{String.valueOf(ContentUris.parseId(uri))});
+                break;
+            case REVIEWS_WITH_REVIEW_ID:
+                result = db.delete(MoviesContract.Reviews.TABLE_NAME,
+                        MoviesContract.Reviews.COLUMN_NAME_REVIEW_ID + "=?",
                         new String[]{uri.getLastPathSegment()});
                 break;
             default:
@@ -447,6 +504,24 @@ public class MoviesProvider extends ContentProvider {
                         MoviesContract.Videos.COLUMN_NAME_VIDEO_ID + "=?",
                         new String[]{uri.getLastPathSegment()});
                 break;
+            case REVIEWS:
+                result = db.update(MoviesContract.Reviews.TABLE_NAME,
+                        values,
+                        selection,
+                        selectionArgs);
+                break;
+            case REVIEWS_WITH_MOVIE_ID:
+                result = db.update(MoviesContract.Reviews.TABLE_NAME,
+                        values,
+                        MoviesContract.Reviews.COLUMN_NAME_MOVIE_ID + "=?",
+                        new String[]{String.valueOf(ContentUris.parseId(uri))});
+                break;
+            case REVIEWS_WITH_REVIEW_ID:
+                result = db.update(MoviesContract.Reviews.TABLE_NAME,
+                        values,
+                        MoviesContract.Reviews.COLUMN_NAME_REVIEW_ID + "=?",
+                        new String[]{uri.getLastPathSegment()});
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown URI: " + uri);
         }
@@ -482,6 +557,10 @@ public class MoviesProvider extends ContentProvider {
         matcher.addURI(authority, MoviesContract.PATH_VIDEOS, VIDEOS);
         matcher.addURI(authority, MoviesContract.PATH_VIDEOS + "/#", VIDEOS_WITH_MOVIE_ID);
         matcher.addURI(authority, MoviesContract.PATH_VIDEOS + "/*", VIDEOS_WITH_VIDEO_ID);
+
+        matcher.addURI(authority, MoviesContract.PATH_REVIEWS, REVIEWS);
+        matcher.addURI(authority, MoviesContract.PATH_REVIEWS + "/#", REVIEWS_WITH_MOVIE_ID);
+        matcher.addURI(authority, MoviesContract.PATH_REVIEWS + "/*", REVIEWS_WITH_REVIEW_ID);
 
         return matcher;
     }
