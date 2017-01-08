@@ -93,7 +93,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
-            // TODO: implement movie refreshing
+            refreshCurrentMovie();
             return true;
         }
         if (id == R.id.action_favorite) {
@@ -153,8 +153,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
                 // Update movie if need
                 long currentTime = Calendar.getInstance().getTimeInMillis();
                 if ((currentTime - data.getLong(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_LAST_UPDATED)) >= Utils.CACHE_UPDATE_INTERVAL) {
-                    CacheUpdateService.startActionUpdateMovie(getActivity(),
-                            data.getInt(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_MOVIE_ID));
+                    refreshCurrentMovie();
                 }
                 break;
             case FAVORITE_MARK_LOADER:
@@ -182,4 +181,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
         }
     }
 
+    void refreshCurrentMovie() {
+        CacheUpdateService.startActionUpdateMovie(getActivity(), (int) movieId);
+    }
 }
