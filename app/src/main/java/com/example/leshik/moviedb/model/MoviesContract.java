@@ -275,7 +275,23 @@ public final class MoviesContract {
                 ");";
         // Drop table statement
         static final String DROP_TABLE_STATEMENT = "DROP TABLE " + TABLE_NAME + ";";
-
+        // Default projection
+        public static final String[] DETAIL_PROJECTION = {
+                _ID,
+                COLUMN_NAME_MOVIE_ID,
+                COLUMN_NAME_VIDEO_ID,
+                COLUMN_NAME_KEY,
+                COLUMN_NAME_SITE,
+                COLUMN_NAME_SIZE,
+                COLUMN_NAME_TYPE
+        };
+        public static final int DETAIL_PROJECTION_INDEX_ID = 0;
+        public static final int DETAIL_PROJECTION_INDEX_MOVIE_ID = 1;
+        public static final int DETAIL_PROJECTION_VIDEO_ID = 2;
+        public static final int DETAIL_PROJECTION_KEY = 3;
+        public static final int DETAIL_PROJECTION_SITE = 4;
+        public static final int DETAIL_PROJECTION_SIZE = 5;
+        public static final int DETAIL_PROJECTION_TYPE = 6;
         // URI build method
         public static Uri buildUri(String id) {
             return Uri.withAppendedPath(CONTENT_URI, id);

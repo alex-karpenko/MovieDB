@@ -34,6 +34,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
     public static final String MOVIE_URI = "MOVIE_URI";
     private static final int DETAIL_FRAGMENT_LOADER = 2;
     private static final int FAVORITE_MARK_LOADER = 3;
+    private static final int VIDEOS_LOADER = 4;
     private Uri mUri;
     private long movieId;
 
@@ -78,8 +79,9 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        // create loader
+        // create loaders
         getLoaderManager().initLoader(DETAIL_FRAGMENT_LOADER, null, this);
+        getLoaderManager().initLoader(VIDEOS_LOADER, null, this);
     }
 
     @Override
@@ -112,6 +114,14 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
                     return new CursorLoader(getActivity(),
                             mUri,
                             MoviesContract.Movies.DETAIL_PROJECTION,
+                            null, null, null);
+                }
+                break;
+            case VIDEOS_LOADER:
+                if (movieId > 0) {
+                    return new CursorLoader(getActivity(),
+                            MoviesContract.Videos.buildUri(movieId),
+                            MoviesContract.Videos.DETAIL_PROJECTION,
                             null, null, null);
                 }
                 break;
@@ -162,6 +172,11 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
                     isFavorite = true;
                 }
                 setFavoriteIcon(isFavorite);
+                break;
+            case VIDEOS_LOADER:
+                if (data != null && data.moveToFirst()) {
+                    // TODO:  show videos list
+                }
                 break;
         }
     }
