@@ -50,6 +50,8 @@ public final class MoviesContract {
         public static final String COLUMN_NAME_HOMEPAGE = "homepage";
         public static final String COLUMN_NAME_ADULT = "adult";
         public static final String COLUMN_NAME_VIDEO = "video";
+        public static final String COLUMN_NAME_LAST_UPDATED = "last_updated";
+        public static final String COLUMN_NAME_RUNTIME = "runtime";
         // Default projection
         public static final String[] DETAIL_PROJECTION = {
                 _ID,
@@ -58,7 +60,9 @@ public final class MoviesContract {
                 COLUMN_NAME_OVERVIEW,
                 COLUMN_NAME_POSTER_PATH,
                 COLUMN_NAME_RELEASE_DATE,
-                COLUMN_NAME_VOTE_AVERAGE
+                COLUMN_NAME_VOTE_AVERAGE,
+                COLUMN_NAME_RUNTIME,
+                COLUMN_NAME_LAST_UPDATED
         };
         public static final int DETAIL_PROJECTION_INDEX_ID = 0;
         public static final int DETAIL_PROJECTION_INDEX_MOVIE_ID = 1;
@@ -67,6 +71,8 @@ public final class MoviesContract {
         public static final int DETAIL_PROJECTION_INDEX_POSTER_PATH = 4;
         public static final int DETAIL_PROJECTION_INDEX_RELEASE_DATE = 5;
         public static final int DETAIL_PROJECTION_INDEX_VOTE_AVERAGE = 6;
+        public static final int DETAIL_PROJECTION_INDEX_RUNTIME = 7;
+        public static final int DETAIL_PROJECTION_INDEX_LAST_UPDATED = 8;
         // Create table sql-statement
         static final String CREATE_TABLE_STATEMENT = "CREATE TABLE " + TABLE_NAME + " (" +
                 _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -79,7 +85,9 @@ public final class MoviesContract {
                 COLUMN_NAME_POSTER_PATH + " TEXT NOT NULL, " +
                 COLUMN_NAME_HOMEPAGE + " TEXT, " +
                 COLUMN_NAME_ADULT + " INTEGER DEFAULT 0, " + // 0 - false, 1 - true
-                COLUMN_NAME_VIDEO + " INTEGER DEFAULT 0 " + // 0 - false, 1 - true
+                COLUMN_NAME_VIDEO + " INTEGER DEFAULT 0, " + // 0 - false, 1 - true
+                COLUMN_NAME_RUNTIME + " INTEGER DEFAULT 0, " +
+                COLUMN_NAME_LAST_UPDATED + " INTEGER DEFAULT 0 " +
                 ");";
         // Delete table sql-statement
         static final String DROP_TABLE_STATEMENT = "DROP TABLE " + TABLE_NAME + ";";

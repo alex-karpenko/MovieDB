@@ -30,4 +30,7 @@
     <string name="popular_tab_title">Popular</string>
     <string name="toprated_tab_title">Top rated</string>
     <string name="favorites_tab_title">Favorites</string>
+
+    <!-- Strings related to details view -->
+    <string name="runtime_minutes_text">min</string>
 </resources>

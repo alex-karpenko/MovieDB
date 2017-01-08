@@ -16,6 +16,9 @@ public final class Utils {
     public static final String baseApiSecureUrl = "https://api.themoviedb.org/3/";
     // Number of pages to preload
     public static final int CACHE_PRELOAD_PAGES = 5;
+    // cache update interval in milliseconds
+    // 5 min for debug
+    static final long CACHE_UPDATE_INTERVAL = 1000 * 60 * 5; // 5 minutes
 
     // Common variables, we fill its by fetching configuration from TMDB (in MovieListFragment class)
     public static String basePosterUrl = null;

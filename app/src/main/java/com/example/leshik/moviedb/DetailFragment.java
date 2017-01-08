@@ -22,6 +22,8 @@ import com.example.leshik.moviedb.model.MoviesContract;
 import com.example.leshik.moviedb.service.CacheUpdateService;
 import com.squareup.picasso.Picasso;
 
+import java.util.Calendar;
+
 /**
  * Fragment class with detail info about movie
  * Information. From intent gets URI with movie
@@ -38,6 +40,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
     ImageView posterView;
     TextView title;
     TextView released;
+    TextView runtime;
     TextView rating;
     TextView overview;
 
@@ -63,6 +66,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
         posterView = (ImageView) rootView.findViewById(R.id.poster_image);
         title = (TextView) rootView.findViewById(R.id.detail_title);
         released = (TextView) rootView.findViewById(R.id.detail_released);
+        runtime = (TextView) rootView.findViewById(R.id.detail_runtime);
         rating = (TextView) rootView.findViewById(R.id.detail_rating);
         overview = (TextView) rootView.findViewById(R.id.detail_overview);
 
@@ -135,8 +139,22 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
                             .into(posterView);
                     title.setText(data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_ORIGINAL_TITLE));
                     released.setText(data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_RELEASE_DATE));
+                    // TODO: make runtime formatting more reliable
+                    if (data.getInt(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_RUNTIME) > 0) {
+                        runtime.setText(String.format("%d %s",
+                                data.getInt(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_RUNTIME),
+                                getString(R.string.runtime_minutes_text)));
+                    } else {
+                        runtime.setText("-");
+                    }
                     rating.setText(String.format("%.1f/10", data.getFloat(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_VOTE_AVERAGE)));
                     overview.setText(data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_OVERVIEW));
+                }
+                // Update movie if need
+                long currentTime = Calendar.getInstance().getTimeInMillis();
+                if ((currentTime - data.getLong(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_LAST_UPDATED)) >= Utils.CACHE_UPDATE_INTERVAL) {
+                    CacheUpdateService.startActionUpdateMovie(getActivity(),
+                            data.getInt(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_MOVIE_ID));
                 }
                 break;
             case FAVORITE_MARK_LOADER:
@@ -163,4 +181,5 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
             favMenuItem.setIcon(favIcon);
         }
     }
+
 }

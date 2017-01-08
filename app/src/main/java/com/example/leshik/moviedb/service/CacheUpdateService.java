@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.example.leshik.moviedb.BuildConfig;
 import com.example.leshik.moviedb.R;
@@ -159,7 +160,12 @@ public class CacheUpdateService extends IntentService {
         try {
             // Execute and insert(a-la update) movies table via content provider call
             movie = movieCall.execute().body();
-            getContentResolver().insert(MoviesContract.Movies.CONTENT_URI, movie.getMovieContentValues());
+            ContentValues values = movie.getMovieContentValues();
+            // Set last updated value
+            long currentTime = Calendar.getInstance().getTimeInMillis();
+            values.put(MoviesContract.Movies.COLUMN_NAME_LAST_UPDATED, currentTime);
+            // Update movie
+            getContentResolver().insert(MoviesContract.Movies.CONTENT_URI, values);
         } catch (IOException e) {
             e.printStackTrace();
         }

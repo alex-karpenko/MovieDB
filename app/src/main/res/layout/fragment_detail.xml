@@ -60,6 +60,19 @@
                     android:paddingTop="@dimen/detail_interviews_padding"
                     android:text="Released"
                     android:textSize="18sp" />
+                <!-- runtime -->
+                <TextView
+                    android:id="@+id/detail_runtime"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingEnd="@dimen/detail_right_margin"
+                    android:paddingLeft="@dimen/detail_left_margin"
+                    android:paddingRight="@dimen/detail_left_margin"
+                    android:paddingStart="@dimen/detail_left_margin"
+                    android:paddingTop="@dimen/detail_interviews_padding"
+                    android:text="120 min"
+                    android:textSize="18sp"
+                    android:textStyle="normal|italic" />
                 <!-- rating -->
                 <TextView
                     android:id="@+id/detail_rating"
