@@ -283,7 +283,8 @@ public final class MoviesContract {
                 COLUMN_NAME_KEY,
                 COLUMN_NAME_SITE,
                 COLUMN_NAME_SIZE,
-                COLUMN_NAME_TYPE
+                COLUMN_NAME_TYPE,
+                COLUMN_NAME_NAME
         };
         public static final int DETAIL_PROJECTION_INDEX_ID = 0;
         public static final int DETAIL_PROJECTION_INDEX_MOVIE_ID = 1;
@@ -292,6 +293,7 @@ public final class MoviesContract {
         public static final int DETAIL_PROJECTION_SITE = 4;
         public static final int DETAIL_PROJECTION_SIZE = 5;
         public static final int DETAIL_PROJECTION_TYPE = 6;
+        public static final int DETAIL_PROJECTION_NAME = 6;
         // URI build method
         public static Uri buildUri(String id) {
             return Uri.withAppendedPath(CONTENT_URI, id);

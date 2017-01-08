@@ -50,9 +50,9 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
     private TextView mOverviewText;
 
     private LinearLayout mVideosListLayout;
-    private ListView mVideosList;
+    private NonScrollListView mVideosList;
     private LinearLayout mReviewsListLayout;
-    private ListView mReviewsList;
+    private NonScrollListView mReviewsList;
 
     private SimpleCursorAdapter mVideosListAdapter;
     private SimpleCursorAdapter mReviewsListAdapter;
@@ -83,10 +83,16 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
         mRatingText = (TextView) rootView.findViewById(R.id.detail_rating);
         mOverviewText = (TextView) rootView.findViewById(R.id.detail_overview);
         mVideosListLayout = (LinearLayout) rootView.findViewById(R.id.videos_layout);
-        mVideosList = (ListView) rootView.findViewById(R.id.videos_list);
+        mVideosList = (NonScrollListView) rootView.findViewById(R.id.videos_list);
         mReviewsListLayout = (LinearLayout) rootView.findViewById(R.id.reviews_layout);
-        mReviewsList = (ListView) rootView.findViewById(R.id.reviews_list);
+        mReviewsList = (NonScrollListView) rootView.findViewById(R.id.reviews_list);
 
+        mVideosListAdapter = new SimpleCursorAdapter(getContext(),
+                R.layout.videos_list_item, null,
+                new String[]{MoviesContract.Videos.COLUMN_NAME_NAME},
+                new int[]{R.id.videos_list_item_title},
+                0);
+        mVideosList.setAdapter(mVideosListAdapter);
         isFavorite = false;
 
         return rootView;
@@ -204,7 +210,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
                 break;
             case VIDEOS_LOADER:
                 if (data != null && data.moveToFirst() && data.getCount() > 0) {
-                    // TODO:  show videos list
+                    mVideosListAdapter.swapCursor(data);
                     mVideosListLayout.setVisibility(View.VISIBLE);
                 } else mVideosListLayout.setVisibility(View.GONE);
                 break;
@@ -219,7 +225,14 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        // Nothing to do
+        switch (loader.getId()) {
+            case VIDEOS_LOADER:
+                if (mVideosListAdapter != null) mVideosListAdapter.swapCursor(null);
+                break;
+            case REVIEWS_LOADER:
+                if (mReviewsListAdapter != null) mReviewsListAdapter.swapCursor(null);
+                break;
+        }
     }
 
     void setFavoriteIcon(boolean flag) {
