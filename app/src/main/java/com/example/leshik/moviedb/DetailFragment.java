@@ -16,6 +16,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 import com.example.leshik.moviedb.model.MoviesContract;
@@ -35,15 +38,24 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
     private static final int DETAIL_FRAGMENT_LOADER = 2;
     private static final int FAVORITE_MARK_LOADER = 3;
     private static final int VIDEOS_LOADER = 4;
+    private static final int REVIEWS_LOADER = 5;
     private Uri mUri;
     private long movieId;
 
-    private ImageView poster;
-    private TextView title;
-    private TextView released;
-    private TextView runtime;
-    private TextView rating;
-    private TextView overview;
+    private ImageView mPosterImage;
+    private TextView mTitleText;
+    private TextView mReleasedText;
+    private TextView mRuntimeText;
+    private TextView mRatingText;
+    private TextView mOverviewText;
+
+    private LinearLayout mVideosListLayout;
+    private ListView mVideosList;
+    private LinearLayout mReviewsListLayout;
+    private ListView mReviewsList;
+
+    private SimpleCursorAdapter mVideosListAdapter;
+    private SimpleCursorAdapter mReviewsListAdapter;
 
     private boolean isFavorite;
     private Menu mMenu;
@@ -64,12 +76,16 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
         // Inflate fragment
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
         // Store views references for faster access during updates
-        poster = (ImageView) rootView.findViewById(R.id.poster_image);
-        title = (TextView) rootView.findViewById(R.id.detail_title);
-        released = (TextView) rootView.findViewById(R.id.detail_released);
-        runtime = (TextView) rootView.findViewById(R.id.detail_runtime);
-        rating = (TextView) rootView.findViewById(R.id.detail_rating);
-        overview = (TextView) rootView.findViewById(R.id.detail_overview);
+        mPosterImage = (ImageView) rootView.findViewById(R.id.poster_image);
+        mTitleText = (TextView) rootView.findViewById(R.id.detail_title);
+        mReleasedText = (TextView) rootView.findViewById(R.id.detail_released);
+        mRuntimeText = (TextView) rootView.findViewById(R.id.detail_runtime);
+        mRatingText = (TextView) rootView.findViewById(R.id.detail_rating);
+        mOverviewText = (TextView) rootView.findViewById(R.id.detail_overview);
+        mVideosListLayout = (LinearLayout) rootView.findViewById(R.id.videos_layout);
+        mVideosList = (ListView) rootView.findViewById(R.id.videos_list);
+        mReviewsListLayout = (LinearLayout) rootView.findViewById(R.id.reviews_layout);
+        mReviewsList = (ListView) rootView.findViewById(R.id.reviews_list);
 
         isFavorite = false;
 
@@ -82,6 +98,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
         // create loaders
         getLoaderManager().initLoader(DETAIL_FRAGMENT_LOADER, null, this);
         getLoaderManager().initLoader(VIDEOS_LOADER, null, this);
+        getLoaderManager().initLoader(REVIEWS_LOADER, null, this);
     }
 
     @Override
@@ -118,11 +135,23 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
                 }
                 break;
             case VIDEOS_LOADER:
+                mVideosListLayout.setVisibility(View.GONE);
                 if (movieId > 0) {
                     return new CursorLoader(getActivity(),
                             MoviesContract.Videos.buildUri(movieId),
                             MoviesContract.Videos.DETAIL_PROJECTION,
                             null, null, null);
+                }
+                break;
+            case REVIEWS_LOADER:
+                mReviewsListLayout.setVisibility(View.GONE);
+                if (movieId > 0) {
+                    // TODO: develop reviews table and provider
+                    return null;
+//                    return new CursorLoader(getActivity(),
+//                            MoviesContract.Reviews.buildUri(movieId),
+//                            MoviesContract.Reviews.DETAIL_PROJECTION,
+//                            null, null, null);
                 }
                 break;
             case FAVORITE_MARK_LOADER:
@@ -146,19 +175,19 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
                             .load(Utils.basePosterSecureUrl
                                     + "w185" // TODO: we have to think to adopt width on image
                                     + data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_POSTER_PATH))
-                            .into(poster);
-                    title.setText(data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_ORIGINAL_TITLE));
-                    released.setText(data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_RELEASE_DATE));
-                    // TODO: make runtime formatting more reliable
+                            .into(mPosterImage);
+                    mTitleText.setText(data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_ORIGINAL_TITLE));
+                    mReleasedText.setText(data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_RELEASE_DATE));
+                    // TODO: make mRuntimeText formatting more reliable
                     if (data.getInt(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_RUNTIME) > 0) {
-                        runtime.setText(String.format("%d %s",
+                        mRuntimeText.setText(String.format("%d %s",
                                 data.getInt(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_RUNTIME),
                                 getString(R.string.runtime_minutes_text)));
                     } else {
-                        runtime.setText("-");
+                        mRuntimeText.setText("-");
                     }
-                    rating.setText(String.format("%.1f/10", data.getFloat(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_VOTE_AVERAGE)));
-                    overview.setText(data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_OVERVIEW));
+                    mRatingText.setText(String.format("%.1f/10", data.getFloat(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_VOTE_AVERAGE)));
+                    mOverviewText.setText(data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_OVERVIEW));
                 }
                 // Update movie if need
                 long currentTime = Calendar.getInstance().getTimeInMillis();
@@ -174,9 +203,16 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
                 setFavoriteIcon(isFavorite);
                 break;
             case VIDEOS_LOADER:
-                if (data != null && data.moveToFirst()) {
+                if (data != null && data.moveToFirst() && data.getCount() > 0) {
                     // TODO:  show videos list
-                }
+                    mVideosListLayout.setVisibility(View.VISIBLE);
+                } else mVideosListLayout.setVisibility(View.GONE);
+                break;
+            case REVIEWS_LOADER:
+                if (data != null && data.moveToFirst() && data.getCount() > 0) {
+                    // TODO:  show reviews list
+                    mReviewsListLayout.setVisibility(View.VISIBLE);
+                } else mReviewsListLayout.setVisibility(View.GONE);
                 break;
         }
     }
@@ -199,5 +235,6 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
     void refreshCurrentMovie() {
         CacheUpdateService.startActionUpdateMovie(getActivity(), (int) movieId);
         CacheUpdateService.startActionUpdateVideos(getActivity(), (int) movieId);
+        CacheUpdateService.startActionUpdateReviews(getActivity(), (int) movieId);
     }
 }

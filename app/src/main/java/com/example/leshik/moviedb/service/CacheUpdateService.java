@@ -33,6 +33,7 @@ public class CacheUpdateService extends IntentService {
     static final String ACTION_UPDATE_CONFIGURATION = "com.example.leshik.moviedb.service.action.UPDATE_CONFIGURATION";
     static final String ACTION_UPDATE_FAVORITE = "com.example.leshik.moviedb.service.action.UPDATE_FAVORITE";
     static final String ACTION_UPDATE_VIDEOS = "com.example.leshik.moviedb.service.action.UPDATE_VIDEOS";
+    static final String ACTION_UPDATE_REVIEWS = "com.example.leshik.moviedb.service.action.UPDATE_REVIEWS";
     // Parameters for actions
     // page number for update popular or toprated
     static final String EXTRA_PARAM_PAGE = "com.example.leshik.moviedb.service.extra.PAGE";
@@ -71,6 +72,19 @@ public class CacheUpdateService extends IntentService {
     public static void startActionUpdateVideos(Context context, int movie_id) {
         Intent intent = new Intent(context, CacheUpdateService.class);
         intent.setAction(ACTION_UPDATE_VIDEOS);
+        intent.putExtra(EXTRA_PARAM_MOVIE_ID, movie_id);
+        context.startService(intent);
+    }
+
+    /**
+     * Starts this service to perform action UpdateReviews with the given parameters. If
+     * the service is already performing a task this action will be queued.
+     *
+     * @see IntentService
+     */
+    public static void startActionUpdateReviews(Context context, int movie_id) {
+        Intent intent = new Intent(context, CacheUpdateService.class);
+        intent.setAction(ACTION_UPDATE_REVIEWS);
         intent.putExtra(EXTRA_PARAM_MOVIE_ID, movie_id);
         context.startService(intent);
     }
@@ -151,6 +165,9 @@ public class CacheUpdateService extends IntentService {
             } else if (ACTION_UPDATE_VIDEOS.equals(action)) {
                 final int movie_id = intent.getIntExtra(EXTRA_PARAM_MOVIE_ID, -1);
                 handleActionUpdateVideos(movie_id);
+            } else if (ACTION_UPDATE_REVIEWS.equals(action)) {
+                final int movie_id = intent.getIntExtra(EXTRA_PARAM_MOVIE_ID, -1);
+                handleActionUpdateReviews(movie_id);
             }
         }
     }
@@ -211,6 +228,14 @@ public class CacheUpdateService extends IntentService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Handle action UpdateReviews in the provided background thread with the provided
+     * parameters.
+     */
+    private void handleActionUpdateReviews(int movie_id) {
+        if (movie_id <= 0) return;
     }
 
     /**
