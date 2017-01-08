@@ -12,7 +12,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-class Result {
+class ListResult {
 
     @SerializedName("poster_path")
     @Expose
@@ -66,7 +66,7 @@ public class TmdbListPage {
     public Integer page;
     @SerializedName("results")
     @Expose
-    public List<Result> results = null;
+    public List<ListResult> listResults = null;
     @SerializedName("total_results")
     @Expose
     public Integer totalResults;
@@ -75,9 +75,9 @@ public class TmdbListPage {
     public Integer totalPages;
 
     public ContentValues[] getPopularContentValues() {
-        if (results == null) return null;
+        if (listResults == null) return null;
 
-        int resultsSize = results.size();
+        int resultsSize = listResults.size();
         if (resultsSize == 0) return null;
 
         int basePage = (page - 1) * resultsSize;
@@ -86,40 +86,40 @@ public class TmdbListPage {
         for (int i = 0; i < resultsSize; i++) {
             returnValues[i] = new ContentValues();
             returnValues[i].put(MoviesContract.Popular.COLUMN_NAME_SORT_ID, basePage + i + 1);
-            returnValues[i].put(MoviesContract.Popular.COLUMN_NAME_MOVIE_ID, results.get(i).id);
+            returnValues[i].put(MoviesContract.Popular.COLUMN_NAME_MOVIE_ID, listResults.get(i).id);
         }
 
         return returnValues;
     }
 
     public ContentValues[] getTopratedContentValues() {
-        if (results == null) return null;
+        if (listResults == null) return null;
 
-        int resultsSize = results.size();
+        int resultsSize = listResults.size();
         if (resultsSize == 0) return null;
 
         int basePage = (page - 1) * resultsSize;
-        ContentValues[] returnValues = new ContentValues[results.size()];
+        ContentValues[] returnValues = new ContentValues[listResults.size()];
 
         for (int i = 0; i < resultsSize; i++) {
             returnValues[i] = new ContentValues();
             returnValues[i].put(MoviesContract.Toprated.COLUMN_NAME_SORT_ID, basePage + i + 1);
-            returnValues[i].put(MoviesContract.Toprated.COLUMN_NAME_MOVIE_ID, results.get(i).id);
+            returnValues[i].put(MoviesContract.Toprated.COLUMN_NAME_MOVIE_ID, listResults.get(i).id);
         }
 
         return returnValues;
     }
 
     public ContentValues[] getMoviesContentValues() {
-        if (results == null) return null;
+        if (listResults == null) return null;
 
-        int resultsSize = results.size();
+        int resultsSize = listResults.size();
         if (resultsSize == 0) return null;
 
-        ContentValues[] returnValues = new ContentValues[results.size()];
+        ContentValues[] returnValues = new ContentValues[listResults.size()];
 
         for (int i = 0; i < resultsSize; i++) {
-            Result res = results.get(i);
+            ListResult res = listResults.get(i);
             returnValues[i] = new ContentValues();
             returnValues[i].put(MoviesContract.Movies.COLUMN_NAME_MOVIE_ID, res.id);
             returnValues[i].put(MoviesContract.Movies.COLUMN_NAME_ORIGINAL_TITLE, res.originalTitle);

@@ -37,15 +37,15 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
     private Uri mUri;
     private long movieId;
 
-    ImageView posterView;
-    TextView title;
-    TextView released;
-    TextView runtime;
-    TextView rating;
-    TextView overview;
+    private ImageView poster;
+    private TextView title;
+    private TextView released;
+    private TextView runtime;
+    private TextView rating;
+    private TextView overview;
 
-    boolean isFavorite;
-    Menu mMenu;
+    private boolean isFavorite;
+    private Menu mMenu;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -63,7 +63,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
         // Inflate fragment
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
         // Store views references for faster access during updates
-        posterView = (ImageView) rootView.findViewById(R.id.poster_image);
+        poster = (ImageView) rootView.findViewById(R.id.poster_image);
         title = (TextView) rootView.findViewById(R.id.detail_title);
         released = (TextView) rootView.findViewById(R.id.detail_released);
         runtime = (TextView) rootView.findViewById(R.id.detail_runtime);
@@ -136,7 +136,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
                             .load(Utils.basePosterSecureUrl
                                     + "w185" // TODO: we have to think to adopt width on image
                                     + data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_POSTER_PATH))
-                            .into(posterView);
+                            .into(poster);
                     title.setText(data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_ORIGINAL_TITLE));
                     released.setText(data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_RELEASE_DATE));
                     // TODO: make runtime formatting more reliable
@@ -183,5 +183,6 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
 
     void refreshCurrentMovie() {
         CacheUpdateService.startActionUpdateMovie(getActivity(), (int) movieId);
+        CacheUpdateService.startActionUpdateVideos(getActivity(), (int) movieId);
     }
 }

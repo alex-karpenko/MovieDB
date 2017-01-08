@@ -252,13 +252,13 @@ public final class MoviesContract {
         public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_VIDEOS;
         // Columns
-        static final String COLUMN_NAME_MOVIE_ID = "movie_id";
-        static final String COLUMN_NAME_VIDEO_ID = "video_id";
-        static final String COLUMN_NAME_KEY = "video_key";
-        static final String COLUMN_NAME_NAME = "name";
-        static final String COLUMN_NAME_SITE = "site";
-        static final String COLUMN_NAME_SIZE = "size";
-        static final String COLUMN_NAME_TYPE = "type";
+        public static final String COLUMN_NAME_MOVIE_ID = "movie_id";
+        public static final String COLUMN_NAME_VIDEO_ID = "video_id";
+        public static final String COLUMN_NAME_KEY = "video_key";
+        public static final String COLUMN_NAME_NAME = "name";
+        public static final String COLUMN_NAME_SITE = "site";
+        public static final String COLUMN_NAME_SIZE = "size";
+        public static final String COLUMN_NAME_TYPE = "type";
         // Create statement
         static final String CREATE_TABLE_STATEMENT = "CREATE TABLE " + TABLE_NAME + " (" +
                 _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
