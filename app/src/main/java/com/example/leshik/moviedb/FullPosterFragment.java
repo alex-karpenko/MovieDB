@@ -5,7 +5,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
@@ -61,27 +60,10 @@ public class FullPosterFragment extends Fragment {
         if (mPosterName != null) {
             Picasso.with(getActivity())
                     .load(Utils.basePosterSecureUrl
-                            + "original" // TODO: we have to think to adopt width on image
+                            + "original"
                             + mPosterName)
                     .into(mPosterImage);
         }
-
-        // Listener for change image size anf fit
-        // Source: http://stackoverflow.com/questions/24463691/how-to-show-imageview-full-screen-on-imageview-click
-        mPosterImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isImageFitToScreen) {
-                    isImageFitToScreen = false;
-                    mPosterImage.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT));
-                    mPosterImage.setAdjustViewBounds(true);
-                } else {
-                    isImageFitToScreen = true;
-                    mPosterImage.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
-                    mPosterImage.setScaleType(ImageView.ScaleType.FIT_XY);
-                }
-            }
-        });
 
         return rootView;
     }

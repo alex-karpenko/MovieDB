@@ -13,7 +13,6 @@
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -33,16 +32,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.leshik.moviedb.MainActivity" />
         </activity>
-
-        <provider
-            android:name=".model.MoviesProvider"
-            android:authorities="@string/content_authority"
-            android:exported="false" />
-
-        <service
-            android:name=".service.CacheUpdateService"
-            android:exported="false" />
-
         <activity
             android:name=".FullPosterActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -53,6 +42,16 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.leshik.moviedb.DetailActivity" />
         </activity>
+
+        <provider
+            android:name=".model.MoviesProvider"
+            android:authorities="@string/content_authority"
+            android:exported="false" />
+
+        <service
+            android:name=".service.CacheUpdateService"
+            android:exported="false" />
+
     </application>
 
 </manifest>
