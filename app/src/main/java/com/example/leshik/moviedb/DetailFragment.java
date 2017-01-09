@@ -16,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SimpleCursorAdapter;
@@ -100,6 +101,15 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
                 new int[]{R.id.videos_list_item_title},
                 0);
         mVideosList.setAdapter(mVideosListAdapter);
+        mVideosList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Cursor cursor = mVideosListAdapter.getCursor();
+                cursor.moveToPosition(position);
+                String key = cursor.getString(MoviesContract.Videos.DETAIL_PROJECTION_INDEX_KEY);
+                Utils.watchYoutubeVideo(getContext(), key);
+            }
+        });
 
         mReviewsListAdapter = new SimpleCursorAdapter(getContext(),
                 R.layout.reviews_list_item,

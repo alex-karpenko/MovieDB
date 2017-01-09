@@ -1,7 +1,10 @@
 package com.example.leshik.moviedb;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.util.DisplayMetrics;
 
 import static com.example.leshik.moviedb.service.CacheUpdateService.CACHE_PREFS_NAME;
@@ -41,5 +44,18 @@ public final class Utils {
         int noOfColumns = (int) (dpWidth / 180);
         if (noOfColumns == 1) noOfColumns = 2;
         return noOfColumns;
+    }
+
+    // Start youtube activity - first try app, if error - start via web
+    // Source: http://stackoverflow.com/questions/574195/android-youtube-app-play-video-intent
+    public static void watchYoutubeVideo(Context context, String id) {
+        Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + id));
+        Intent webIntent = new Intent(Intent.ACTION_VIEW,
+                Uri.parse("http://www.youtube.com/watch?v=" + id));
+        try {
+            context.startActivity(appIntent);
+        } catch (ActivityNotFoundException ex) {
+            context.startActivity(webIntent);
+        }
     }
 }
