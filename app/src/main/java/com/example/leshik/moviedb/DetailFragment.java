@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,11 +31,11 @@ import java.util.Calendar;
  * Fragment class with detail info about movie
  * Information. From intent gets URI with movie
  */
-public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> {
+public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>, SwipeRefreshLayout.OnRefreshListener {
     private static final String LOG_TAG = DetailFragment.class.getSimpleName();
     // data tag to pass data via intent
     public static final String MOVIE_URI = "MOVIE_URI";
-    private static final int DETAIL_FRAGMENT_LOADER = 2;
+    private static final int MOVIE_LOADER = 2;
     private static final int FAVORITE_MARK_LOADER = 3;
     private static final int VIDEOS_LOADER = 4;
     private static final int REVIEWS_LOADER = 5;
@@ -47,6 +48,8 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
     private TextView mRuntimeText;
     private TextView mRatingText;
     private TextView mOverviewText;
+
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
     private LinearLayout mVideosListLayout;
     private NonScrollListView mVideosList;
@@ -81,6 +84,10 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
         mRuntimeText = (TextView) rootView.findViewById(R.id.detail_runtime);
         mRatingText = (TextView) rootView.findViewById(R.id.detail_rating);
         mOverviewText = (TextView) rootView.findViewById(R.id.detail_overview);
+
+        mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swiperefresh);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+
         mVideosListLayout = (LinearLayout) rootView.findViewById(R.id.videos_layout);
         mVideosList = (NonScrollListView) rootView.findViewById(R.id.videos_list);
         mReviewsListLayout = (LinearLayout) rootView.findViewById(R.id.reviews_layout);
@@ -111,7 +118,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         // create loaders
-        getLoaderManager().initLoader(DETAIL_FRAGMENT_LOADER, null, this);
+        getLoaderManager().initLoader(MOVIE_LOADER, null, this);
         getLoaderManager().initLoader(VIDEOS_LOADER, null, this);
         getLoaderManager().initLoader(REVIEWS_LOADER, null, this);
     }
@@ -141,7 +148,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
     @Override
     public Loader<Cursor> onCreateLoader(int loaderId, Bundle args) {
         switch (loaderId) {
-            case DETAIL_FRAGMENT_LOADER:
+            case MOVIE_LOADER:
                 if (mUri != null) {
                     return new CursorLoader(getActivity(),
                             mUri,
@@ -181,7 +188,8 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         switch (loader.getId()) {
-            case DETAIL_FRAGMENT_LOADER:
+            case MOVIE_LOADER:
+                // mSwipeRefreshLayout.setRefreshing(false);
                 if (data != null && data.moveToFirst()) {
                     // Setting all view's content
                     Picasso.with(getActivity())
@@ -222,6 +230,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
                 } else mVideosListLayout.setVisibility(View.GONE);
                 break;
             case REVIEWS_LOADER:
+                mSwipeRefreshLayout.setRefreshing(false);
                 if (data != null && data.moveToFirst() && data.getCount() > 0) {
                     mReviewsListAdapter.swapCursor(data);
                     mReviewsListLayout.setVisibility(View.VISIBLE);
@@ -253,8 +262,14 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor> 
     }
 
     void refreshCurrentMovie() {
+        mSwipeRefreshLayout.setRefreshing(true);
         CacheUpdateService.startActionUpdateMovie(getActivity(), (int) movieId);
         CacheUpdateService.startActionUpdateVideos(getActivity(), (int) movieId);
         CacheUpdateService.startActionUpdateReviews(getActivity(), (int) movieId, -1);
+    }
+
+    @Override
+    public void onRefresh() {
+        refreshCurrentMovie();
     }
 }

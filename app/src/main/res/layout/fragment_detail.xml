@@ -1,176 +1,184 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/swiperefresh"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fadingEdgeLength="0dp"
-    android:fillViewport="true"
-    android:overScrollMode="never"
-    android:scrollbars="none">
+    android:layout_height="match_parent">
 
-    <!-- Main block, includes 3 section: title (text), image+info (linear), overview (text) -->
-    <!-- May by in future I will bring Title TextView out of scrolling area -->
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
-        <!-- Title -->
-        <TextView
-            android:id="@+id/detail_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="@dimen/detail_title_vertical_margin"
-            android:paddingEnd="@dimen/detail_right_margin"
-            android:paddingLeft="@dimen/detail_left_margin"
-            android:paddingRight="@dimen/detail_right_margin"
-            android:paddingStart="@dimen/detail_left_margin"
-            android:paddingTop="@dimen/detail_title_vertical_margin"
-            android:textSize="24sp"
-            tools:text="Original title" />
+        android:fadingEdgeLength="0dp"
+        android:fillViewport="true"
+        android:overScrollMode="never"
+        android:scrollbars="none">
 
-        <!-- Image, release date, rating -->
+        <!-- Main block, includes 3 section: title (text), image+info (linear), overview (text) -->
+        <!-- May by in future I will bring Title TextView out of scrolling area -->
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <!-- poster -->
-            <ImageView
-                android:id="@+id/poster_image"
-                android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <!-- Title -->
+            <TextView
+                android:id="@+id/detail_title"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:adjustViewBounds="true"
-                android:cropToPadding="true"
+                android:paddingBottom="@dimen/detail_title_vertical_margin"
+                android:paddingEnd="@dimen/detail_right_margin"
                 android:paddingLeft="@dimen/detail_left_margin"
-                android:paddingTop="@dimen/detail_interviews_padding"
-                android:transitionName="@string/poster_image" />
+                android:paddingRight="@dimen/detail_right_margin"
+                android:paddingStart="@dimen/detail_left_margin"
+                android:paddingTop="@dimen/detail_title_vertical_margin"
+                android:textSize="24sp"
+                tools:text="Original title" />
 
-            <!-- text info (release date, rating) -->
+            <!-- Image, release date, rating -->
             <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-                <!-- release date -->
-                <TextView
-                    android:id="@+id/detail_released"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingEnd="@dimen/detail_right_margin"
-                    android:paddingLeft="@dimen/detail_left_margin"
-                    android:paddingRight="@dimen/detail_left_margin"
-                    android:paddingStart="@dimen/detail_left_margin"
-                    android:paddingTop="@dimen/detail_interviews_padding"
-                    android:text="Released"
-                    android:textSize="18sp" />
-                <!-- runtime -->
-                <TextView
-                    android:id="@+id/detail_runtime"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingEnd="@dimen/detail_right_margin"
-                    android:paddingLeft="@dimen/detail_left_margin"
-                    android:paddingRight="@dimen/detail_left_margin"
-                    android:paddingStart="@dimen/detail_left_margin"
-                    android:paddingTop="@dimen/detail_interviews_padding"
-                    android:text="-"
-                    android:textSize="18sp"
-                    android:textStyle="normal|italic" />
-                <!-- rating -->
-                <TextView
-                    android:id="@+id/detail_rating"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingEnd="@dimen/detail_right_margin"
-                    android:paddingLeft="@dimen/detail_left_margin"
-                    android:paddingRight="@dimen/detail_left_margin"
-                    android:paddingStart="@dimen/detail_left_margin"
-                    android:paddingTop="@dimen/detail_interviews_padding"
-                    android:text="8.1/10"
-                    android:textSize="14sp" />
+                android:orientation="horizontal">
 
-                <!-- end of text info block -->
+                <!-- poster -->
+                <ImageView
+                    android:id="@+id/poster_image"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:adjustViewBounds="true"
+                    android:cropToPadding="true"
+                    android:paddingLeft="@dimen/detail_left_margin"
+                    android:paddingTop="@dimen/detail_interviews_padding"
+                    android:transitionName="@string/poster_image" />
+
+                <!-- text info (release date, rating) -->
+                <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <!-- release date -->
+                    <TextView
+                        android:id="@+id/detail_released"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingEnd="@dimen/detail_right_margin"
+                        android:paddingLeft="@dimen/detail_left_margin"
+                        android:paddingRight="@dimen/detail_left_margin"
+                        android:paddingStart="@dimen/detail_left_margin"
+                        android:paddingTop="@dimen/detail_interviews_padding"
+                        android:text="Released"
+                        android:textSize="18sp" />
+                    <!-- runtime -->
+                    <TextView
+                        android:id="@+id/detail_runtime"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingEnd="@dimen/detail_right_margin"
+                        android:paddingLeft="@dimen/detail_left_margin"
+                        android:paddingRight="@dimen/detail_left_margin"
+                        android:paddingStart="@dimen/detail_left_margin"
+                        android:paddingTop="@dimen/detail_interviews_padding"
+                        android:text="-"
+                        android:textSize="18sp"
+                        android:textStyle="normal|italic" />
+                    <!-- rating -->
+                    <TextView
+                        android:id="@+id/detail_rating"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingEnd="@dimen/detail_right_margin"
+                        android:paddingLeft="@dimen/detail_left_margin"
+                        android:paddingRight="@dimen/detail_left_margin"
+                        android:paddingStart="@dimen/detail_left_margin"
+                        android:paddingTop="@dimen/detail_interviews_padding"
+                        android:text="8.1/10"
+                        android:textSize="14sp" />
+
+                    <!-- end of text info block -->
+                </LinearLayout>
+                <!-- end of middle block (poster + info) -->
             </LinearLayout>
-            <!-- end of middle block (poster + info) -->
-        </LinearLayout>
 
-        <!-- Overview -->
-        <TextView
-            android:id="@+id/detail_overview"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="@dimen/detail_title_vertical_margin"
-            android:paddingEnd="@dimen/detail_right_margin"
-            android:paddingLeft="@dimen/detail_left_margin"
-            android:paddingRight="@dimen/detail_right_margin"
-            android:paddingStart="@dimen/detail_left_margin"
-            android:paddingTop="@dimen/detail_title_vertical_margin"
-            android:text="Overview text" />
-
-        <!-- List of trailers -->
-        <LinearLayout
-            android:id="@+id/videos_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
+            <!-- Overview -->
             <TextView
-                android:id="@+id/videos_list_title"
+                android:id="@+id/detail_overview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:labelFor="@+id/videos_list"
+                android:paddingBottom="@dimen/detail_title_vertical_margin"
                 android:paddingEnd="@dimen/detail_right_margin"
                 android:paddingLeft="@dimen/detail_left_margin"
-                android:paddingRight="@dimen/detail_left_margin"
+                android:paddingRight="@dimen/detail_right_margin"
                 android:paddingStart="@dimen/detail_left_margin"
-                android:paddingTop="@dimen/detail_interviews_padding"
-                android:text="@string/videos_list_title"
-                android:textSize="18sp" />
+                android:paddingTop="@dimen/detail_title_vertical_margin"
+                android:text="Overview text" />
 
-            <com.example.leshik.moviedb.NonScrollListView
-                android:id="@+id/videos_list"
+            <!-- List of trailers -->
+            <LinearLayout
+                android:id="@+id/videos_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingEnd="@dimen/detail_right_margin"
-                android:paddingLeft="@dimen/detail_left_margin"
-                android:paddingRight="@dimen/detail_left_margin"
-                android:paddingStart="@dimen/detail_left_margin" />
+                android:orientation="vertical">
 
+                <TextView
+                    android:id="@+id/videos_list_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:labelFor="@+id/videos_list"
+                    android:paddingEnd="@dimen/detail_right_margin"
+                    android:paddingLeft="@dimen/detail_left_margin"
+                    android:paddingRight="@dimen/detail_left_margin"
+                    android:paddingStart="@dimen/detail_left_margin"
+                    android:paddingTop="@dimen/detail_interviews_padding"
+                    android:text="@string/videos_list_title"
+                    android:textSize="18sp"
+                    android:textStyle="normal|bold|italic" />
+
+                <com.example.leshik.moviedb.NonScrollListView
+                    android:id="@+id/videos_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingEnd="@dimen/detail_right_margin"
+                    android:paddingLeft="@dimen/detail_left_margin"
+                    android:paddingRight="@dimen/detail_left_margin"
+                    android:paddingStart="@dimen/detail_left_margin" />
+
+            </LinearLayout>
+
+            <!-- List of reviews -->
+            <LinearLayout
+                android:id="@+id/reviews_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/reviews_list_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:labelFor="@+id/reviews_list"
+                    android:paddingEnd="@dimen/detail_right_margin"
+                    android:paddingLeft="@dimen/detail_left_margin"
+                    android:paddingRight="@dimen/detail_left_margin"
+                    android:paddingStart="@dimen/detail_left_margin"
+                    android:paddingTop="@dimen/detail_interviews_padding"
+                    android:text="@string/reviews_list_title"
+                    android:textSize="18sp"
+                    android:textStyle="normal|bold|italic" />
+
+                <com.example.leshik.moviedb.NonScrollListView
+                    android:id="@+id/reviews_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingEnd="@dimen/detail_right_margin"
+                    android:paddingLeft="@dimen/detail_left_margin"
+                    android:paddingRight="@dimen/detail_left_margin"
+                    android:paddingStart="@dimen/detail_left_margin" />
+
+            </LinearLayout>
+
+            <!-- End of main block -->
         </LinearLayout>
 
-        <!-- List of reviews -->
-        <LinearLayout
-            android:id="@+id/reviews_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/reviews_list_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:labelFor="@+id/reviews_list"
-                android:paddingEnd="@dimen/detail_right_margin"
-                android:paddingLeft="@dimen/detail_left_margin"
-                android:paddingRight="@dimen/detail_left_margin"
-                android:paddingStart="@dimen/detail_left_margin"
-                android:paddingTop="@dimen/detail_interviews_padding"
-                android:text="@string/reviews_list_title"
-                android:textSize="18sp" />
-
-            <com.example.leshik.moviedb.NonScrollListView
-                android:id="@+id/reviews_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingEnd="@dimen/detail_right_margin"
-                android:paddingLeft="@dimen/detail_left_margin"
-                android:paddingRight="@dimen/detail_left_margin"
-                android:paddingStart="@dimen/detail_left_margin" />
-
-        </LinearLayout>
-
-        <!-- End of main block -->
-    </LinearLayout>
-
-</ScrollView>
+    </ScrollView>
+</android.support.v4.widget.SwipeRefreshLayout>
