@@ -24,7 +24,9 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
         // Get a support ActionBar corresponding to this toolbar
         ActionBar ab = getSupportActionBar();
         // Enable the Up button
-        ab.setDisplayHomeAsUpEnabled(true);
+        if (ab != null) {
+            ab.setDisplayHomeAsUpEnabled(true);
+        }
 
 
         if (savedInstanceState == null) {

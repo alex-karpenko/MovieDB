@@ -18,7 +18,6 @@ public class FullPosterFragment extends Fragment {
     private static final String ARG_POSTER_NAME = "POSTER_NAME";
 
     private String mPosterName;
-    private TouchImageView mPosterImage;
 
     public FullPosterFragment() {
         // Required empty public constructor
@@ -52,15 +51,14 @@ public class FullPosterFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_full_poster, container, false);
+
         // Inflate the layout for this fragment
-        mPosterImage = (TouchImageView) rootView.findViewById(R.id.full_poster_image);
-        if (mPosterName != null) {
-            Picasso.with(getActivity())
-                    .load(Utils.basePosterSecureUrl
-                            + "original"
-                            + mPosterName)
-                    .into(mPosterImage);
-        }
+        TouchImageView mPosterImage = (TouchImageView) rootView.findViewById(R.id.full_poster_image);
+        Picasso.with(getActivity())
+                .load(Utils.basePosterSecureUrl
+                        + "original"
+                        + mPosterName)
+                .into(mPosterImage);
 
         return rootView;
     }

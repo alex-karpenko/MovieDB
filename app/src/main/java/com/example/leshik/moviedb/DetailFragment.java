@@ -54,9 +54,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
     private SwipeRefreshLayout mSwipeRefreshLayout;
 
     private LinearLayout mVideosListLayout;
-    private NonScrollListView mVideosList;
     private LinearLayout mReviewsListLayout;
-    private NonScrollListView mReviewsList;
 
     private SimpleCursorAdapter mVideosListAdapter;
     private SimpleCursorAdapter mReviewsListAdapter;
@@ -92,9 +90,9 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
         mSwipeRefreshLayout.setOnRefreshListener(this);
 
         mVideosListLayout = (LinearLayout) rootView.findViewById(R.id.videos_layout);
-        mVideosList = (NonScrollListView) rootView.findViewById(R.id.videos_list);
+        NonScrollListView mVideosList = (NonScrollListView) rootView.findViewById(R.id.videos_list);
         mReviewsListLayout = (LinearLayout) rootView.findViewById(R.id.reviews_layout);
-        mReviewsList = (NonScrollListView) rootView.findViewById(R.id.reviews_list);
+        NonScrollListView mReviewsList = (NonScrollListView) rootView.findViewById(R.id.reviews_list);
 
         mVideosListAdapter = new SimpleCursorAdapter(getContext(),
                 R.layout.videos_list_item,

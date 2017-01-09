@@ -17,8 +17,8 @@ import com.squareup.picasso.Picasso;
  * Created by Leshik on 27.12.2016.
  */
 
-public class MoviesRecycleListAdapter extends CursorRecyclerViewAdapter<MoviesRecycleListAdapter.ViewHolder> {
-    public MoviesRecycleListAdapter(Context context, Cursor cursor) {
+class MoviesRecycleListAdapter extends CursorRecyclerViewAdapter<MoviesRecycleListAdapter.ViewHolder> {
+    MoviesRecycleListAdapter(Context context, Cursor cursor) {
         super(context, cursor);
     }
 
@@ -51,10 +51,10 @@ public class MoviesRecycleListAdapter extends CursorRecyclerViewAdapter<MoviesRe
     }
 
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView mPosterView;
 
-        public ViewHolder(View itemView) {
+        ViewHolder(View itemView) {
             super(itemView);
             mPosterView = (ImageView) itemView.findViewById(R.id.poster_image);
         }
