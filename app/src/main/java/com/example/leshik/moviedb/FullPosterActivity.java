@@ -8,7 +8,6 @@ import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 
 /**
@@ -18,17 +17,6 @@ import android.view.View;
 public class FullPosterActivity extends AppCompatActivity {
 
     public static final String ARG_POSTER_NAME = "POSTER_NAME";
-    /**
-     * Whether or not the system UI should be auto-hidden after
-     * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
-     */
-    private static final boolean AUTO_HIDE = true;
-
-    /**
-     * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
-     * user interaction before hiding the system UI.
-     */
-    private static final int AUTO_HIDE_DELAY_MILLIS = 3000;
 
     /**
      * Some older devices needs a small delay between UI widget updates
@@ -69,20 +57,6 @@ public class FullPosterActivity extends AppCompatActivity {
         @Override
         public void run() {
             hide();
-        }
-    };
-    /**
-     * Touch listener to use for in-layout UI controls to delay hiding the
-     * system UI. This is to prevent the jarring behavior of controls going away
-     * while interacting with activity UI.
-     */
-    private final View.OnTouchListener mDelayHideTouchListener = new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View view, MotionEvent motionEvent) {
-            if (AUTO_HIDE) {
-                delayedHide(AUTO_HIDE_DELAY_MILLIS);
-            }
-            return false;
         }
     };
 
