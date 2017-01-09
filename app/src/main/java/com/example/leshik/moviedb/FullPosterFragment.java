@@ -5,7 +5,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 
@@ -19,9 +18,7 @@ public class FullPosterFragment extends Fragment {
     private static final String ARG_POSTER_NAME = "POSTER_NAME";
 
     private String mPosterName;
-    private ImageView mPosterImage;
-
-    boolean isImageFitToScreen;
+    private TouchImageView mPosterImage;
 
     public FullPosterFragment() {
         // Required empty public constructor
@@ -56,7 +53,7 @@ public class FullPosterFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_full_poster, container, false);
         // Inflate the layout for this fragment
-        mPosterImage = (ImageView) rootView.findViewById(R.id.full_poster_image);
+        mPosterImage = (TouchImageView) rootView.findViewById(R.id.full_poster_image);
         if (mPosterName != null) {
             Picasso.with(getActivity())
                     .load(Utils.basePosterSecureUrl
