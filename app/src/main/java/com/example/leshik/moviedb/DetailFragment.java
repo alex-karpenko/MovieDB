@@ -40,6 +40,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
     private static final int FAVORITE_MARK_LOADER = 3;
     private static final int VIDEOS_LOADER = 4;
     private static final int REVIEWS_LOADER = 5;
+
     private Uri mUri;
     private long movieId;
 
@@ -60,6 +61,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
     private SimpleCursorAdapter mVideosListAdapter;
     private SimpleCursorAdapter mReviewsListAdapter;
 
+    private String mPosterName;
     private boolean isFavorite;
     private Menu mMenu;
 
@@ -101,15 +103,6 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
                 new int[]{R.id.videos_list_item_title},
                 0);
         mVideosList.setAdapter(mVideosListAdapter);
-        mVideosList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Cursor cursor = mVideosListAdapter.getCursor();
-                cursor.moveToPosition(position);
-                String key = cursor.getString(MoviesContract.Videos.DETAIL_PROJECTION_INDEX_KEY);
-                Utils.watchYoutubeVideo(getContext(), key);
-            }
-        });
 
         mReviewsListAdapter = new SimpleCursorAdapter(getContext(),
                 R.layout.reviews_list_item,
@@ -120,6 +113,28 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
         mReviewsList.setAdapter(mReviewsListAdapter);
 
         isFavorite = false;
+
+        // Click listeners
+        // click on video list item - call youtube app
+        mVideosList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Cursor cursor = mVideosListAdapter.getCursor();
+                cursor.moveToPosition(position);
+                String key = cursor.getString(MoviesContract.Videos.DETAIL_PROJECTION_INDEX_KEY);
+                Utils.watchYoutubeVideo(getContext(), key);
+            }
+        });
+
+        // clock on poster image - set fragment to full poster image view
+        mPosterImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mPosterName != null) {
+                    ((DetailFragment.Callback) getContext()).onImageClicked(mPosterName);
+                }
+            }
+        });
 
         return rootView;
     }
@@ -202,11 +217,13 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
                 // mSwipeRefreshLayout.setRefreshing(false);
                 if (data != null && data.moveToFirst()) {
                     // Setting all view's content
+                    mPosterName = data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_POSTER_PATH);
                     Picasso.with(getActivity())
                             .load(Utils.basePosterSecureUrl
                                     + "w185" // TODO: we have to think to adopt width on image
-                                    + data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_POSTER_PATH))
+                                    + mPosterName)
                             .into(mPosterImage);
+
                     mTitleText.setText(data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_ORIGINAL_TITLE));
                     mReleasedText.setText(data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_RELEASE_DATE));
                     // TODO: make mRuntimeText formatting more reliable
@@ -281,5 +298,17 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
     @Override
     public void onRefresh() {
         refreshCurrentMovie();
+    }
+
+    /**
+     * A callback interface that all activities containing this fragment must
+     * implement. This mechanism allows activities to be notified of poster image
+     * clicked.
+     */
+    public interface Callback {
+        /**
+         * DetailFragmentCallback for when an item has been selected.
+         */
+        void onImageClicked(String posterName);
     }
 }

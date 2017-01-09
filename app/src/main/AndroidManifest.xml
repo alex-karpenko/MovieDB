@@ -13,6 +13,7 @@
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -41,6 +42,17 @@
         <service
             android:name=".service.CacheUpdateService"
             android:exported="false" />
+
+        <activity
+            android:name=".FullPosterActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_full_poster"
+            android:parentActivityName=".DetailActivity"
+            android:theme="@style/FullscreenTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.leshik.moviedb.DetailActivity" />
+        </activity>
     </application>
 
 </manifest>

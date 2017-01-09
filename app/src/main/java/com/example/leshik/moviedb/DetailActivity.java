@@ -1,5 +1,6 @@
 package com.example.leshik.moviedb;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -10,7 +11,7 @@ import android.view.Menu;
  * Activity class for deal with detail movie information
  * It starts from MainActivity by clicking on the poster image in list
  */
-public class DetailActivity extends AppCompatActivity {
+public class DetailActivity extends AppCompatActivity implements DetailFragment.Callback {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,4 +48,10 @@ public class DetailActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    public void onImageClicked(String posterName) {
+        Intent intent = new Intent(this, FullPosterActivity.class);
+        intent.putExtra(FullPosterActivity.ARG_POSTER_NAME, posterName);
+        startActivity(intent);
+    }
 }
