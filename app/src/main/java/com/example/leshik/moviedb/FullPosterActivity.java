@@ -54,7 +54,6 @@ public class FullPosterActivity extends AppCompatActivity {
                     | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         }
     };
-    private View mControlsView;
     private final Runnable mShowPart2Runnable = new Runnable() {
         @Override
         public void run() {
@@ -63,7 +62,6 @@ public class FullPosterActivity extends AppCompatActivity {
             if (actionBar != null) {
                 actionBar.show();
             }
-            mControlsView.setVisibility(View.VISIBLE);
         }
     };
     private boolean mVisible;
@@ -99,7 +97,6 @@ public class FullPosterActivity extends AppCompatActivity {
         }
 
         mVisible = true;
-        mControlsView = findViewById(R.id.fullscreen_content_controls);
         mContentView = findViewById(R.id.fullscreen_content);
 
 
@@ -110,11 +107,6 @@ public class FullPosterActivity extends AppCompatActivity {
                 toggle();
             }
         });
-
-        // Upon interacting with UI controls, delay any scheduled hide()
-        // operations to prevent the jarring behavior of controls going away
-        // while interacting with the UI.
-        findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
 
         // get poster image name from intent
         Intent intent = getIntent();
@@ -161,7 +153,6 @@ public class FullPosterActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.hide();
         }
-        mControlsView.setVisibility(View.GONE);
         mVisible = false;
 
         // Schedule a runnable to remove the status and navigation bar after a delay
