@@ -166,7 +166,7 @@
                     android:textSize="18sp"
                     android:textStyle="normal|bold|italic" />
 
-                <com.example.leshik.moviedb.NonScrollListView
+                <TableLayout
                     android:id="@+id/reviews_list"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

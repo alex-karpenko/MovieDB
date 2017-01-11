@@ -20,10 +20,12 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SimpleCursorAdapter;
+import android.widget.TableLayout;
 import android.widget.TextView;
 
 import com.example.leshik.moviedb.model.MoviesContract;
 import com.example.leshik.moviedb.service.CacheUpdateService;
+import com.ms.square.android.expandabletextview.ExpandableTextView;
 import com.squareup.picasso.Picasso;
 
 import java.util.Calendar;
@@ -55,6 +57,8 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
 
     private LinearLayout mVideosListLayout;
     private LinearLayout mReviewsListLayout;
+
+    private TableLayout mReviewsListTable;
 
     private SimpleCursorAdapter mVideosListAdapter;
     private SimpleCursorAdapter mReviewsListAdapter;
@@ -92,7 +96,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
         mVideosListLayout = (LinearLayout) rootView.findViewById(R.id.videos_layout);
         NonScrollListView mVideosList = (NonScrollListView) rootView.findViewById(R.id.videos_list);
         mReviewsListLayout = (LinearLayout) rootView.findViewById(R.id.reviews_layout);
-        NonScrollListView mReviewsList = (NonScrollListView) rootView.findViewById(R.id.reviews_list);
+        mReviewsListTable = (TableLayout) rootView.findViewById(R.id.reviews_list);
 
         mVideosListAdapter = new SimpleCursorAdapter(getContext(),
                 R.layout.videos_list_item,
@@ -108,7 +112,17 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
                 new String[]{MoviesContract.Reviews.COLUMN_NAME_AUTHOR, MoviesContract.Reviews.COLUMN_NAME_CONTENT},
                 new int[]{R.id.reviews_list_item_author, R.id.reviews_list_item_content},
                 0);
-        mReviewsList.setAdapter(mReviewsListAdapter);
+        mReviewsListAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
+            @Override
+            public boolean setViewValue(View view, Cursor cursor, int i) {
+                if (i == MoviesContract.Reviews.DETAIL_PROJECTION_INDEX_CONTENT) {
+                    ((ExpandableTextView) view).setText(cursor.getString(i));
+                    return true;
+                }
+                return false;
+            }
+        });
+        // mReviewsListTable.setAdapter(mReviewsListAdapter);
 
         isFavorite = false;
 
@@ -250,17 +264,27 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
                 setFavoriteIcon(isFavorite);
                 break;
             case VIDEOS_LOADER:
-                if (data != null && data.moveToFirst() && data.getCount() > 0) {
+                if (data != null) {
                     mVideosListAdapter.swapCursor(data);
-                    mVideosListLayout.setVisibility(View.VISIBLE);
+                    if (data.moveToFirst() && data.getCount() > 0) {
+                        mVideosListLayout.setVisibility(View.VISIBLE);
+                    }
                 } else mVideosListLayout.setVisibility(View.GONE);
                 break;
             case REVIEWS_LOADER:
-                mSwipeRefreshLayout.setRefreshing(false);
-                if (data != null && data.moveToFirst() && data.getCount() > 0) {
+                mReviewsListTable.removeAllViews();
+                if (data != null) {
                     mReviewsListAdapter.swapCursor(data);
-                    mReviewsListLayout.setVisibility(View.VISIBLE);
+                    if (data.moveToFirst() && data.getCount() > 0) {
+                        int rowsCount = mReviewsListAdapter.getCount();
+                        for (int i = 0; i < rowsCount; i++) {
+                            View v = mReviewsListAdapter.getView(i, null, mReviewsListTable);
+                            mReviewsListTable.addView(v);
+                        }
+                        mReviewsListLayout.setVisibility(View.VISIBLE);
+                    }
                 } else mReviewsListLayout.setVisibility(View.GONE);
+                mSwipeRefreshLayout.setRefreshing(false);
                 break;
         }
     }
