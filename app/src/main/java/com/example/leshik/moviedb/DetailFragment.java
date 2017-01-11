@@ -157,6 +157,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
+            mSwipeRefreshLayout.setRefreshing(true);
             refreshCurrentMovie();
             return true;
         }
@@ -287,7 +288,6 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
     }
 
     void refreshCurrentMovie() {
-        mSwipeRefreshLayout.setRefreshing(true);
         CacheUpdateService.startActionUpdateMovie(getActivity(), (int) movieId);
         CacheUpdateService.startActionUpdateVideos(getActivity(), (int) movieId);
         CacheUpdateService.startActionUpdateReviews(getActivity(), (int) movieId, -1);
