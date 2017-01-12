@@ -33,6 +33,10 @@ public final class Utils {
     static int iconFavoriteBlack = R.drawable.ic_favorite_black_light;
     static int iconFavoriteOutline = R.drawable.ic_favorite_outline_light;
 
+    // Default image width
+    private static String posterSmallWidthStr = "w185";
+    private static String posterFullWidthStr = "original";
+
     static long getLongCachePreference(Context context, int key) {
         SharedPreferences prefs = context.getSharedPreferences(CACHE_PREFS_NAME, 0);
         return prefs.getLong(context.getString(key), -1);
@@ -76,5 +80,17 @@ public final class Utils {
             iconFavoriteBlack = R.drawable.ic_favorite_black_light;
             iconFavoriteOutline = R.drawable.ic_favorite_outline_light;
         }
+    }
+
+    static Uri getPosterSmallUri(String poster) {
+        return Uri.parse(basePosterSecureUrl
+                + posterSmallWidthStr
+                + poster);
+    }
+
+    static Uri getPosterFullUri(String poster) {
+        return Uri.parse(basePosterSecureUrl
+                + posterFullWidthStr
+                + poster);
     }
 }

@@ -233,9 +233,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
                     // Setting all view's content
                     mPosterName = data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_POSTER_PATH);
                     Picasso.with(getActivity())
-                            .load(Utils.basePosterSecureUrl
-                                    + "w185" // TODO: we have to think to adopt width on image
-                                    + mPosterName)
+                            .load(Utils.getPosterSmallUri(mPosterName))
                             .into(mPosterImage);
 
                     mTitleText.setText(data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_ORIGINAL_TITLE));

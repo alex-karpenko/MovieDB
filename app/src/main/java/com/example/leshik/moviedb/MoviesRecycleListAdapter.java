@@ -25,9 +25,7 @@ class MoviesRecycleListAdapter extends CursorRecyclerViewAdapter<MoviesRecycleLi
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, Cursor cursor) {
         Picasso.with(getContext())
-                .load(Utils.basePosterSecureUrl
-                        + "w185" // TODO: we have to think to adopt width of image, mayby
-                        + cursor.getString(MoviesContract.SHORT_LIST_PROJECTION_INDEX_POSTER_PATH))
+                .load(Utils.getPosterSmallUri(cursor.getString(MoviesContract.SHORT_LIST_PROJECTION_INDEX_POSTER_PATH)))
                 .into(viewHolder.mPosterView);
 
         // set item click listener

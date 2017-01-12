@@ -55,9 +55,7 @@ public class FullPosterFragment extends Fragment {
         // Inflate the layout for this fragment
         TouchImageView mPosterImage = (TouchImageView) rootView.findViewById(R.id.full_poster_image);
         Picasso.with(getActivity())
-                .load(Utils.basePosterSecureUrl
-                        + "original"
-                        + mPosterName)
+                .load(Utils.getPosterFullUri(mPosterName))
                 .into(mPosterImage);
 
         return rootView;
