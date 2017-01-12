@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 
 import static com.example.leshik.moviedb.service.CacheUpdateService.CACHE_PREFS_NAME;
 
@@ -27,6 +28,10 @@ public final class Utils {
     public static String basePosterUrl = null;
     public static String basePosterSecureUrl = null;
     public static String[] posterSizes = null;
+
+    // Current favorite icons
+    static int iconFavoriteBlack = R.drawable.ic_favorite_black_light;
+    static int iconFavoriteOutline = R.drawable.ic_favorite_outline_light;
 
     static long getLongCachePreference(Context context, int key) {
         SharedPreferences prefs = context.getSharedPreferences(CACHE_PREFS_NAME, 0);
@@ -56,6 +61,20 @@ public final class Utils {
             context.startActivity(appIntent);
         } catch (ActivityNotFoundException ex) {
             context.startActivity(webIntent);
+        }
+    }
+
+    static void setupThemeIcons(Context context) {
+        TypedValue val = new TypedValue();
+        context.getTheme().resolveAttribute(R.attr.isLightTheme, val, true);
+        if (val.type == TypedValue.TYPE_INT_BOOLEAN && val.data == 0) {
+            // Dark
+            iconFavoriteBlack = R.drawable.ic_favorite_black_dark;
+            iconFavoriteOutline = R.drawable.ic_favorite_outline_dark;
+        } else {
+            // Light
+            iconFavoriteBlack = R.drawable.ic_favorite_black_light;
+            iconFavoriteOutline = R.drawable.ic_favorite_outline_light;
         }
     }
 }

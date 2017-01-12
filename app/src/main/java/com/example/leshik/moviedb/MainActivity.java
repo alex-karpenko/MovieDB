@@ -27,6 +27,8 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
         // Every time when activity created - update configuration from the TMDB
         Utils.basePosterUrl = Utils.getStringCachePreference(this, R.string.base_potser_url);
         Utils.basePosterSecureUrl = Utils.getStringCachePreference(this, R.string.base_potser_secure_url);
+        Utils.setupThemeIcons(this);
+
         CacheUpdateService.startActionUpdateConfiguration(this);
 
         setContentView(R.layout.activity_main);

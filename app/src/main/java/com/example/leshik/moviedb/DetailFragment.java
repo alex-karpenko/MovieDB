@@ -177,6 +177,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
         }
         if (id == R.id.action_favorite) {
             isFavorite = !isFavorite;
+            setFavoriteIcon(isFavorite);
             CacheUpdateService.startActionUpdateFavorite(getActivity(), movieId, isFavorite);
             return true;
         }
@@ -303,8 +304,8 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
 
     void setFavoriteIcon(boolean flag) {
         int favIcon;
-        if (flag) favIcon = R.drawable.ic_favorite_black_light;
-        else favIcon = R.drawable.ic_favorite_outline_light;
+        if (flag) favIcon = Utils.iconFavoriteBlack;
+        else favIcon = Utils.iconFavoriteOutline;
         if (mMenu != null) {
             MenuItem favMenuItem = mMenu.findItem(R.id.action_favorite);
             favMenuItem.setIcon(favIcon);
