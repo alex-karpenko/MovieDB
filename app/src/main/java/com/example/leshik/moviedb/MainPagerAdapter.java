@@ -10,7 +10,7 @@ import android.support.v4.app.FragmentPagerAdapter;
  */
 
 class MainPagerAdapter extends FragmentPagerAdapter {
-    public MainPagerAdapter(FragmentManager fm) {
+    MainPagerAdapter(FragmentManager fm) {
         super(fm);
     }
 

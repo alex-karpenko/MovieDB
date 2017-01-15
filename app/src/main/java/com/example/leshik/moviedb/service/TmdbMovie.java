@@ -164,6 +164,7 @@ public class TmdbMovie {
         returnValues.put(MoviesContract.Movies.COLUMN_NAME_HOMEPAGE, homepage);
         returnValues.put(MoviesContract.Movies.COLUMN_NAME_ADULT, adult);
         returnValues.put(MoviesContract.Movies.COLUMN_NAME_VIDEO, video);
+        returnValues.put(MoviesContract.Movies.COLUMN_NAME_RUNTIME, runtime);
 
         return returnValues;
     }

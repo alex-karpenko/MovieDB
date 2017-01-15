@@ -25,6 +25,7 @@ public class MoviesDbHelper extends SQLiteOpenHelper {
         db.execSQL(MoviesContract.Toprated.CREATE_TABLE_STATEMENT);
         db.execSQL(MoviesContract.Favorites.CREATE_TABLE_STATEMENT);
         db.execSQL(MoviesContract.Videos.CREATE_TABLE_STATEMENT);
+        db.execSQL(MoviesContract.Reviews.CREATE_TABLE_STATEMENT);
     }
 
     @Override
@@ -34,6 +35,7 @@ public class MoviesDbHelper extends SQLiteOpenHelper {
 //        db.execSQL(MoviesContract.Toprated.DROP_TABLE_STATEMENT);
 //        db.execSQL(MoviesContract.Favorites.DROP_TABLE_STATEMENT);
 //        db.execSQL(MoviesContract.Videos.DROP_TABLE_STATEMENT);
+//        db.execSQL(MoviesContract.Reviews.DROP_TABLE_STATEMENT);
         // and drop movies table after all
 //        db.execSQL(MoviesContract.Movies.DROP_TABLE_STATEMENT);
 //        onCreate(db);

@@ -17,17 +17,15 @@ import com.squareup.picasso.Picasso;
  * Created by Leshik on 27.12.2016.
  */
 
-public class MoviesRecycleListAdapter extends CursorRecyclerViewAdapter<MoviesRecycleListAdapter.ViewHolder> {
-    public MoviesRecycleListAdapter(Context context, Cursor cursor) {
+class MoviesRecycleListAdapter extends CursorRecyclerViewAdapter<MoviesRecycleListAdapter.ViewHolder> {
+    MoviesRecycleListAdapter(Context context, Cursor cursor) {
         super(context, cursor);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, Cursor cursor) {
         Picasso.with(getContext())
-                .load(Utils.basePosterSecureUrl
-                        + "w185" // TODO: we have to think to adopt width of image, mayby
-                        + cursor.getString(MoviesContract.SHORT_LIST_PROJECTION_INDEX_POSTER_PATH))
+                .load(Utils.getPosterSmallUri(cursor.getString(MoviesContract.SHORT_LIST_PROJECTION_INDEX_POSTER_PATH)))
                 .into(viewHolder.mPosterView);
 
         // set item click listener
@@ -51,10 +49,10 @@ public class MoviesRecycleListAdapter extends CursorRecyclerViewAdapter<MoviesRe
     }
 
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView mPosterView;
 
-        public ViewHolder(View itemView) {
+        ViewHolder(View itemView) {
             super(itemView);
             mPosterView = (ImageView) itemView.findViewById(R.id.poster_image);
         }

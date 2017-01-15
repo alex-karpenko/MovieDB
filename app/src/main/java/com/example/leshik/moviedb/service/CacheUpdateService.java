@@ -32,6 +32,8 @@ public class CacheUpdateService extends IntentService {
     static final String ACTION_UPDATE_TOPRATED = "com.example.leshik.moviedb.service.action.UPDATE_TOPRATED";
     static final String ACTION_UPDATE_CONFIGURATION = "com.example.leshik.moviedb.service.action.UPDATE_CONFIGURATION";
     static final String ACTION_UPDATE_FAVORITE = "com.example.leshik.moviedb.service.action.UPDATE_FAVORITE";
+    static final String ACTION_UPDATE_VIDEOS = "com.example.leshik.moviedb.service.action.UPDATE_VIDEOS";
+    static final String ACTION_UPDATE_REVIEWS = "com.example.leshik.moviedb.service.action.UPDATE_REVIEWS";
     // Parameters for actions
     // page number for update popular or toprated
     static final String EXTRA_PARAM_PAGE = "com.example.leshik.moviedb.service.extra.PAGE";
@@ -58,6 +60,33 @@ public class CacheUpdateService extends IntentService {
         Intent intent = new Intent(context, CacheUpdateService.class);
         intent.setAction(ACTION_UPDATE_MOVIE);
         intent.putExtra(EXTRA_PARAM_MOVIE_ID, movie_id);
+        context.startService(intent);
+    }
+
+    /**
+     * Starts this service to perform action UpdateVideos with the given parameters. If
+     * the service is already performing a task this action will be queued.
+     *
+     * @see IntentService
+     */
+    public static void startActionUpdateVideos(Context context, int movie_id) {
+        Intent intent = new Intent(context, CacheUpdateService.class);
+        intent.setAction(ACTION_UPDATE_VIDEOS);
+        intent.putExtra(EXTRA_PARAM_MOVIE_ID, movie_id);
+        context.startService(intent);
+    }
+
+    /**
+     * Starts this service to perform action UpdateReviews with the given parameters. If
+     * the service is already performing a task this action will be queued.
+     *
+     * @see IntentService
+     */
+    public static void startActionUpdateReviews(Context context, int movie_id, int page) {
+        Intent intent = new Intent(context, CacheUpdateService.class);
+        intent.setAction(ACTION_UPDATE_REVIEWS);
+        intent.putExtra(EXTRA_PARAM_MOVIE_ID, movie_id);
+        intent.putExtra(EXTRA_PARAM_PAGE, page);
         context.startService(intent);
     }
 
@@ -134,6 +163,13 @@ public class CacheUpdateService extends IntentService {
                 final long movie_id = intent.getLongExtra(EXTRA_PARAM_MOVIE_ID, -1);
                 final boolean isFavorite = intent.getBooleanExtra(EXTRA_PARAM_FAVORITE_FLAG, false);
                 handleActionUpdateFavorite(movie_id, isFavorite);
+            } else if (ACTION_UPDATE_VIDEOS.equals(action)) {
+                final int movie_id = intent.getIntExtra(EXTRA_PARAM_MOVIE_ID, -1);
+                handleActionUpdateVideos(movie_id);
+            } else if (ACTION_UPDATE_REVIEWS.equals(action)) {
+                final int movie_id = intent.getIntExtra(EXTRA_PARAM_MOVIE_ID, -1);
+                final int page = intent.getIntExtra(EXTRA_PARAM_PAGE, -1);
+                handleActionUpdateReviews(movie_id, page);
             }
         }
     }
@@ -159,7 +195,74 @@ public class CacheUpdateService extends IntentService {
         try {
             // Execute and insert(a-la update) movies table via content provider call
             movie = movieCall.execute().body();
-            getContentResolver().insert(MoviesContract.Movies.CONTENT_URI, movie.getMovieContentValues());
+            ContentValues values = movie.getMovieContentValues();
+            // Set last updated value
+            long currentTime = Calendar.getInstance().getTimeInMillis();
+            values.put(MoviesContract.Movies.COLUMN_NAME_LAST_UPDATED, currentTime);
+            // Update movie
+            getContentResolver().insert(MoviesContract.Movies.CONTENT_URI, values);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Handle action UpdateVideos in the provided background thread with the provided
+     * parameters.
+     */
+    private void handleActionUpdateVideos(int movie_id) {
+        if (movie_id <= 0) return;
+
+        // Create retrofit object...
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(Utils.baseApiSecureUrl)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        // ... create service and call ....
+        TmdbApiService service = retrofit.create(TmdbApiService.class);
+        Call<TmdbVideos> videosCall = service.getVideos(movie_id, BuildConfig.THE_MOVIE_DB_API_KEY);
+        TmdbVideos listVideos;
+
+        try {
+            listVideos = videosCall.execute().body();
+            // Insert videos tables via content provider calls
+            getContentResolver().bulkInsert(MoviesContract.Videos.CONTENT_URI, listVideos.getVideosContentValues());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Handle action UpdateReviews in the provided background thread with the provided
+     * parameters.
+     */
+    private void handleActionUpdateReviews(int movie_id, int page) {
+        // TODO: retrieve all pages
+        if (movie_id <= 0) return;
+        int requestPage = page <= 0 ? 1 : page;
+
+        // Create retrofit object...
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(Utils.baseApiSecureUrl)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        // ... create service and call ....
+        TmdbApiService service = retrofit.create(TmdbApiService.class);
+        Call<TmdbReviews> reviewsCall = service.getReviews(movie_id, requestPage, BuildConfig.THE_MOVIE_DB_API_KEY);
+        TmdbReviews reviewsPage;
+
+        try {
+            reviewsPage = reviewsCall.execute().body();
+
+            if (page <= 0) {
+                // If page number is not positive - first delete all data from reviews table for specified movie
+                getContentResolver().
+                        delete(MoviesContract.Reviews.buildUri(movie_id),
+                                null,
+                                null);
+            }
+            // Insert reviews table via content provider calls
+            getContentResolver().bulkInsert(MoviesContract.Reviews.CONTENT_URI, reviewsPage.getReviewsContentValues());
         } catch (IOException e) {
             e.printStackTrace();
         }

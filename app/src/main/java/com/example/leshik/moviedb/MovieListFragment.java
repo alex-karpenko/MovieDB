@@ -40,11 +40,7 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
     public static final int FAVORITES_TAB_FRAGMENT = 2;
     // Current fragment type
     private int fragmentTabType = FAVORITES_TAB_FRAGMENT;
-    // cache update interval in milliseconds
-    // 5 min for debug
-    private static final long CACHE_UPDATE_INTERVAL = 1000 * 60 * 5; // 5 minutes
     private MoviesRecycleListAdapter mAdapter;
-    private RecyclerView mRecyclerView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView.LayoutManager mLayoutManager;
 
@@ -80,7 +76,7 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
 
         // Inflate fragment
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.movies_list);
+        RecyclerView mRecyclerView = (RecyclerView) rootView.findViewById(R.id.movies_list);
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swiperefresh);
         mSwipeRefreshLayout.setOnRefreshListener(this);
@@ -106,8 +102,7 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
 
         // Every time, when fragment appears on the screen, we have to update contents
         // (after start activity, returning from details or settings, etc.)
-        // TODO: !!!
-//        updateAllCacheIfNeed();
+        updateCurrentPageCacheIfNeed();
     }
 
     @Override
@@ -159,12 +154,12 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
 
         switch (fragmentTabType) {
             case POPULAR_TAB_FRAGMENT:
-                if (currentTime - Utils.getLongCachePreference(getActivity(), R.string.last_popular_update_time) >= CACHE_UPDATE_INTERVAL) {
+                if (currentTime - Utils.getLongCachePreference(getActivity(), R.string.last_popular_update_time) >= Utils.CACHE_UPDATE_INTERVAL) {
                     updatePopularCache();
                 }
                 break;
             case TOPRATED_TAB_FRAGMENT:
-                if (currentTime - Utils.getLongCachePreference(getActivity(), R.string.last_toprated_update_time) >= CACHE_UPDATE_INTERVAL) {
+                if (currentTime - Utils.getLongCachePreference(getActivity(), R.string.last_toprated_update_time) >= Utils.CACHE_UPDATE_INTERVAL) {
                     updateTopratedCache();
                 }
                 break;
