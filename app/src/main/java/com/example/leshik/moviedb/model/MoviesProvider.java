@@ -358,7 +358,7 @@ public class MoviesProvider extends ContentProvider {
             default:
                 return super.bulkInsert(uri, values);
         }
-        getContext().getContentResolver().notifyChange(uri, null);
+        if (result > 0) getContext().getContentResolver().notifyChange(uri, null);
         return result;
     }
 
@@ -431,7 +431,7 @@ public class MoviesProvider extends ContentProvider {
                 throw new UnsupportedOperationException("Unknown URI: " + uri);
         }
 
-        getContext().getContentResolver().notifyChange(uri, null);
+        if (result > 0) getContext().getContentResolver().notifyChange(uri, null);
         return result;
     }
 
@@ -530,7 +530,7 @@ public class MoviesProvider extends ContentProvider {
                 throw new UnsupportedOperationException("Unknown URI: " + uri);
         }
 
-        getContext().getContentResolver().notifyChange(uri, null);
+        if (result > 0) getContext().getContentResolver().notifyChange(uri, null);
         return result;
     }
 
