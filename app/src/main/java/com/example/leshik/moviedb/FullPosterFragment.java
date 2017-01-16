@@ -1,11 +1,20 @@
 package com.example.leshik.moviedb;
 
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.leshik.moviedb.model.MoviesContract;
+import com.example.leshik.moviedb.service.CacheUpdateService;
 import com.squareup.picasso.Picasso;
 
 
@@ -14,10 +23,17 @@ import com.squareup.picasso.Picasso;
  * Use the {@link FullPosterFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class FullPosterFragment extends Fragment {
+public class FullPosterFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String ARG_POSTER_NAME = "POSTER_NAME";
+    private static final String ARG_MOVIE_ID = "MOVIE_ID";
+
+    private static final int FAVORITE_MARK_LOADER = 3;
 
     private String mPosterName;
+    private int movieId;
+
+    private Menu mMenu;
+    private boolean isFavorite;
 
     public FullPosterFragment() {
         // Required empty public constructor
@@ -30,20 +46,43 @@ public class FullPosterFragment extends Fragment {
      * @param posterName - file name of poster image.
      * @return A new instance of fragment FullPosterFragment.
      */
-    public static FullPosterFragment newInstance(String posterName) {
+    public static FullPosterFragment newInstance(int movie_id, String posterName) {
         FullPosterFragment fragment = new FullPosterFragment();
         Bundle args = new Bundle();
         args.putString(ARG_POSTER_NAME, posterName);
+        args.putInt(ARG_MOVIE_ID, movie_id);
         fragment.setArguments(args);
         return fragment;
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.poster_fragment, menu);
+        mMenu = menu;
+        getLoaderManager().initLoader(FAVORITE_MARK_LOADER, null, this);
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+
         if (getArguments() != null) {
             mPosterName = getArguments().getString(ARG_POSTER_NAME);
+            movieId = getArguments().getInt(ARG_MOVIE_ID, -1);
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_favorite) {
+            isFavorite = !isFavorite;
+            Utils.setFavoriteIcon(isFavorite, mMenu);
+            CacheUpdateService.startActionUpdateFavorite(getActivity(), movieId, isFavorite);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -59,5 +98,38 @@ public class FullPosterFragment extends Fragment {
                 .into(mPosterImage);
 
         return rootView;
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        switch (id) {
+            case FAVORITE_MARK_LOADER:
+                if (movieId > 0) {
+                    return new CursorLoader(getActivity(),
+                            MoviesContract.Favorites.buildUri(movieId),
+                            null, null, null, null);
+                }
+                break;
+        }
+        return null;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        switch (loader.getId()) {
+            case FAVORITE_MARK_LOADER:
+                isFavorite = false;
+                if (data != null && data.moveToFirst()) {
+                    isFavorite = true;
+                }
+                Utils.setFavoriteIcon(isFavorite, mMenu);
+                break;
+        }
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
     }
 }
