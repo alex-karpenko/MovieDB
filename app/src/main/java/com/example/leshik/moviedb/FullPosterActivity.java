@@ -22,6 +22,18 @@ public class FullPosterActivity extends AppCompatActivity {
     public static final String ARG_MOVIE_ID = "MOVIE_ID";
 
     /**
+     * Whether or not the system UI should be auto-hidden after
+     * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
+     */
+    private static final boolean AUTO_HIDE = true;
+
+    /**
+     * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
+     * user interaction before hiding the system UI.
+     */
+    private static final int AUTO_HIDE_DELAY_MILLIS = 3000;
+
+    /**
      * Some older devices needs a small delay between UI widget updates
      * and a change of the status and navigation bar.
      */
@@ -124,6 +136,9 @@ public class FullPosterActivity extends AppCompatActivity {
             imageView.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View view, MotionEvent motionEvent) {
+                    if (AUTO_HIDE) {
+                        delayedHide(AUTO_HIDE_DELAY_MILLIS);
+                    }
                     toggle();
                     return true;
                 }
