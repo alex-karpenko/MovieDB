@@ -34,6 +34,7 @@
         </activity>
         <activity
             android:name=".FullPosterActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_full_poster"
             android:parentActivityName=".DetailActivity">
             <meta-data

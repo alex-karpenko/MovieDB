@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 
 /**
@@ -113,6 +114,30 @@ public class FullPosterActivity extends AppCompatActivity {
         // created, to briefly hint to the user that UI controls
         // are available.
         delayedHide(100);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        TouchImageView imageView = (TouchImageView) mContentView.findViewById(R.id.full_poster_image);
+        if (imageView != null) {
+            imageView.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    toggle();
+                    return true;
+                }
+            });
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        TouchImageView imageView = (TouchImageView) mContentView.findViewById(R.id.full_poster_image);
+        if (imageView != null) {
+            imageView.setOnTouchListener(null);
+        }
     }
 
     @Override
