@@ -251,7 +251,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
                 }
                 // Update movie if need
                 long currentTime = Calendar.getInstance().getTimeInMillis();
-                if ((currentTime - data.getLong(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_LAST_UPDATED)) >= Utils.CACHE_UPDATE_INTERVAL) {
+                if ((currentTime - data.getLong(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_LAST_UPDATED)) >= Utils.getCacheUpdateInterval()) {
                     refreshCurrentMovie();
                 }
                 break;
