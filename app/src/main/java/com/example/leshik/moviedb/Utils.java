@@ -21,10 +21,21 @@ public final class Utils {
     public static final String baseApiUrl = "http://api.themoviedb.org/3/";
     public static final String baseApiSecureUrl = "https://api.themoviedb.org/3/";
     // Number of pages to preload
-    public static final int CACHE_PRELOAD_PAGES = 5;
+    public static int CACHE_PRELOAD_PAGES = 5;
+
     // cache update interval in milliseconds
     // 5 min for debug
-    static final long CACHE_UPDATE_INTERVAL = 1000 * 60 * 5; // 5 minutes
+    private static long CACHE_UPDATE_INTERVAL = 1000 * 60 * 5; // 5 minutes
+
+    // getter/setter
+    public static long getCacheUpdateInterval() {
+        return CACHE_UPDATE_INTERVAL;
+    }
+
+    public static void setCacheUpdateInterval(long cacheUpdateInterval) {
+        CACHE_UPDATE_INTERVAL = cacheUpdateInterval;
+    }
+
 
     // Common variables, we fill its by fetching configuration from TMDB (in MovieListFragment class)
     public static String basePosterUrl = null;
