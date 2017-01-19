@@ -3,7 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
     <ListPreference
         android:defaultValue="@string/pref_sortorder_popular"
         android:entries="@array/pref_sortorder_options"

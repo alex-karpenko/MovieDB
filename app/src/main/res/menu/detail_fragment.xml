@@ -6,10 +6,10 @@
         android:id="@+id/action_favorite"
         android:icon="@drawable/ic_favorite_outline_light"
         android:title="@string/action_favorite"
-        app:showAsAction="ifRoom"></item>
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_refresh"
         android:orderInCategory="100"
-        android:title="@string/action_refresh"
+        android:title="@string/action_refresh_movie"
         app:showAsAction="never" />
 </menu>
