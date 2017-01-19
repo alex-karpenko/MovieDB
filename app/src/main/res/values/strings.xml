@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">Popular Movies</string>
-    <string name="title_activity_detail">Movie details</string>
     <string name="content_authority">com.example.leshik.moviedb</string>
+    <string name="title_activity_detail">Movie details</string>
+    <string name="title_activity_full_poster">Poster</string>
     <!-- Strings related to menu actions -->
     <string name="action_refresh_list">Refresh list</string>
     <string name="action_refresh_movie">Refresh movie</string>
@@ -37,7 +38,4 @@
     <string name="runtime_minutes_text">min</string>
     <string name="videos_list_title">Trailers:</string>
     <string name="reviews_list_title">Reviews:</string>
-
-    <string name="title_activity_full_poster">Poster</string>
-
 </resources>

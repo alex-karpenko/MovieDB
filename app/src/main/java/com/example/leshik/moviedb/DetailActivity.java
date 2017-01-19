@@ -6,6 +6,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.view.MenuItem;
 
 /**
  * Activity class for deal with detail movie information
@@ -49,6 +50,21 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
         getMenuInflater().inflate(R.menu.detail, menu);
         return true;
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle menu item clicks here.
+        // Get pressed menu item
+        int id = item.getItemId();
+
+        // if Settings pressed, start SettingsActivity via explicit intent
+        if (id == R.id.action_settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 
     @Override
     public void onImageClicked(int movieId, String posterName) {
