@@ -75,6 +75,22 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
             // For other preferences, set the summary to the value's simple string representation.
             preference.setSummary(stringValue);
         }
+
+        if (preference.getKey().equals(getString(R.string.pref_theme_key))) {
+            // TODO: change current theme
+            int newTheme = R.style.AppThemeDark;
+            if (stringValue.equals(getString(R.string.pref_theme_dark)))
+                newTheme = R.style.AppThemeDark;
+            else if (stringValue.equals(getString(R.string.pref_theme_light)))
+                newTheme = R.style.AppThemeLight;
+            getActivity().getApplicationContext().setTheme(newTheme);
+
+        } else if (preference.getKey().equals(getString(R.string.pref_cache_key))) {
+            // TODO: change cache update interval
+            long newInterval = Long.valueOf(stringValue);
+            newInterval = newInterval * 60 * 60 * 1000; // convert hours to milliseconds
+            Utils.setCacheUpdateInterval(newInterval);
+        }
         return true;
     }
 }
