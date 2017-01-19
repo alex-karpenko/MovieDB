@@ -88,7 +88,7 @@ public class FullPosterActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setTitle("");
+            actionBar.setDisplayShowTitleEnabled(false);
         }
 
         mVisible = true;
