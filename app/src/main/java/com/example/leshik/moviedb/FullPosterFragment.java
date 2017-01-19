@@ -1,11 +1,14 @@
 package com.example.leshik.moviedb;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.ShareActionProvider;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -60,6 +63,23 @@ public class FullPosterFragment extends Fragment implements LoaderManager.Loader
         inflater.inflate(R.menu.poster_fragment, menu);
         mMenu = menu;
         getLoaderManager().initLoader(FAVORITE_MARK_LOADER, null, this);
+
+        // Setup share provider
+        // get provider's menu item
+        MenuItem shareItem = menu.findItem(R.id.action_share);
+        // ... and get provider fro it
+        ShareActionProvider myShareActionProvider =
+                (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
+
+        // create intent
+        Intent myShareIntent = new Intent(Intent.ACTION_SEND);
+        // TODO: 19.01.2017 : change type to html?
+        myShareIntent.setType("text/*");
+        // TODO: 19.01.2017 : create html page with content of the movie
+        String contentToSend = Utils.getPosterFullUri(mPosterName).toString();
+        myShareIntent.putExtra(Intent.EXTRA_TEXT, contentToSend);
+        // set intent into provider
+        myShareActionProvider.setShareIntent(myShareIntent);
     }
 
     @Override
