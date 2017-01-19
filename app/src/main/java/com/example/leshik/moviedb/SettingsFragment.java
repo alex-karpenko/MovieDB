@@ -38,7 +38,8 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         // For all preferences, attach an OnPreferenceChangeListener so the UI summary can be
         // updated when the preference changes.
         // Now only one
-        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_sortorder_key)));
+        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_theme_key)));
+        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_cache_key)));
     }
 
     /**
