@@ -143,7 +143,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
             @Override
             public void onClick(View v) {
                 if (mPosterName != null) {
-                    ((DetailFragment.Callback) getContext()).onImageClicked(mPosterName);
+                    ((DetailFragment.Callback) getContext()).onImageClicked((int) movieId, mPosterName);
                 }
             }
         });
@@ -177,7 +177,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
         }
         if (id == R.id.action_favorite) {
             isFavorite = !isFavorite;
-            setFavoriteIcon(isFavorite);
+            Utils.setFavoriteIcon(isFavorite, mMenu);
             CacheUpdateService.startActionUpdateFavorite(getActivity(), movieId, isFavorite);
             return true;
         }
@@ -260,7 +260,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
                 if (data != null && data.moveToFirst()) {
                     isFavorite = true;
                 }
-                setFavoriteIcon(isFavorite);
+                Utils.setFavoriteIcon(isFavorite, mMenu);
                 break;
             case VIDEOS_LOADER:
                 if (data != null) {
@@ -300,16 +300,6 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
         }
     }
 
-    void setFavoriteIcon(boolean flag) {
-        int favIcon;
-        if (flag) favIcon = Utils.iconFavoriteBlack;
-        else favIcon = Utils.iconFavoriteOutline;
-        if (mMenu != null) {
-            MenuItem favMenuItem = mMenu.findItem(R.id.action_favorite);
-            favMenuItem.setIcon(favIcon);
-        }
-    }
-
     void refreshCurrentMovie() {
         CacheUpdateService.startActionUpdateMovie(getActivity(), (int) movieId);
         CacheUpdateService.startActionUpdateVideos(getActivity(), (int) movieId);
@@ -330,6 +320,6 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
         /**
          * DetailFragmentCallback for when an item has been selected.
          */
-        void onImageClicked(String posterName);
+        void onImageClicked(int movieId, String posterName);
     }
 }

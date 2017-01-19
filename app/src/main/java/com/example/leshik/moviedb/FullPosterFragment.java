@@ -1,11 +1,23 @@
 package com.example.leshik.moviedb;
 
+import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.ShareActionProvider;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.leshik.moviedb.model.MoviesContract;
+import com.example.leshik.moviedb.service.CacheUpdateService;
 import com.squareup.picasso.Picasso;
 
 
@@ -14,10 +26,17 @@ import com.squareup.picasso.Picasso;
  * Use the {@link FullPosterFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class FullPosterFragment extends Fragment {
+public class FullPosterFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String ARG_POSTER_NAME = "POSTER_NAME";
+    private static final String ARG_MOVIE_ID = "MOVIE_ID";
+
+    private static final int FAVORITE_MARK_LOADER = 3;
 
     private String mPosterName;
+    private int movieId;
+
+    private Menu mMenu;
+    private boolean isFavorite;
 
     public FullPosterFragment() {
         // Required empty public constructor
@@ -30,20 +49,60 @@ public class FullPosterFragment extends Fragment {
      * @param posterName - file name of poster image.
      * @return A new instance of fragment FullPosterFragment.
      */
-    public static FullPosterFragment newInstance(String posterName) {
+    public static FullPosterFragment newInstance(int movie_id, String posterName) {
         FullPosterFragment fragment = new FullPosterFragment();
         Bundle args = new Bundle();
         args.putString(ARG_POSTER_NAME, posterName);
+        args.putInt(ARG_MOVIE_ID, movie_id);
         fragment.setArguments(args);
         return fragment;
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.poster_fragment, menu);
+        mMenu = menu;
+        getLoaderManager().initLoader(FAVORITE_MARK_LOADER, null, this);
+
+        // Setup share provider
+        // get provider's menu item
+        MenuItem shareItem = menu.findItem(R.id.action_share);
+        // ... and get provider fro it
+        ShareActionProvider myShareActionProvider =
+                (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
+
+        // create intent
+        Intent myShareIntent = new Intent(Intent.ACTION_SEND);
+        // TODO: 19.01.2017 : change type to html?
+        myShareIntent.setType("text/*");
+        // TODO: 19.01.2017 : create html page with content of the movie
+        String contentToSend = Utils.getPosterFullUri(mPosterName).toString();
+        myShareIntent.putExtra(Intent.EXTRA_TEXT, contentToSend);
+        // set intent into provider
+        myShareActionProvider.setShareIntent(myShareIntent);
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+
         if (getArguments() != null) {
             mPosterName = getArguments().getString(ARG_POSTER_NAME);
+            movieId = getArguments().getInt(ARG_MOVIE_ID, -1);
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_favorite) {
+            isFavorite = !isFavorite;
+            Utils.setFavoriteIcon(isFavorite, mMenu);
+            CacheUpdateService.startActionUpdateFavorite(getActivity(), movieId, isFavorite);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -59,5 +118,38 @@ public class FullPosterFragment extends Fragment {
                 .into(mPosterImage);
 
         return rootView;
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        switch (id) {
+            case FAVORITE_MARK_LOADER:
+                if (movieId > 0) {
+                    return new CursorLoader(getActivity(),
+                            MoviesContract.Favorites.buildUri(movieId),
+                            null, null, null, null);
+                }
+                break;
+        }
+        return null;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        switch (loader.getId()) {
+            case FAVORITE_MARK_LOADER:
+                isFavorite = false;
+                if (data != null && data.moveToFirst()) {
+                    isFavorite = true;
+                }
+                Utils.setFavoriteIcon(isFavorite, mMenu);
+                break;
+        }
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
     }
 }

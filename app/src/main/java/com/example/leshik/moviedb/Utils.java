@@ -7,6 +7,8 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import static com.example.leshik.moviedb.service.CacheUpdateService.CACHE_PREFS_NAME;
 
@@ -92,5 +94,15 @@ public final class Utils {
         return Uri.parse(basePosterSecureUrl
                 + posterFullWidthStr
                 + poster);
+    }
+
+    static void setFavoriteIcon(boolean flag, Menu menu) {
+        int favIcon;
+        if (flag) favIcon = iconFavoriteBlack;
+        else favIcon = iconFavoriteOutline;
+        if (menu != null) {
+            MenuItem favMenuItem = menu.findItem(R.id.action_favorite);
+            favMenuItem.setIcon(favIcon);
+        }
     }
 }

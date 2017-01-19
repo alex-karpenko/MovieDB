@@ -1,15 +1,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".DetailActivity">
+    tools:context=".FullPosterActivity">
     <item
         android:id="@+id/action_favorite"
         android:icon="@drawable/ic_favorite_outline_light"
         android:title="@string/action_favorite"
-        app:showAsAction="ifRoom"></item>
+        app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/action_refresh"
-        android:orderInCategory="100"
-        android:title="@string/action_refresh"
-        app:showAsAction="never" />
+        android:id="@+id/action_share"
+        android:title="@string/action_share"
+        app:actionProviderClass="android.support.v7.widget.ShareActionProvider"
+        app:showAsAction="ifRoom" />
 </menu>
