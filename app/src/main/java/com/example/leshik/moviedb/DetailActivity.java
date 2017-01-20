@@ -16,6 +16,7 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Utils.applyCurrentTheme(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
@@ -43,6 +44,12 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
                     .add(R.id.detail_container, fragment)
                     .commit();
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Utils.restartActivityIfNeed(this);
     }
 
     @Override

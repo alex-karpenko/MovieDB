@@ -1,11 +1,14 @@
 package com.example.leshik.moviedb;
 
+import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,17 +28,9 @@ public final class Utils {
 
     // cache update interval in milliseconds
     // 5 min for debug
-    private static long CACHE_UPDATE_INTERVAL = 1000 * 60 * 5; // 5 minutes
+    private static long cacheUpdateInterval = 1000 * 60 * 5; // 5 minutes
 
-    // getter/setter
-    public static long getCacheUpdateInterval() {
-        return CACHE_UPDATE_INTERVAL;
-    }
-
-    public static void setCacheUpdateInterval(long cacheUpdateInterval) {
-        CACHE_UPDATE_INTERVAL = cacheUpdateInterval;
-    }
-
+    private static int currentTheme = R.style.AppThemeDark;
 
     // Common variables, we fill its by fetching configuration from TMDB (in MovieListFragment class)
     public static String basePosterUrl = null;
@@ -49,6 +44,8 @@ public final class Utils {
     // Default image width
     private static String posterSmallWidthStr = "w185";
     private static String posterFullWidthStr = "original";
+
+    private static boolean restartActivity = false;
 
     static long getLongCachePreference(Context context, int key) {
         SharedPreferences prefs = context.getSharedPreferences(CACHE_PREFS_NAME, 0);
@@ -114,6 +111,64 @@ public final class Utils {
         if (menu != null) {
             MenuItem favMenuItem = menu.findItem(R.id.action_favorite);
             favMenuItem.setIcon(favIcon);
+        }
+    }
+
+    static void setCurrentTheme(Context context, String themeName) {
+        int themeId = R.style.AppThemeDark;
+
+        if (themeName.equals(context.getString(R.string.pref_theme_dark)))
+            themeId = R.style.AppThemeDark;
+        else if (themeName.equals(context.getString(R.string.pref_theme_light)))
+            themeId = R.style.AppThemeLight;
+
+        if (themeId != currentTheme) scheduleActivityRestart();
+        currentTheme = themeId;
+    }
+
+    public static int getCurrentTheme() {
+        return currentTheme;
+    }
+
+    static void applyCurrentTheme(Context context) {
+        context.setTheme(getCurrentTheme());
+        setupThemeIcons(context);
+    }
+
+    public static void loadDefaultPreferences(Context context) {
+        // set defaults, if need
+        PreferenceManager.setDefaultValues(context, R.xml.pref_general, false);
+
+        // get theme and apply it
+        setCurrentTheme(context, PreferenceManager.getDefaultSharedPreferences(context).
+                getString(context.getString(R.string.pref_theme_key), context.getString(R.string.pref_theme_default)));
+        applyCurrentTheme(context);
+
+        // get cache update interval
+        setCacheUpdateInterval(Long.valueOf(PreferenceManager.getDefaultSharedPreferences(context).
+                getString(context.getString(R.string.pref_cache_key), "0")) * 60 * 60 * 1000);
+
+        Log.i("Utils", "loadDefaultPreferences: cache update interval=" + String.valueOf(getCacheUpdateInterval()));
+    }
+
+    public static long getCacheUpdateInterval() {
+        return cacheUpdateInterval;
+    }
+
+    public static void setCacheUpdateInterval(long cacheUpdateInterval) {
+        Utils.cacheUpdateInterval = cacheUpdateInterval;
+    }
+
+    public static void scheduleActivityRestart() {
+        restartActivity = true;
+    }
+
+    public static void restartActivityIfNeed(Activity context) {
+        if (restartActivity) {
+            restartActivity = false;
+            Intent i = context.getBaseContext().getPackageManager().getLaunchIntentForPackage(context.getBaseContext().getPackageName());
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            context.startActivity(i);
         }
     }
 }

@@ -250,9 +250,11 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
                     mOverviewText.setText(data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_OVERVIEW));
                 }
                 // Update movie if need
-                long currentTime = Calendar.getInstance().getTimeInMillis();
-                if ((currentTime - data.getLong(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_LAST_UPDATED)) >= Utils.getCacheUpdateInterval()) {
-                    refreshCurrentMovie();
+                if (Utils.getCacheUpdateInterval() > 0) {
+                    long currentTime = Calendar.getInstance().getTimeInMillis();
+                    if ((currentTime - data.getLong(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_LAST_UPDATED)) >= Utils.getCacheUpdateInterval()) {
+                        refreshCurrentMovie();
+                    }
                 }
                 break;
             case FAVORITE_MARK_LOADER:

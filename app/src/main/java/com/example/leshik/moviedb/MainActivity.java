@@ -22,12 +22,14 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Utils.loadDefaultPreferences(this);
+        Utils.applyCurrentTheme(this);
+
         super.onCreate(savedInstanceState);
 
         // Every time when activity created - update configuration from the TMDB
         Utils.basePosterUrl = Utils.getStringCachePreference(this, R.string.base_potser_url);
         Utils.basePosterSecureUrl = Utils.getStringCachePreference(this, R.string.base_potser_secure_url);
-        Utils.setupThemeIcons(this);
 
         CacheUpdateService.startActionUpdateConfiguration(this);
 
@@ -47,6 +49,12 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
         // Assign pager to tab layout
         TabLayout tabLayout = (TabLayout) findViewById(R.id.main_tabs);
         tabLayout.setupWithViewPager(mViewPager);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Utils.restartActivityIfNeed(this);
     }
 
     @Override

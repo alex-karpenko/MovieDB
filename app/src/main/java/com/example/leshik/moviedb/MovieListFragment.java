@@ -154,13 +154,17 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
 
         switch (fragmentTabType) {
             case POPULAR_TAB_FRAGMENT:
-                if (currentTime - Utils.getLongCachePreference(getActivity(), R.string.last_popular_update_time) >= Utils.getCacheUpdateInterval()) {
-                    updatePopularCache();
+                if (Utils.getCacheUpdateInterval() > 0) {
+                    if (currentTime - Utils.getLongCachePreference(getActivity(), R.string.last_popular_update_time) >= Utils.getCacheUpdateInterval()) {
+                        updatePopularCache();
+                    }
                 }
                 break;
             case TOPRATED_TAB_FRAGMENT:
-                if (currentTime - Utils.getLongCachePreference(getActivity(), R.string.last_toprated_update_time) >= Utils.getCacheUpdateInterval()) {
-                    updateTopratedCache();
+                if (Utils.getCacheUpdateInterval() > 0) {
+                    if (currentTime - Utils.getLongCachePreference(getActivity(), R.string.last_toprated_update_time) >= Utils.getCacheUpdateInterval()) {
+                        updateTopratedCache();
+                    }
                 }
                 break;
             case FAVORITES_TAB_FRAGMENT:

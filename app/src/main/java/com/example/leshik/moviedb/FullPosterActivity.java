@@ -77,6 +77,7 @@ public class FullPosterActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Utils.applyCurrentTheme(this);
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_full_poster);
