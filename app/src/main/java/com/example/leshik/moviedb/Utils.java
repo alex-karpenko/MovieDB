@@ -8,7 +8,6 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,29 +22,35 @@ public final class Utils {
     // Base URLs to deal with TMBD API
     public static final String baseApiUrl = "http://api.themoviedb.org/3/";
     public static final String baseApiSecureUrl = "https://api.themoviedb.org/3/";
-    // Number of pages to preload
-    public static int CACHE_PRELOAD_PAGES = 5;
-
-    // cache update interval in milliseconds
-    // 5 min for debug
-    private static long cacheUpdateInterval = 1000 * 60 * 5; // 5 minutes
-
-    private static int currentTheme = R.style.AppThemeDark;
 
     // Common variables, we fill its by fetching configuration from TMDB (in MovieListFragment class)
     public static String basePosterUrl = null;
     public static String basePosterSecureUrl = null;
     public static String[] posterSizes = null;
 
+    // Number of pages to preload if cache is empty
+    private static int cachePreloadPages = 2;
+
+    // cache update interval in milliseconds
+    private static long cacheUpdateInterval = 1000 * 60 * 60 * 24; // 24 hours
+
+    // current theme id
+    private static int currentTheme = R.style.AppThemeDark;
+
     // Current favorite icons
-    static int iconFavoriteBlack = R.drawable.ic_favorite_black_light;
-    static int iconFavoriteOutline = R.drawable.ic_favorite_outline_light;
+    private static int iconFavoriteBlack = R.drawable.ic_favorite_black_light;
+    private static int iconFavoriteOutline = R.drawable.ic_favorite_outline_light;
 
     // Default image width
     private static String posterSmallWidthStr = "w185";
     private static String posterFullWidthStr = "original";
 
+    // flag to know is activity needs to restart after theme switch
     private static boolean restartActivity = false;
+
+    // private constructor to avoid creation on instance
+    private Utils() {
+    }
 
     static long getLongCachePreference(Context context, int key) {
         SharedPreferences prefs = context.getSharedPreferences(CACHE_PREFS_NAME, 0);
@@ -147,8 +152,6 @@ public final class Utils {
         // get cache update interval
         setCacheUpdateInterval(Long.valueOf(PreferenceManager.getDefaultSharedPreferences(context).
                 getString(context.getString(R.string.pref_cache_key), "0")) * 60 * 60 * 1000);
-
-        Log.i("Utils", "loadDefaultPreferences: cache update interval=" + String.valueOf(getCacheUpdateInterval()));
     }
 
     public static long getCacheUpdateInterval() {
@@ -171,4 +174,10 @@ public final class Utils {
             context.startActivity(i);
         }
     }
+
+    public static int getCachePreloadPages() {
+        return cachePreloadPages;
+    }
+
+
 }

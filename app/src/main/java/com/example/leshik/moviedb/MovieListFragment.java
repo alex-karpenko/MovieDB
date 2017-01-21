@@ -125,13 +125,13 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
 
     private void updatePopularCache() {
         CacheUpdateService.startActionUpdatePopular(getActivity(), -1);
-        for (int i = 2; i <= Utils.CACHE_PRELOAD_PAGES; i++)
+        for (int i = 2; i <= Utils.getCachePreloadPages(); i++)
             CacheUpdateService.startActionUpdatePopular(getActivity(), i);
     }
 
     private void updateTopratedCache() {
         CacheUpdateService.startActionUpdateToprated(getActivity(), -1);
-        for (int i = 2; i <= Utils.CACHE_PRELOAD_PAGES; i++)
+        for (int i = 2; i <= Utils.getCachePreloadPages(); i++)
             CacheUpdateService.startActionUpdateToprated(getActivity(), i);
     }
 
