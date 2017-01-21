@@ -95,8 +95,11 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
 
         mVideosListLayout = (LinearLayout) rootView.findViewById(R.id.videos_layout);
         NonScrollListView mVideosList = (NonScrollListView) rootView.findViewById(R.id.videos_list);
+        mVideosListLayout.setVisibility(View.GONE);
+
         mReviewsListLayout = (LinearLayout) rootView.findViewById(R.id.reviews_layout);
         mReviewsListTable = (TableLayout) rootView.findViewById(R.id.reviews_list);
+        mReviewsListLayout.setVisibility(View.GONE);
 
         mVideosListAdapter = new SimpleCursorAdapter(getContext(),
                 R.layout.videos_list_item,
