@@ -151,18 +151,21 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
 
     private void updateCurrentPageCacheIfNeed() {
         long currentTime = Calendar.getInstance().getTimeInMillis();
+        long lastUpdateTime;
 
         switch (fragmentTabType) {
             case POPULAR_TAB_FRAGMENT:
-                if (Utils.getCacheUpdateInterval() > 0) {
-                    if (currentTime - Utils.getLongCachePreference(getActivity(), R.string.last_popular_update_time) >= Utils.getCacheUpdateInterval()) {
+                lastUpdateTime = Utils.getLongCachePreference(getActivity(), R.string.last_toprated_update_time);
+                if (Utils.getCacheUpdateInterval() > 0 || lastUpdateTime <= 0) {
+                    if (currentTime - lastUpdateTime >= Utils.getCacheUpdateInterval()) {
                         updatePopularCache();
                     }
                 }
                 break;
             case TOPRATED_TAB_FRAGMENT:
-                if (Utils.getCacheUpdateInterval() > 0) {
-                    if (currentTime - Utils.getLongCachePreference(getActivity(), R.string.last_toprated_update_time) >= Utils.getCacheUpdateInterval()) {
+                lastUpdateTime = Utils.getLongCachePreference(getActivity(), R.string.last_toprated_update_time);
+                if (Utils.getCacheUpdateInterval() > 0 || lastUpdateTime <= 0) {
+                    if (currentTime - lastUpdateTime >= Utils.getCacheUpdateInterval()) {
                         updateTopratedCache();
                     }
                 }
