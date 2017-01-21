@@ -1,21 +1,38 @@
 <resources>
     <string name="app_name">Popular Movies</string>
-    <string name="title_activity_detail">Movie details</string>
     <string name="content_authority">com.example.leshik.moviedb</string>
-
-    <!-- Strings related to Settings -->
-    <string name="action_refresh">Refresh</string>
+    <string name="title_activity_detail">Movie details</string>
+    <string name="title_activity_full_poster">Poster</string>
+    <string name="title_activity_settings">Settings</string>
+    <!-- Strings related to menu actions -->
+    <string name="action_refresh_list">Refresh list</string>
+    <string name="action_refresh_movie">Refresh movie</string>
     <string name="action_settings">Settings</string>
     <string name="action_favorite">Favorite</string>
-    <string name="title_activity_settings">Settings</string>
-    <string name="pref_sortorder_popular" translatable="false">popular</string>
-    <string name="pref_sortorder_default" translatable="false">popular</string>
-    <string name="pref_sortorder_rating" translatable="false">top_rated</string>
-    <string name="pref_sortorder_key" translatable="false">sortorder</string>
-    <string name="pref_sortorder_label">Sorting order</string>
-    <string name="pref_sortorder_label_popular">By popularity</string>
-    <string name="pref_sortorder_label_rating">By rating</string>
-    <string name="network_error_brief_notify">Network error, try later...</string>
+    <string name="action_share">Share</string>
+    <!-- Strings related to Settings -->
+    <!-- theme -->
+    <string name="pref_theme_dark" translatable="false">dark</string>
+    <string name="pref_theme_light" translatable="false">light</string>
+    <string name="pref_theme_default" translatable="false">@string/pref_theme_dark</string>
+    <string name="pref_theme_key" translatable="false">theme</string>
+    <string name="pref_theme_label">Application theme</string>
+    <string name="pref_theme_label_dark">Dark</string>
+    <string name="pref_theme_label_light">Light</string>
+    <!-- cache update interval -->
+    <string name="pref_cache_never" translatable="false">0</string>
+    <string name="pref_cache_1h" translatable="false">1</string>
+    <string name="pref_cache_4h" translatable="false">4</string>
+    <string name="pref_cache_12h" translatable="false">12</string>
+    <string name="pref_cache_24h" translatable="false">24</string>
+    <string name="pref_cache_default" translatable="false">@string/pref_cache_never</string>
+    <string name="pref_cache_key" translatable="false">cache_expire</string>
+    <string name="pref_cache_label">Cache update interval</string>
+    <string name="pref_cache_label_never">Never</string>
+    <string name="pref_cache_label_1h">1 hour</string>
+    <string name="pref_cache_label_4h">4 hours</string>
+    <string name="pref_cache_label_12h">12 hours</string>
+    <string name="pref_cache_label_24h">1 day</string>
 
     <!-- Strings related to misc preferences values -->
     <string name="last_popular_update_time" translatable="false">last_popular_update_time</string>
@@ -35,7 +52,4 @@
     <string name="runtime_minutes_text">min</string>
     <string name="videos_list_title">Trailers:</string>
     <string name="reviews_list_title">Reviews:</string>
-
-    <string name="title_activity_full_poster">Poster</string>
-    <string name="action_share">Share</string>
 </resources>

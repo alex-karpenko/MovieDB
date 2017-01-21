@@ -125,13 +125,13 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
 
     private void updatePopularCache() {
         CacheUpdateService.startActionUpdatePopular(getActivity(), -1);
-        for (int i = 2; i <= Utils.CACHE_PRELOAD_PAGES; i++)
+        for (int i = 2; i <= Utils.getCachePreloadPages(); i++)
             CacheUpdateService.startActionUpdatePopular(getActivity(), i);
     }
 
     private void updateTopratedCache() {
         CacheUpdateService.startActionUpdateToprated(getActivity(), -1);
-        for (int i = 2; i <= Utils.CACHE_PRELOAD_PAGES; i++)
+        for (int i = 2; i <= Utils.getCachePreloadPages(); i++)
             CacheUpdateService.startActionUpdateToprated(getActivity(), i);
     }
 
@@ -151,16 +151,23 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
 
     private void updateCurrentPageCacheIfNeed() {
         long currentTime = Calendar.getInstance().getTimeInMillis();
+        long lastUpdateTime;
 
         switch (fragmentTabType) {
             case POPULAR_TAB_FRAGMENT:
-                if (currentTime - Utils.getLongCachePreference(getActivity(), R.string.last_popular_update_time) >= Utils.CACHE_UPDATE_INTERVAL) {
-                    updatePopularCache();
+                lastUpdateTime = Utils.getLongCachePreference(getActivity(), R.string.last_toprated_update_time);
+                if (Utils.getCacheUpdateInterval() > 0 || lastUpdateTime <= 0) {
+                    if (currentTime - lastUpdateTime >= Utils.getCacheUpdateInterval()) {
+                        updatePopularCache();
+                    }
                 }
                 break;
             case TOPRATED_TAB_FRAGMENT:
-                if (currentTime - Utils.getLongCachePreference(getActivity(), R.string.last_toprated_update_time) >= Utils.CACHE_UPDATE_INTERVAL) {
-                    updateTopratedCache();
+                lastUpdateTime = Utils.getLongCachePreference(getActivity(), R.string.last_toprated_update_time);
+                if (Utils.getCacheUpdateInterval() > 0 || lastUpdateTime <= 0) {
+                    if (currentTime - lastUpdateTime >= Utils.getCacheUpdateInterval()) {
+                        updateTopratedCache();
+                    }
                 }
                 break;
             case FAVORITES_TAB_FRAGMENT:

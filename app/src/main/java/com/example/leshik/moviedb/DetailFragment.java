@@ -172,7 +172,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
             mSwipeRefreshLayout.setRefreshing(true);
-            refreshCurrentMovie();
+            refreshCurrentMovieReverseOrder();
             return true;
         }
         if (id == R.id.action_favorite) {
@@ -228,7 +228,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         switch (loader.getId()) {
             case MOVIE_LOADER:
-                // mSwipeRefreshLayout.setRefreshing(false);
+                mSwipeRefreshLayout.setRefreshing(false);
                 if (data != null && data.moveToFirst()) {
                     // Setting all view's content
                     mPosterName = data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_POSTER_PATH);
@@ -250,9 +250,12 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
                     mOverviewText.setText(data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_OVERVIEW));
                 }
                 // Update movie if need
-                long currentTime = Calendar.getInstance().getTimeInMillis();
-                if ((currentTime - data.getLong(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_LAST_UPDATED)) >= Utils.CACHE_UPDATE_INTERVAL) {
-                    refreshCurrentMovie();
+                long lastUpdateTime = data.getLong(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_LAST_UPDATED);
+                if (Utils.getCacheUpdateInterval() > 0 || lastUpdateTime <= 0) {
+                    long currentTime = Calendar.getInstance().getTimeInMillis();
+                    if ((currentTime - lastUpdateTime) >= Utils.getCacheUpdateInterval()) {
+                        refreshCurrentMovie();
+                    }
                 }
                 break;
             case FAVORITE_MARK_LOADER:
@@ -283,7 +286,6 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
                         mReviewsListLayout.setVisibility(View.VISIBLE);
                     }
                 } else mReviewsListLayout.setVisibility(View.GONE);
-                mSwipeRefreshLayout.setRefreshing(false);
                 break;
         }
     }
@@ -306,9 +308,15 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
         CacheUpdateService.startActionUpdateReviews(getActivity(), (int) movieId, -1);
     }
 
+    void refreshCurrentMovieReverseOrder() {
+        CacheUpdateService.startActionUpdateVideos(getActivity(), (int) movieId);
+        CacheUpdateService.startActionUpdateReviews(getActivity(), (int) movieId, -1);
+        CacheUpdateService.startActionUpdateMovie(getActivity(), (int) movieId);
+    }
+
     @Override
     public void onRefresh() {
-        refreshCurrentMovie();
+        refreshCurrentMovieReverseOrder();
     }
 
     /**

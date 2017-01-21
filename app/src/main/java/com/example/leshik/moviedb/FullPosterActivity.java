@@ -77,18 +77,19 @@ public class FullPosterActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Utils.applyCurrentTheme(this);
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_full_poster);
 
         Toolbar mToolbar = (Toolbar) findViewById(R.id.poster_toolbar);
         setSupportActionBar(mToolbar);
-        mToolbar.getBackground().setAlpha(191);
+        mToolbar.getBackground().setAlpha(100);
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setTitle("");
+            actionBar.setDisplayShowTitleEnabled(false);
         }
 
         mVisible = true;
