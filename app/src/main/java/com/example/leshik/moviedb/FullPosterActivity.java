@@ -84,7 +84,7 @@ public class FullPosterActivity extends AppCompatActivity {
 
         Toolbar mToolbar = (Toolbar) findViewById(R.id.poster_toolbar);
         setSupportActionBar(mToolbar);
-        mToolbar.getBackground().setAlpha(191);
+        mToolbar.getBackground().setAlpha(100);
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
