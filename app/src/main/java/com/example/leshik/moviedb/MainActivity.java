@@ -16,9 +16,13 @@ import android.widget.ImageView;
 import com.example.leshik.moviedb.service.CacheUpdateService;
 
 public class MainActivity extends AppCompatActivity implements MovieListFragment.Callback {
+    private static final String STATE_CURRENT_PAGE = "STATE_CURRENT_PAGE";
+
     public static String[] tabFragmentNames;
-    MainPagerAdapter mPagerAdapter;
-    ViewPager mViewPager;
+
+    private MainPagerAdapter mPagerAdapter;
+    private ViewPager mViewPager;
+    private TabLayout mTabLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,8 +51,19 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
         tabFragmentNames = res.getStringArray(R.array.main_tab_names);
 
         // Assign pager to tab layout
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.main_tabs);
-        tabLayout.setupWithViewPager(mViewPager);
+        mTabLayout = (TabLayout) findViewById(R.id.main_tabs);
+        mTabLayout.setupWithViewPager(mViewPager);
+
+        if (savedInstanceState != null) {
+            int selectedTab = savedInstanceState.getInt(STATE_CURRENT_PAGE);
+            mViewPager.setCurrentItem(selectedTab);
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(STATE_CURRENT_PAGE, mViewPager.getCurrentItem());
     }
 
     @Override

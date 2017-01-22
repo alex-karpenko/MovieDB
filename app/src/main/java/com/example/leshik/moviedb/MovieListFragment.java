@@ -42,6 +42,7 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
     private int fragmentTabType = FAVORITES_TAB_FRAGMENT;
     private MoviesRecycleListAdapter mAdapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
+    private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
 
     @Override
@@ -76,7 +77,7 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
 
         // Inflate fragment
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-        RecyclerView mRecyclerView = (RecyclerView) rootView.findViewById(R.id.movies_list);
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.movies_list);
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swiperefresh);
         mSwipeRefreshLayout.setOnRefreshListener(this);
