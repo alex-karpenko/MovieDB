@@ -24,7 +24,8 @@ public class FullPosterActivity extends AppCompatActivity {
     public static final String ARG_MOVIE_ID = "MOVIE_ID";
 
     private boolean mVisible;
-    int movieId;
+    private int movieId;
+    private String posterName;
 
     /**
      * Whether or not the system UI should be auto-hidden after
@@ -100,14 +101,27 @@ public class FullPosterActivity extends AppCompatActivity {
         mContentView = findViewById(R.id.fullscreen_content);
 
         // get poster image name from intent
-        Intent intent = getIntent();
-        String posterName = intent.getStringExtra(ARG_POSTER_NAME);
-        movieId = intent.getIntExtra(ARG_MOVIE_ID, -1);
+        if (savedInstanceState == null) {
+            Intent intent = getIntent();
+            posterName = intent.getStringExtra(ARG_POSTER_NAME);
+            movieId = intent.getIntExtra(ARG_MOVIE_ID, -1);
+        } else {
+            posterName = savedInstanceState.getString(ARG_POSTER_NAME, "");
+            movieId = savedInstanceState.getInt(ARG_MOVIE_ID, -1);
+        }
+
         // Inflate new fragment full screen poster image
         FullPosterFragment fragment = FullPosterFragment.newInstance(movieId, posterName);
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.fullscreen_content, fragment)
                 .commit();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(ARG_POSTER_NAME, posterName);
+        outState.putInt(ARG_MOVIE_ID, movieId);
     }
 
     @Override

@@ -52,7 +52,7 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
 
         // Inflate new fragment (inner class below) with detail info
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.detail_container, fragment)
+                .add(R.id.detail_container, fragment)
                 .commit();
 
     }
