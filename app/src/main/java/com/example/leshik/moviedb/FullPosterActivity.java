@@ -113,7 +113,7 @@ public class FullPosterActivity extends AppCompatActivity {
         // Inflate new fragment full screen poster image
         FullPosterFragment fragment = FullPosterFragment.newInstance(movieId, posterName);
         getSupportFragmentManager().beginTransaction()
-                .add(R.id.fullscreen_content, fragment)
+                .replace(R.id.fullscreen_content, fragment)
                 .commit();
     }
 
