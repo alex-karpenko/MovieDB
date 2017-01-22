@@ -10,7 +10,6 @@ import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -37,8 +36,8 @@ import java.util.Calendar;
  */
 public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>, SwipeRefreshLayout.OnRefreshListener {
     private static final String TAG = "DetailFragment";
-    // data tag to pass data via intent
-    public static final String MOVIE_URI = "MOVIE_URI";
+    // data tag to pass data via args bundle
+    public static final String FRAGMENT_MOVIE_URI = "FRAGMENT_MOVIE_URI";
     private static final int MOVIE_LOADER = 2;
     private static final int FAVORITE_MARK_LOADER = 3;
     private static final int VIDEOS_LOADER = 4;
@@ -75,7 +74,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
 
         // restore movie uri
         if (savedInstanceState != null) {
-            mUri = savedInstanceState.getParcelable(MOVIE_URI);
+            mUri = savedInstanceState.getParcelable(FRAGMENT_MOVIE_URI);
         }
     }
 
@@ -83,36 +82,18 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         // put movie uri into state bundle
-        outState.putParcelable(MOVIE_URI, mUri);
-    }
-
-    @Override
-    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
-        // restore movie uri
-        if (savedInstanceState != null) {
-            mUri = savedInstanceState.getParcelable(MOVIE_URI);
-        }
+        outState.putParcelable(FRAGMENT_MOVIE_URI, mUri);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // FIXME: 22.01.2017 remove log calls
-        if (savedInstanceState != null)
-            Log.i(TAG, "onCreateView: state=" + savedInstanceState.toString());
-        else Log.i(TAG, "onCreateView: state=null");
-
         // Get bundle with args (URI)
         if (savedInstanceState != null) {
-            mUri = savedInstanceState.getParcelable(MOVIE_URI);
+            mUri = savedInstanceState.getParcelable(FRAGMENT_MOVIE_URI);
         } else {
             Bundle args = getArguments();
-            // FIXME: 22.01.2017 remove log calls
-            if (args != null) Log.i(TAG, "onCreateView: args=" + args.toString());
-            else Log.i(TAG, "onCreateView: args=null");
-
-            if (args != null) mUri = args.getParcelable(MOVIE_URI);
+            if (args != null) mUri = args.getParcelable(FRAGMENT_MOVIE_URI);
         }
         if (mUri != null) movieId = ContentUris.parseId(mUri);
         // Inflate fragment

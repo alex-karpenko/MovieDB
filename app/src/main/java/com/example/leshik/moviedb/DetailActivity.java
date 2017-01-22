@@ -1,7 +1,9 @@
 package com.example.leshik.moviedb;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -13,6 +15,9 @@ import android.view.MenuItem;
  * It starts from MainActivity by clicking on the poster image in list
  */
 public class DetailActivity extends AppCompatActivity implements DetailFragment.Callback {
+    private static final String TAG = "DetailActivity";
+    private static final String MOVIE_URI = "MOVIE_URI";
+    Uri mUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,18 +37,30 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
 
 
         if (savedInstanceState == null) {
-            Bundle args = new Bundle();
-            // put URI from intent to fragment's Data
-            args.putParcelable(DetailFragment.MOVIE_URI, getIntent().getData());
-
-            DetailFragment fragment = new DetailFragment();
-            fragment.setArguments(args);
-
-            // Inflate new fragment (inner class below) with detail info
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.detail_container, fragment)
-                    .commit();
+            // get URI from intent
+            mUri = getIntent().getData();
+        } else {
+            // or restore it from saved state
+            mUri = savedInstanceState.getParcelable(MOVIE_URI);
         }
+
+        Bundle args = new Bundle();
+        args.putParcelable(DetailFragment.FRAGMENT_MOVIE_URI, mUri);
+
+        DetailFragment fragment = new DetailFragment();
+        fragment.setArguments(args);
+
+        // Inflate new fragment (inner class below) with detail info
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.detail_container, fragment)
+                .commit();
+
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(MOVIE_URI, mUri);
     }
 
     @Override
@@ -67,6 +84,10 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
         // if Settings pressed, start SettingsActivity via explicit intent
         if (id == R.id.action_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
+            return true;
+        }
+        if (id == R.id.home) {
+            NavUtils.navigateUpFromSameTask(this);
             return true;
         }
         return super.onOptionsItemSelected(item);
