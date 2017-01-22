@@ -13,6 +13,8 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.example.leshik.moviedb.model.MoviesContract;
+
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
@@ -20,6 +22,9 @@ import android.view.View;
 public class FullPosterActivity extends AppCompatActivity {
     public static final String ARG_POSTER_NAME = "POSTER_NAME";
     public static final String ARG_MOVIE_ID = "MOVIE_ID";
+
+    private boolean mVisible;
+    int movieId;
 
     /**
      * Whether or not the system UI should be auto-hidden after
@@ -73,8 +78,6 @@ public class FullPosterActivity extends AppCompatActivity {
         }
     };
 
-    private boolean mVisible;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Utils.applyCurrentTheme(this);
@@ -99,7 +102,7 @@ public class FullPosterActivity extends AppCompatActivity {
         // get poster image name from intent
         Intent intent = getIntent();
         String posterName = intent.getStringExtra(ARG_POSTER_NAME);
-        int movieId = intent.getIntExtra(ARG_MOVIE_ID, -1);
+        movieId = intent.getIntExtra(ARG_MOVIE_ID, -1);
         // Inflate new fragment full screen poster image
         FullPosterFragment fragment = FullPosterFragment.newInstance(movieId, posterName);
         getSupportFragmentManager().beginTransaction()
@@ -154,8 +157,10 @@ public class FullPosterActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
-            // This ID represents the Home or Up button.
-            NavUtils.navigateUpFromSameTask(this);
+            Intent i = new Intent();
+            i.setClass(this, DetailActivity.class);
+            i.setData(MoviesContract.Movies.buildUri(movieId));
+            NavUtils.navigateUpTo(this, i);
             return true;
         }
         return super.onOptionsItemSelected(item);
