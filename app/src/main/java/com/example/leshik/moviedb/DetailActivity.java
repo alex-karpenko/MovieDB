@@ -50,10 +50,16 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
         DetailFragment fragment = new DetailFragment();
         fragment.setArguments(args);
 
-        // Inflate new fragment (inner class below) with detail info
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.detail_container, fragment)
-                .commit();
+        // add new fragment with detail info
+        if (savedInstanceState != null) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.detail_container, fragment)
+                    .commit();
+        } else {
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.detail_container, fragment)
+                    .commit();
+        }
 
     }
 
