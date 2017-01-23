@@ -37,6 +37,11 @@
     <!-- Strings related to misc preferences values -->
     <string name="last_popular_update_time" translatable="false">last_popular_update_time</string>
     <string name="last_toprated_update_time" translatable="false">last_toprated_update_time</string>
+    <string name="total_popular_pages">total_popular_pages</string>
+    <string name="total_popular_items">total_popular_items</string>
+    <string name="total_toprated_pages">total_toprated_pages</string>
+    <string name="total_toprated_items">total_toprated_items</string>
+
     <string name="base_potser_url" translatable="false">base_poster_url</string>
     <string name="base_potser_secure_url" translatable="false">base_poster_secure_url</string>
 

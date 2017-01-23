@@ -237,7 +237,6 @@ public class CacheUpdateService extends IntentService {
      * parameters.
      */
     private void handleActionUpdateReviews(int movie_id, int page) {
-        // TODO: retrieve all pages
         if (movie_id <= 0) return;
         int requestPage = page <= 0 ? 1 : page;
 
@@ -263,6 +262,10 @@ public class CacheUpdateService extends IntentService {
             }
             // Insert reviews table via content provider calls
             getContentResolver().bulkInsert(MoviesContract.Reviews.CONTENT_URI, reviewsPage.getReviewsContentValues());
+
+            // queue fetching the next page if present
+            if (reviewsPage.page < reviewsPage.totalPages)
+                startActionUpdateReviews(getApplicationContext(), movie_id, requestPage + 1);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -317,6 +320,10 @@ public class CacheUpdateService extends IntentService {
             // Insert movies and popular tables via content provider calls
             getContentResolver().bulkInsert(MoviesContract.Movies.CONTENT_URI, listPage.getMoviesContentValues());
             getContentResolver().bulkInsert(MoviesContract.Popular.CONTENT_URI, listPage.getPopularContentValues());
+
+            // Update preferences to set number of pages and items
+            updateCachePreference(R.string.total_popular_pages, listPage.totalPages);
+            updateCachePreference(R.string.total_popular_items, listPage.totalResults);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -352,6 +359,10 @@ public class CacheUpdateService extends IntentService {
             // Insert movies and toprated tables via content provider calls
             getContentResolver().bulkInsert(MoviesContract.Movies.CONTENT_URI, listPage.getMoviesContentValues());
             getContentResolver().bulkInsert(MoviesContract.Toprated.CONTENT_URI, listPage.getTopratedContentValues());
+
+            // Update preferences to set number of pages and items
+            updateCachePreference(R.string.total_popular_pages, listPage.totalPages);
+            updateCachePreference(R.string.total_popular_items, listPage.totalResults);
         } catch (IOException e) {
             e.printStackTrace();
         }
