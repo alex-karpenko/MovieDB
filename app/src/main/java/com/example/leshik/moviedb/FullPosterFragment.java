@@ -33,7 +33,7 @@ public class FullPosterFragment extends Fragment implements LoaderManager.Loader
     private static final int FAVORITE_MARK_LOADER = 3;
 
     private String mPosterName;
-    private int movieId;
+    private int mMovieId;
 
     private Menu mMenu;
     private boolean isFavorite;
@@ -87,10 +87,22 @@ public class FullPosterFragment extends Fragment implements LoaderManager.Loader
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-        if (getArguments() != null) {
-            mPosterName = getArguments().getString(ARG_POSTER_NAME);
-            movieId = getArguments().getInt(ARG_MOVIE_ID, -1);
+        if (savedInstanceState == null) {
+            if (getArguments() != null) {
+                mPosterName = getArguments().getString(ARG_POSTER_NAME);
+                mMovieId = getArguments().getInt(ARG_MOVIE_ID, -1);
+            }
+        } else {
+            mPosterName = savedInstanceState.getString(ARG_POSTER_NAME);
+            mMovieId = savedInstanceState.getInt(ARG_MOVIE_ID);
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(ARG_POSTER_NAME, mPosterName);
+        outState.putInt(ARG_MOVIE_ID, mMovieId);
     }
 
     @Override
@@ -99,7 +111,7 @@ public class FullPosterFragment extends Fragment implements LoaderManager.Loader
         if (id == R.id.action_favorite) {
             isFavorite = !isFavorite;
             Utils.setFavoriteIcon(isFavorite, mMenu);
-            CacheUpdateService.startActionUpdateFavorite(getActivity(), movieId, isFavorite);
+            CacheUpdateService.startActionUpdateFavorite(getActivity(), mMovieId, isFavorite);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -124,9 +136,9 @@ public class FullPosterFragment extends Fragment implements LoaderManager.Loader
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         switch (id) {
             case FAVORITE_MARK_LOADER:
-                if (movieId > 0) {
+                if (mMovieId > 0) {
                     return new CursorLoader(getActivity(),
-                            MoviesContract.Favorites.buildUri(movieId),
+                            MoviesContract.Favorites.buildUri(mMovieId),
                             null, null, null, null);
                 }
                 break;

@@ -35,9 +35,9 @@ import java.util.Calendar;
  * Information. From intent gets URI with movie
  */
 public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>, SwipeRefreshLayout.OnRefreshListener {
-    private static final String LOG_TAG = DetailFragment.class.getSimpleName();
-    // data tag to pass data via intent
-    public static final String MOVIE_URI = "MOVIE_URI";
+    private static final String TAG = "DetailFragment";
+    // data tag to pass data via args bundle
+    public static final String FRAGMENT_MOVIE_URI = "FRAGMENT_MOVIE_URI";
     private static final int MOVIE_LOADER = 2;
     private static final int FAVORITE_MARK_LOADER = 3;
     private static final int VIDEOS_LOADER = 4;
@@ -71,14 +71,30 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        // restore movie uri
+        if (savedInstanceState != null) {
+            mUri = savedInstanceState.getParcelable(FRAGMENT_MOVIE_URI);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        // put movie uri into state bundle
+        outState.putParcelable(FRAGMENT_MOVIE_URI, mUri);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Get bundle with args (URI)
-        Bundle args = getArguments();
-        if (args != null) mUri = args.getParcelable(MOVIE_URI);
+        if (savedInstanceState != null) {
+            mUri = savedInstanceState.getParcelable(FRAGMENT_MOVIE_URI);
+        } else {
+            Bundle args = getArguments();
+            if (args != null) mUri = args.getParcelable(FRAGMENT_MOVIE_URI);
+        }
         if (mUri != null) movieId = ContentUris.parseId(mUri);
         // Inflate fragment
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
@@ -95,8 +111,11 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
 
         mVideosListLayout = (LinearLayout) rootView.findViewById(R.id.videos_layout);
         NonScrollListView mVideosList = (NonScrollListView) rootView.findViewById(R.id.videos_list);
+        mVideosListLayout.setVisibility(View.GONE);
+
         mReviewsListLayout = (LinearLayout) rootView.findViewById(R.id.reviews_layout);
         mReviewsListTable = (TableLayout) rootView.findViewById(R.id.reviews_list);
+        mReviewsListLayout.setVisibility(View.GONE);
 
         mVideosListAdapter = new SimpleCursorAdapter(getContext(),
                 R.layout.videos_list_item,

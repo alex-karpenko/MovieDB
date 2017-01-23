@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -20,6 +19,10 @@ import android.view.View;
 public class FullPosterActivity extends AppCompatActivity {
     public static final String ARG_POSTER_NAME = "POSTER_NAME";
     public static final String ARG_MOVIE_ID = "MOVIE_ID";
+
+    private boolean mVisible;
+    private int movieId;
+    private String posterName;
 
     /**
      * Whether or not the system UI should be auto-hidden after
@@ -73,8 +76,6 @@ public class FullPosterActivity extends AppCompatActivity {
         }
     };
 
-    private boolean mVisible;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Utils.applyCurrentTheme(this);
@@ -97,14 +98,33 @@ public class FullPosterActivity extends AppCompatActivity {
         mContentView = findViewById(R.id.fullscreen_content);
 
         // get poster image name from intent
-        Intent intent = getIntent();
-        String posterName = intent.getStringExtra(ARG_POSTER_NAME);
-        int movieId = intent.getIntExtra(ARG_MOVIE_ID, -1);
+        if (savedInstanceState == null) {
+            Intent intent = getIntent();
+            posterName = intent.getStringExtra(ARG_POSTER_NAME);
+            movieId = intent.getIntExtra(ARG_MOVIE_ID, -1);
+        } else {
+            posterName = savedInstanceState.getString(ARG_POSTER_NAME, "");
+            movieId = savedInstanceState.getInt(ARG_MOVIE_ID, -1);
+        }
+
         // Inflate new fragment full screen poster image
         FullPosterFragment fragment = FullPosterFragment.newInstance(movieId, posterName);
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.fullscreen_content, fragment)
-                .commit();
+        if (savedInstanceState != null) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fullscreen_content, fragment)
+                    .commit();
+        } else {
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.fullscreen_content, fragment)
+                    .commit();
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(ARG_POSTER_NAME, posterName);
+        outState.putInt(ARG_MOVIE_ID, movieId);
     }
 
     @Override
@@ -153,11 +173,13 @@ public class FullPosterActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == android.R.id.home) {
-            // This ID represents the Home or Up button.
-            NavUtils.navigateUpFromSameTask(this);
-            return true;
+
+        switch (id) {
+            case android.R.id.home:
+                finish();
+                return true;
         }
+
         return super.onOptionsItemSelected(item);
     }
 
