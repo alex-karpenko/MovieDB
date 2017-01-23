@@ -317,13 +317,16 @@ public class CacheUpdateService extends IntentService {
                                 new String[]{String.valueOf(DEFAULT_PAGE_SIZE)});
                 updateCachePreference(R.string.last_popular_update_time, Calendar.getInstance().getTimeInMillis());
             }
-            // Insert movies and popular tables via content provider calls
-            getContentResolver().bulkInsert(MoviesContract.Movies.CONTENT_URI, listPage.getMoviesContentValues());
-            getContentResolver().bulkInsert(MoviesContract.Popular.CONTENT_URI, listPage.getPopularContentValues());
 
-            // Update preferences to set number of pages and items
-            updateCachePreference(R.string.total_popular_pages, listPage.totalPages);
-            updateCachePreference(R.string.total_popular_items, listPage.totalResults);
+            // Insert movies and popular tables via content provider calls
+            if (listPage.listResults.size() > 0) {
+                getContentResolver().bulkInsert(MoviesContract.Movies.CONTENT_URI, listPage.getMoviesContentValues());
+                getContentResolver().bulkInsert(MoviesContract.Popular.CONTENT_URI, listPage.getPopularContentValues());
+
+                // Update preferences to set number of pages and items
+                updateCachePreference(R.string.total_popular_pages, listPage.totalPages);
+                updateCachePreference(R.string.total_popular_items, listPage.totalResults);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -356,13 +359,16 @@ public class CacheUpdateService extends IntentService {
                                 new String[]{String.valueOf(DEFAULT_PAGE_SIZE)});
                 updateCachePreference(R.string.last_toprated_update_time, Calendar.getInstance().getTimeInMillis());
             }
-            // Insert movies and toprated tables via content provider calls
-            getContentResolver().bulkInsert(MoviesContract.Movies.CONTENT_URI, listPage.getMoviesContentValues());
-            getContentResolver().bulkInsert(MoviesContract.Toprated.CONTENT_URI, listPage.getTopratedContentValues());
 
-            // Update preferences to set number of pages and items
-            updateCachePreference(R.string.total_toprated_pages, listPage.totalPages);
-            updateCachePreference(R.string.total_toprated_items, listPage.totalResults);
+            if (listPage.listResults.size() > 0) {
+                // Insert movies and toprated tables via content provider calls
+                getContentResolver().bulkInsert(MoviesContract.Movies.CONTENT_URI, listPage.getMoviesContentValues());
+                getContentResolver().bulkInsert(MoviesContract.Toprated.CONTENT_URI, listPage.getTopratedContentValues());
+
+                // Update preferences to set number of pages and items
+                updateCachePreference(R.string.total_toprated_pages, listPage.totalPages);
+                updateCachePreference(R.string.total_toprated_items, listPage.totalResults);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
