@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -90,6 +91,29 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
         mAdapter = new MoviesRecycleListAdapter(getActivity(), null);
         // ... and set it to recycle view
         mRecyclerView.setAdapter(mAdapter);
+
+        // Set up scroll listener for auto load list's tail
+        if (fragmentTabType == POPULAR_TAB_FRAGMENT || fragmentTabType == TOPRATED_TAB_FRAGMENT) {
+            mRecyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener((LinearLayoutManager) mLayoutManager) {
+                @Override
+                public void onLoadMore(int current_page) {
+                    long maxPages;
+
+                    switch (fragmentTabType) {
+                        case POPULAR_TAB_FRAGMENT:
+                            maxPages = Utils.getLongCachePreference(getActivity(), R.string.total_popular_pages);
+                            if (current_page <= maxPages)
+                                CacheUpdateService.startActionUpdatePopular(getActivity(), current_page);
+                            break;
+                        case TOPRATED_TAB_FRAGMENT:
+                            maxPages = Utils.getLongCachePreference(getActivity(), R.string.total_toprated_pages);
+                            if (current_page <= maxPages)
+                                CacheUpdateService.startActionUpdateToprated(getActivity(), current_page);
+                            break;
+                    }
+                }
+            });
+        }
 
         return rootView;
     }
