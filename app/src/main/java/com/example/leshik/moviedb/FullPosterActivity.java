@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -12,8 +11,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-
-import com.example.leshik.moviedb.model.MoviesContract;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -176,13 +173,13 @@ public class FullPosterActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == android.R.id.home) {
-            Intent i = new Intent();
-            i.setClass(this, DetailActivity.class);
-            i.setData(MoviesContract.Movies.buildUri(movieId));
-            NavUtils.navigateUpTo(this, i);
-            return true;
+
+        switch (id) {
+            case android.R.id.home:
+                finish();
+                return true;
         }
+
         return super.onOptionsItemSelected(item);
     }
 

@@ -3,7 +3,6 @@ package com.example.leshik.moviedb;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -87,15 +86,15 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
         // Get pressed menu item
         int id = item.getItemId();
 
-        // if Settings pressed, start SettingsActivity via explicit intent
-        if (id == R.id.action_settings) {
-            startActivity(new Intent(this, SettingsActivity.class));
-            return true;
+        switch (id) {
+            case R.id.action_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                return true;
+            case android.R.id.home:
+                finish();
+                return true;
         }
-        if (id == R.id.home) {
-            NavUtils.navigateUpFromSameTask(this);
-            return true;
-        }
+
         return super.onOptionsItemSelected(item);
     }
 
