@@ -361,8 +361,8 @@ public class CacheUpdateService extends IntentService {
             getContentResolver().bulkInsert(MoviesContract.Toprated.CONTENT_URI, listPage.getTopratedContentValues());
 
             // Update preferences to set number of pages and items
-            updateCachePreference(R.string.total_popular_pages, listPage.totalPages);
-            updateCachePreference(R.string.total_popular_items, listPage.totalResults);
+            updateCachePreference(R.string.total_toprated_pages, listPage.totalPages);
+            updateCachePreference(R.string.total_toprated_items, listPage.totalResults);
         } catch (IOException e) {
             e.printStackTrace();
         }
