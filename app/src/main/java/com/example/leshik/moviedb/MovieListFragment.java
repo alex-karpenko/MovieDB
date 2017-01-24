@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -40,10 +41,14 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
     public static final int FAVORITES_TAB_FRAGMENT = 2;
     // Current fragment type
     private int fragmentTabType = FAVORITES_TAB_FRAGMENT;
+
     private MoviesRecycleListAdapter mAdapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
+
+    private boolean loadingCache = false;
+    private int scrollingThreshold = 5;
 
     @Override
     public void onRefresh() {
@@ -90,6 +95,12 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
         mAdapter = new MoviesRecycleListAdapter(getActivity(), null);
         // ... and set it to recycle view
         mRecyclerView.setAdapter(mAdapter);
+
+        // Set up scroll listener for auto load list's tail
+        if (fragmentTabType == POPULAR_TAB_FRAGMENT || fragmentTabType == TOPRATED_TAB_FRAGMENT) {
+            scrollingThreshold = scrollingThreshold * Utils.calculateNoOfColumns(getActivity());
+            mRecyclerView.addOnScrollListener(new AutoLoadingScrollListener());
+        }
 
         return rootView;
     }
@@ -156,7 +167,7 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
 
         switch (fragmentTabType) {
             case POPULAR_TAB_FRAGMENT:
-                lastUpdateTime = Utils.getLongCachePreference(getActivity(), R.string.last_toprated_update_time);
+                lastUpdateTime = Utils.getLongCachePreference(getActivity(), R.string.last_popular_update_time);
                 if (Utils.getCacheUpdateInterval() > 0 || lastUpdateTime <= 0) {
                     if (currentTime - lastUpdateTime >= Utils.getCacheUpdateInterval()) {
                         updatePopularCache();
@@ -206,11 +217,45 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mAdapter.changeCursor(data);
         mSwipeRefreshLayout.setRefreshing(false);
+        loadingCache = false;
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mAdapter.changeCursor(null);
+        loadingCache = false;
     }
 
+    private class AutoLoadingScrollListener extends RecyclerView.OnScrollListener {
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            super.onScrolled(recyclerView, dx, dy);
+            if (loadingCache) return;
+
+            int totalItems = mLayoutManager.getItemCount();
+            int lastVisibleItem = ((LinearLayoutManager) mLayoutManager).findLastVisibleItemPosition();
+            if (lastVisibleItem + scrollingThreshold >= totalItems) {
+                long maxPages;
+                int currentPage = totalItems / Utils.getCachePageSize();
+
+                switch (fragmentTabType) {
+                    case POPULAR_TAB_FRAGMENT:
+                        maxPages = Utils.getLongCachePreference(getActivity(), R.string.total_popular_pages);
+                        if (currentPage <= maxPages) {
+                            CacheUpdateService.startActionUpdatePopular(getActivity(), currentPage + 1);
+                            loadingCache = true;
+                        }
+                        break;
+                    case TOPRATED_TAB_FRAGMENT:
+                        maxPages = Utils.getLongCachePreference(getActivity(), R.string.total_toprated_pages);
+                        if (currentPage <= maxPages) {
+                            CacheUpdateService.startActionUpdateToprated(getActivity(), currentPage + 1);
+                            loadingCache = true;
+                        }
+                        break;
+                }
+
+            }
+        }
+    }
 }

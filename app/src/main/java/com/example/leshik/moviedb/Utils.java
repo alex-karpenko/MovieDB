@@ -31,6 +31,8 @@ public final class Utils {
     // Number of pages to preload if cache is empty
     private static int cachePreloadPages = 2;
 
+    private static int cachePageSize = 20;
+
     // cache update interval in milliseconds
     private static long cacheUpdateInterval = 1000 * 60 * 60 * 24; // 24 hours
 
@@ -179,5 +181,8 @@ public final class Utils {
         return cachePreloadPages;
     }
 
+    public static int getCachePageSize() {
+        return cachePageSize;
+    }
 
 }
