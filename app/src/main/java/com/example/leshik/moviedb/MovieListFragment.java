@@ -41,10 +41,13 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
     public static final int FAVORITES_TAB_FRAGMENT = 2;
     // Current fragment type
     private int fragmentTabType = FAVORITES_TAB_FRAGMENT;
+
     private MoviesRecycleListAdapter mAdapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
+
+    private boolean loading = false;
 
     @Override
     public void onRefresh() {
@@ -94,25 +97,7 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
 
         // Set up scroll listener for auto load list's tail
         if (fragmentTabType == POPULAR_TAB_FRAGMENT || fragmentTabType == TOPRATED_TAB_FRAGMENT) {
-            mRecyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener((LinearLayoutManager) mLayoutManager) {
-                @Override
-                public void onLoadMore(int current_page) {
-                    long maxPages;
-
-                    switch (fragmentTabType) {
-                        case POPULAR_TAB_FRAGMENT:
-                            maxPages = Utils.getLongCachePreference(getActivity(), R.string.total_popular_pages);
-                            if (current_page <= maxPages)
-                                CacheUpdateService.startActionUpdatePopular(getActivity(), current_page);
-                            break;
-                        case TOPRATED_TAB_FRAGMENT:
-                            maxPages = Utils.getLongCachePreference(getActivity(), R.string.total_toprated_pages);
-                            if (current_page <= maxPages)
-                                CacheUpdateService.startActionUpdateToprated(getActivity(), current_page);
-                            break;
-                    }
-                }
-            });
+            mRecyclerView.addOnScrollListener(new AutoLoadingScrollListener());
         }
 
         return rootView;
@@ -180,7 +165,7 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
 
         switch (fragmentTabType) {
             case POPULAR_TAB_FRAGMENT:
-                lastUpdateTime = Utils.getLongCachePreference(getActivity(), R.string.last_toprated_update_time);
+                lastUpdateTime = Utils.getLongCachePreference(getActivity(), R.string.last_popular_update_time);
                 if (Utils.getCacheUpdateInterval() > 0 || lastUpdateTime <= 0) {
                     if (currentTime - lastUpdateTime >= Utils.getCacheUpdateInterval()) {
                         updatePopularCache();
@@ -230,11 +215,47 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mAdapter.changeCursor(data);
         mSwipeRefreshLayout.setRefreshing(false);
+        loading = false;
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mAdapter.changeCursor(null);
+        loading = false;
     }
 
+    private class AutoLoadingScrollListener extends RecyclerView.OnScrollListener {
+        private static final int threshold = 10;
+
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            super.onScrolled(recyclerView, dx, dy);
+            if (loading) return;
+
+            int totalItems = mLayoutManager.getItemCount();
+            int lastVisibleItem = ((LinearLayoutManager) mLayoutManager).findLastVisibleItemPosition();
+            if (lastVisibleItem + threshold >= totalItems) {
+                long maxPages;
+                int currentPage = totalItems / Utils.getCachePageSize();
+
+                switch (fragmentTabType) {
+                    case POPULAR_TAB_FRAGMENT:
+                        maxPages = Utils.getLongCachePreference(getActivity(), R.string.total_popular_pages);
+                        if (currentPage <= maxPages) {
+                            CacheUpdateService.startActionUpdatePopular(getActivity(), currentPage + 1);
+                            loading = true;
+                        }
+                        break;
+                    case TOPRATED_TAB_FRAGMENT:
+                        maxPages = Utils.getLongCachePreference(getActivity(), R.string.total_toprated_pages);
+                        if (currentPage <= maxPages) {
+                            CacheUpdateService.startActionUpdateToprated(getActivity(), currentPage + 1);
+                            loading = true;
+                        }
+                        break;
+                }
+
+            }
+        }
+    }
 }
