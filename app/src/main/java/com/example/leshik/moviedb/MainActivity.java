@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.example.leshik.moviedb.service.CacheUpdateService;
@@ -22,7 +23,10 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
 
     private MainPagerAdapter mPagerAdapter;
     private ViewPager mViewPager;
+    private FrameLayout mDetailContainer = null;
     private TabLayout mTabLayout;
+
+    private boolean twoPane = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +42,10 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
         CacheUpdateService.startActionUpdateConfiguration(this);
 
         setContentView(R.layout.activity_main);
+        if (findViewById(R.id.detail_container) != null) {
+            twoPane = true;
+            mDetailContainer = (FrameLayout) findViewById(R.id.detail_container);
+        }
 
         Toolbar mToolbar = (Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(mToolbar);
@@ -97,14 +105,30 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
     public void onItemSelected(Uri movieUri, ImageView posterView) {
         Intent intent = new Intent(this, DetailActivity.class)
                 .setData(movieUri);
-        // If Lollipop or higher - start activity with image animation
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            ActivityOptions options = ActivityOptions
-                    .makeSceneTransitionAnimation(this, posterView, getString(R.string.poster_image));
-            startActivity(intent, options.toBundle());
+
+        if (!twoPane) {
+            // If one pane - start details activity
+            // If Lollipop or higher - start activity with image animation
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                ActivityOptions options = ActivityOptions
+                        .makeSceneTransitionAnimation(this, posterView, getString(R.string.poster_image));
+                startActivity(intent, options.toBundle());
+            } else {
+                // If lower then Lollipop - simple start detail activity
+                startActivity(intent);
+            }
         } else {
-            // If lower then Lollipop - simple start detail activity
-            startActivity(intent);
+            // if two panes
+            // replace fragment into details frame
+            Bundle args = new Bundle();
+            args.putParcelable(DetailFragment.FRAGMENT_MOVIE_URI, movieUri);
+
+            DetailFragment fragment = new DetailFragment();
+            fragment.setArguments(args);
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.detail_container, fragment)
+                    .commit();
         }
     }
 }
