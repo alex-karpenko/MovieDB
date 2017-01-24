@@ -86,7 +86,7 @@ public class TmdbMovie {
     public BelongsToCollection belongsToCollection;
     @SerializedName("budget")
     @Expose
-    public Integer budget;
+    public Float budget;
     @SerializedName("genres")
     @Expose
     public List<Genre> genres = null;
@@ -125,7 +125,7 @@ public class TmdbMovie {
     public String releaseDate;
     @SerializedName("revenue")
     @Expose
-    public Integer revenue;
+    public Float revenue;
     @SerializedName("runtime")
     @Expose
     public Integer runtime;
