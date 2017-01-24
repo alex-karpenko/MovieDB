@@ -42,8 +42,6 @@ public class CacheUpdateService extends IntentService {
     static final String EXTRA_PARAM_FAVORITE_FLAG = "com.example.leshik.moviedb.service.extra.FAVORITE_FLAG";
     // File name to store shared preferences by cache update service
     public static final String CACHE_PREFS_NAME = "cache_prefs";
-    // Default page size of the popular and top rated responses
-    public static final int DEFAULT_PAGE_SIZE = 20;
 
     // Default constructor
     public CacheUpdateService() {
@@ -314,7 +312,7 @@ public class CacheUpdateService extends IntentService {
                 getContentResolver().
                         delete(MoviesContract.Popular.CONTENT_URI,
                                 MoviesContract.Popular.COLUMN_NAME_SORT_ID + ">?",
-                                new String[]{String.valueOf(DEFAULT_PAGE_SIZE)});
+                                new String[]{String.valueOf(Utils.getCachePageSize())});
                 updateCachePreference(R.string.last_popular_update_time, Calendar.getInstance().getTimeInMillis());
             }
 
@@ -356,7 +354,7 @@ public class CacheUpdateService extends IntentService {
                 getContentResolver()
                         .delete(MoviesContract.Toprated.CONTENT_URI,
                                 MoviesContract.Toprated.COLUMN_NAME_SORT_ID + ">?",
-                                new String[]{String.valueOf(DEFAULT_PAGE_SIZE)});
+                                new String[]{String.valueOf(Utils.getCachePageSize())});
                 updateCachePreference(R.string.last_toprated_update_time, Calendar.getInstance().getTimeInMillis());
             }
 
