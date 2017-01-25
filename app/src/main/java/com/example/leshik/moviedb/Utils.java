@@ -19,6 +19,7 @@ import static com.example.leshik.moviedb.service.CacheUpdateService.CACHE_PREFS_
  */
 
 public final class Utils {
+    private static final String TAG = "Utils";
     // Base URLs to deal with TMBD API
     public static final String baseApiUrl = "http://api.themoviedb.org/3/";
     public static final String baseApiSecureUrl = "https://api.themoviedb.org/3/";
@@ -73,7 +74,7 @@ public final class Utils {
         if (isTwoPane()) {
             dpWidth = dpWidth / 2;
         }
-        int noOfColumns = (int) (dpWidth / 180);
+        int noOfColumns = Math.round(dpWidth / 180);
         if (noOfColumns == 1) noOfColumns = 2;
         return noOfColumns;
     }
