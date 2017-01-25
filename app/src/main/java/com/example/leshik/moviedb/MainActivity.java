@@ -11,20 +11,21 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.example.leshik.moviedb.service.CacheUpdateService;
 
 public class MainActivity extends AppCompatActivity implements MovieListFragment.Callback, DetailFragment.Callback {
     private static final String STATE_CURRENT_PAGE = "STATE_CURRENT_PAGE";
+    private static final String STATE_SELECTED_URI = "STATE_SELECTED_URI";
 
     public static String[] tabFragmentNames;
 
     private MainPagerAdapter mPagerAdapter;
     private ViewPager mViewPager;
-    private FrameLayout mDetailContainer = null;
     private TabLayout mTabLayout;
+
+    private Uri selectedMovieUri = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,8 +43,7 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
         setContentView(R.layout.activity_main);
         if (findViewById(R.id.detail_container) != null) {
             Utils.setTwoPane(true);
-            mDetailContainer = (FrameLayout) findViewById(R.id.detail_container);
-        }
+        } else Utils.setTwoPane(false);
 
         Toolbar mToolbar = (Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(mToolbar);
@@ -62,7 +62,21 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
 
         if (savedInstanceState != null) {
             int selectedTab = savedInstanceState.getInt(STATE_CURRENT_PAGE);
+            selectedMovieUri = savedInstanceState.getParcelable(STATE_SELECTED_URI);
             mViewPager.setCurrentItem(selectedTab);
+
+            if (selectedMovieUri != null && Utils.isTwoPane()) {
+                // replace fragment into details frame
+                Bundle args = new Bundle();
+                args.putParcelable(DetailFragment.FRAGMENT_MOVIE_URI, selectedMovieUri);
+
+                DetailFragment fragment = new DetailFragment();
+                fragment.setArguments(args);
+
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.detail_container, fragment)
+                        .commit();
+            }
         }
     }
 
@@ -70,6 +84,7 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(STATE_CURRENT_PAGE, mViewPager.getCurrentItem());
+        if (selectedMovieUri != null) outState.putParcelable(STATE_SELECTED_URI, selectedMovieUri);
     }
 
     @Override
@@ -101,6 +116,8 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
 
     @Override
     public void onItemSelected(Uri movieUri, ImageView posterView) {
+        selectedMovieUri = movieUri;
+
         Intent intent = new Intent(this, DetailActivity.class)
                 .setData(movieUri);
 
