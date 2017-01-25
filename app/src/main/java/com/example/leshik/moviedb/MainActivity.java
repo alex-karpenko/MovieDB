@@ -16,7 +16,7 @@ import android.widget.ImageView;
 
 import com.example.leshik.moviedb.service.CacheUpdateService;
 
-public class MainActivity extends AppCompatActivity implements MovieListFragment.Callback {
+public class MainActivity extends AppCompatActivity implements MovieListFragment.Callback, DetailFragment.Callback {
     private static final String STATE_CURRENT_PAGE = "STATE_CURRENT_PAGE";
 
     public static String[] tabFragmentNames;
@@ -25,8 +25,6 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
     private ViewPager mViewPager;
     private FrameLayout mDetailContainer = null;
     private TabLayout mTabLayout;
-
-    private boolean twoPane = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
 
         setContentView(R.layout.activity_main);
         if (findViewById(R.id.detail_container) != null) {
-            twoPane = true;
+            Utils.setTwoPane(true);
             mDetailContainer = (FrameLayout) findViewById(R.id.detail_container);
         }
 
@@ -106,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
         Intent intent = new Intent(this, DetailActivity.class)
                 .setData(movieUri);
 
-        if (!twoPane) {
+        if (!Utils.isTwoPane()) {
             // If one pane - start details activity
             // If Lollipop or higher - start activity with image animation
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
@@ -130,5 +128,10 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
                     .replace(R.id.detail_container, fragment)
                     .commit();
         }
+    }
+
+    @Override
+    public void onImageClicked(int movieId, String posterName) {
+        Utils.startFullPosterActivity(this, movieId, posterName);
     }
 }

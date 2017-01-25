@@ -33,6 +33,8 @@ public final class Utils {
 
     private static int cachePageSize = 20;
 
+    private static boolean twoPane = false;
+
     // cache update interval in milliseconds
     private static long cacheUpdateInterval = 1000 * 60 * 60 * 24; // 24 hours
 
@@ -67,6 +69,10 @@ public final class Utils {
     public static int calculateNoOfColumns(Context context) {
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
         float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+
+        if (isTwoPane()) {
+            dpWidth = dpWidth / 2;
+        }
         int noOfColumns = (int) (dpWidth / 180);
         if (noOfColumns == 1) noOfColumns = 2;
         return noOfColumns;
@@ -184,5 +190,22 @@ public final class Utils {
     public static int getCachePageSize() {
         return cachePageSize;
     }
+
+    public static void startFullPosterActivity(Context context, int movieId, String posterName) {
+        Intent intent = new Intent(context, FullPosterActivity.class);
+        intent.putExtra(FullPosterActivity.ARG_POSTER_NAME, posterName);
+        intent.putExtra(FullPosterActivity.ARG_MOVIE_ID, movieId);
+        context.startActivity(intent);
+
+    }
+
+    public static boolean isTwoPane() {
+        return twoPane;
+    }
+
+    public static void setTwoPane(boolean twoPane) {
+        Utils.twoPane = twoPane;
+    }
+
 
 }
