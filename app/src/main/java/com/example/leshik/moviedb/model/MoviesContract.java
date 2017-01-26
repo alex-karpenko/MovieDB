@@ -294,7 +294,7 @@ public final class MoviesContract {
         public static final int DETAIL_PROJECTION_INDEX_SITE = 4;
         public static final int DETAIL_PROJECTION_INDEX_SIZE = 5;
         public static final int DETAIL_PROJECTION_INDEX_TYPE = 6;
-        public static final int DETAIL_PROJECTION_INDEX_NAME = 6;
+        public static final int DETAIL_PROJECTION_INDEX_NAME = 7;
         // URI build method
         public static Uri buildUri(String id) {
             return Uri.withAppendedPath(CONTENT_URI, id);
