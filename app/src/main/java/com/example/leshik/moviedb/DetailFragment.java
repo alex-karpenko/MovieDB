@@ -16,7 +16,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SimpleCursorAdapter;
@@ -59,6 +58,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
     private LinearLayout mReviewsListLayout;
 
     private TableLayout mReviewsListTable;
+    private TableLayout mVideosListTable;
 
     private SimpleCursorAdapter mVideosListAdapter;
     private SimpleCursorAdapter mReviewsListAdapter;
@@ -108,7 +108,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
         mSwipeRefreshLayout.setOnRefreshListener(this);
 
         mVideosListLayout = (LinearLayout) rootView.findViewById(R.id.videos_layout);
-        NonScrollListView mVideosList = (NonScrollListView) rootView.findViewById(R.id.videos_list);
+        mVideosListTable = (TableLayout) rootView.findViewById(R.id.videos_list);
         mVideosListLayout.setVisibility(View.GONE);
 
         mReviewsListLayout = (LinearLayout) rootView.findViewById(R.id.reviews_layout);
@@ -119,9 +119,26 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
                 R.layout.videos_list_item,
                 null, // cursor
                 new String[]{MoviesContract.Videos.COLUMN_NAME_NAME},
-                new int[]{R.id.videos_list_item_title},
+                new int[]{R.id.videos_list_item_frame},
                 0);
-        mVideosList.setAdapter(mVideosListAdapter);
+        mVideosListAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
+            @Override
+            public boolean setViewValue(View view, Cursor cursor, int i) {
+                if (i == MoviesContract.Videos.DETAIL_PROJECTION_INDEX_NAME) {
+                    TextView titleView = (TextView) view.findViewById(R.id.videos_list_item_title);
+                    titleView.setText(cursor.getString(i));
+                    view.setTag(cursor.getString(MoviesContract.Videos.DETAIL_PROJECTION_INDEX_KEY));
+                    view.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Utils.watchYoutubeVideo(getContext(), (String) view.getTag());
+                        }
+                    });
+                    return true;
+                }
+                return false;
+            }
+        });
 
         mReviewsListAdapter = new SimpleCursorAdapter(getContext(),
                 R.layout.reviews_list_item,
@@ -139,21 +156,8 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
                 return false;
             }
         });
-        // mReviewsListTable.setAdapter(mReviewsListAdapter);
 
         isFavorite = false;
-
-        // Click listeners
-        // click on video list item - call youtube app
-        mVideosList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Cursor cursor = mVideosListAdapter.getCursor();
-                cursor.moveToPosition(position);
-                String key = cursor.getString(MoviesContract.Videos.DETAIL_PROJECTION_INDEX_KEY);
-                Utils.watchYoutubeVideo(getContext(), key);
-            }
-        });
 
         // clock on poster image - set fragment to full poster image view
         mPosterImage.setOnClickListener(new View.OnClickListener() {
@@ -284,9 +288,15 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
                 Utils.setFavoriteIcon(isFavorite, mMenu);
                 break;
             case VIDEOS_LOADER:
+                mVideosListTable.removeAllViews();
                 if (data != null) {
                     mVideosListAdapter.swapCursor(data);
                     if (data.moveToFirst() && data.getCount() > 0) {
+                        int rowsCount = mVideosListAdapter.getCount();
+                        for (int i = 0; i < rowsCount; i++) {
+                            View v = mVideosListAdapter.getView(i, null, mVideosListTable);
+                            mVideosListTable.addView(v);
+                        }
                         mVideosListLayout.setVisibility(View.VISIBLE);
                     }
                 } else mVideosListLayout.setVisibility(View.GONE);
