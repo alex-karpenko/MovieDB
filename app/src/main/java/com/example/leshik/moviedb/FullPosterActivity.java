@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.TextView;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -47,6 +48,7 @@ public class FullPosterActivity extends AppCompatActivity {
     private final Handler mHideHandler = new Handler();
 
     private View mContentView;
+    private TextView mTitleView;
 
     private final Runnable mHideRunnable = new Runnable() {
         @Override
@@ -64,6 +66,7 @@ public class FullPosterActivity extends AppCompatActivity {
             if (actionBar != null) {
                 actionBar.hide();
             }
+            if (mTitleView != null) mTitleView.setVisibility(View.INVISIBLE);
         }
     };
 
@@ -75,6 +78,7 @@ public class FullPosterActivity extends AppCompatActivity {
             if (actionBar != null) {
                 actionBar.show();
             }
+            if (mTitleView != null) mTitleView.setVisibility(View.VISIBLE);
         }
     };
 
@@ -98,6 +102,7 @@ public class FullPosterActivity extends AppCompatActivity {
         mVisible = true;
 
         mContentView = findViewById(R.id.fullscreen_content);
+        mTitleView = (TextView) findViewById(R.id.full_poster_title);
 
         // get poster image name from intent
         if (savedInstanceState == null) {
@@ -110,6 +115,8 @@ public class FullPosterActivity extends AppCompatActivity {
             movieId = savedInstanceState.getInt(ARG_MOVIE_ID, -1);
             movieTitle = savedInstanceState.getString(ARG_MOVIE_TITLE, "");
         }
+
+        mTitleView.setText(movieTitle);
 
         // Inflate new fragment full screen poster image
         FullPosterFragment fragment = FullPosterFragment.newInstance(movieId, posterName, movieTitle);
