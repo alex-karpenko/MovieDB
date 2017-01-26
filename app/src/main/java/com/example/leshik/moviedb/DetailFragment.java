@@ -89,13 +89,10 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Get bundle with args (URI)
-        if (savedInstanceState != null) {
-            mUri = savedInstanceState.getParcelable(FRAGMENT_MOVIE_URI);
-        } else {
-            Bundle args = getArguments();
-            if (args != null) mUri = args.getParcelable(FRAGMENT_MOVIE_URI);
-        }
+        Bundle args = getArguments();
+        if (args != null) mUri = args.getParcelable(FRAGMENT_MOVIE_URI);
         if (mUri != null) movieId = ContentUris.parseId(mUri);
+
         // Inflate fragment
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
         // Store views references for faster access during updates

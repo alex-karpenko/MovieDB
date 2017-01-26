@@ -32,6 +32,7 @@ import java.util.Calendar;
  */
 public class MovieListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,
         SwipeRefreshLayout.OnRefreshListener {
+    private static final String TAG = "MovieListFragment";
     // Loader ID for movie's list
     private static final int FRAGMENT_LIST_LOADER_ID = 1;
     // Fragment types, for PageAdapter
