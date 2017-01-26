@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import com.example.leshik.moviedb.service.CacheUpdateService;
 
 public class MainActivity extends AppCompatActivity implements MovieListFragment.Callback, DetailFragment.Callback {
+    private static final String TAG = "MainActivity";
     private static final String STATE_CURRENT_PAGE = "STATE_CURRENT_PAGE";
     private static final String STATE_SELECTED_URI = "STATE_SELECTED_URI";
 

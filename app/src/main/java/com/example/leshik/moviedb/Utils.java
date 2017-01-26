@@ -74,7 +74,7 @@ public final class Utils {
         if (isTwoPane()) {
             dpWidth = dpWidth / 2;
         }
-        int noOfColumns = Math.round(dpWidth / 180);
+        int noOfColumns = (int) (dpWidth / 180);
         if (noOfColumns == 1) noOfColumns = 2;
         return noOfColumns;
     }
