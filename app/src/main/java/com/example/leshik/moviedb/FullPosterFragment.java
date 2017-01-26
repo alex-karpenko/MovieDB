@@ -29,11 +29,13 @@ import com.squareup.picasso.Picasso;
 public class FullPosterFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String ARG_POSTER_NAME = "POSTER_NAME";
     private static final String ARG_MOVIE_ID = "MOVIE_ID";
+    private static final String ARG_MOVIE_TITLE = "MOVIE_TITLE";
 
     private static final int FAVORITE_MARK_LOADER = 3;
 
     private String mPosterName;
     private int mMovieId;
+    private String mMovieTitle;
 
     private Menu mMenu;
     private boolean isFavorite;
@@ -49,11 +51,12 @@ public class FullPosterFragment extends Fragment implements LoaderManager.Loader
      * @param posterName - file name of poster image.
      * @return A new instance of fragment FullPosterFragment.
      */
-    public static FullPosterFragment newInstance(int movie_id, String posterName) {
+    public static FullPosterFragment newInstance(int movie_id, String posterName, String movieTitle) {
         FullPosterFragment fragment = new FullPosterFragment();
         Bundle args = new Bundle();
         args.putString(ARG_POSTER_NAME, posterName);
         args.putInt(ARG_MOVIE_ID, movie_id);
+        args.putString(ARG_MOVIE_TITLE, movieTitle);
         fragment.setArguments(args);
         return fragment;
     }
@@ -91,10 +94,12 @@ public class FullPosterFragment extends Fragment implements LoaderManager.Loader
             if (getArguments() != null) {
                 mPosterName = getArguments().getString(ARG_POSTER_NAME);
                 mMovieId = getArguments().getInt(ARG_MOVIE_ID, -1);
+                mMovieTitle = getArguments().getString(ARG_MOVIE_TITLE);
             }
         } else {
             mPosterName = savedInstanceState.getString(ARG_POSTER_NAME);
             mMovieId = savedInstanceState.getInt(ARG_MOVIE_ID);
+            mMovieTitle = savedInstanceState.getString(ARG_MOVIE_TITLE);
         }
     }
 
@@ -103,6 +108,7 @@ public class FullPosterFragment extends Fragment implements LoaderManager.Loader
         super.onSaveInstanceState(outState);
         outState.putString(ARG_POSTER_NAME, mPosterName);
         outState.putInt(ARG_MOVIE_ID, mMovieId);
+        outState.putString(ARG_MOVIE_TITLE, mMovieTitle);
     }
 
     @Override

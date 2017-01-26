@@ -192,10 +192,11 @@ public final class Utils {
         return cachePageSize;
     }
 
-    public static void startFullPosterActivity(Context context, int movieId, String posterName) {
+    public static void startFullPosterActivity(Context context, int movieId, String posterName, String movieTitle) {
         Intent intent = new Intent(context, FullPosterActivity.class);
         intent.putExtra(FullPosterActivity.ARG_POSTER_NAME, posterName);
         intent.putExtra(FullPosterActivity.ARG_MOVIE_ID, movieId);
+        intent.putExtra(FullPosterActivity.ARG_MOVIE_TITLE, movieTitle);
         context.startActivity(intent);
 
     }

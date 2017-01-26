@@ -18,11 +18,13 @@ import android.view.View;
  */
 public class FullPosterActivity extends AppCompatActivity {
     public static final String ARG_POSTER_NAME = "POSTER_NAME";
+    public static final String ARG_MOVIE_TITLE = "MOVIE_TITLE";
     public static final String ARG_MOVIE_ID = "MOVIE_ID";
 
     private boolean mVisible;
     private int movieId;
     private String posterName;
+    private String movieTitle;
 
     /**
      * Whether or not the system UI should be auto-hidden after
@@ -102,13 +104,15 @@ public class FullPosterActivity extends AppCompatActivity {
             Intent intent = getIntent();
             posterName = intent.getStringExtra(ARG_POSTER_NAME);
             movieId = intent.getIntExtra(ARG_MOVIE_ID, -1);
+            movieTitle = intent.getStringExtra(ARG_MOVIE_TITLE);
         } else {
             posterName = savedInstanceState.getString(ARG_POSTER_NAME, "");
             movieId = savedInstanceState.getInt(ARG_MOVIE_ID, -1);
+            movieTitle = savedInstanceState.getString(ARG_MOVIE_TITLE, "");
         }
 
         // Inflate new fragment full screen poster image
-        FullPosterFragment fragment = FullPosterFragment.newInstance(movieId, posterName);
+        FullPosterFragment fragment = FullPosterFragment.newInstance(movieId, posterName, movieTitle);
         if (savedInstanceState != null) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fullscreen_content, fragment)
@@ -125,6 +129,7 @@ public class FullPosterActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         outState.putString(ARG_POSTER_NAME, posterName);
         outState.putInt(ARG_MOVIE_ID, movieId);
+        outState.putString(ARG_MOVIE_TITLE, movieTitle);
     }
 
     @Override

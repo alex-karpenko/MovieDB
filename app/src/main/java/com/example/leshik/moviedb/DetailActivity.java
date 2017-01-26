@@ -100,7 +100,7 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
 
 
     @Override
-    public void onImageClicked(int movieId, String posterName) {
-        Utils.startFullPosterActivity(this, movieId, posterName);
+    public void onImageClicked(int movieId, String posterName, String movieTitle) {
+        Utils.startFullPosterActivity(this, movieId, posterName, movieTitle);
     }
 }

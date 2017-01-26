@@ -149,7 +149,7 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
     }
 
     @Override
-    public void onImageClicked(int movieId, String posterName) {
-        Utils.startFullPosterActivity(this, movieId, posterName);
+    public void onImageClicked(int movieId, String posterName, String movieTitle) {
+        Utils.startFullPosterActivity(this, movieId, posterName, movieTitle);
     }
 }

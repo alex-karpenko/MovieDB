@@ -64,6 +64,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
     private SimpleCursorAdapter mReviewsListAdapter;
 
     private String mPosterName;
+    private String mMovieTitle;
     private boolean isFavorite;
     private Menu mMenu;
 
@@ -159,7 +160,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
             @Override
             public void onClick(View v) {
                 if (mPosterName != null) {
-                    ((DetailFragment.Callback) getContext()).onImageClicked((int) movieId, mPosterName);
+                    ((DetailFragment.Callback) getContext()).onImageClicked((int) movieId, mPosterName, mMovieTitle);
                 }
             }
         });
@@ -248,6 +249,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
                 if (data != null && data.moveToFirst()) {
                     // Setting all view's content
                     mPosterName = data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_POSTER_PATH);
+                    mMovieTitle = data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_ORIGINAL_TITLE);
                     Picasso.with(getActivity())
                             .load(Utils.getPosterSmallUri(mPosterName))
                             .into(mPosterImage);
@@ -344,6 +346,6 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
         /**
          * DetailFragmentCallback for when an item has been selected.
          */
-        void onImageClicked(int movieId, String posterName);
+        void onImageClicked(int movieId, String posterName, String movieTitle);
     }
 }
