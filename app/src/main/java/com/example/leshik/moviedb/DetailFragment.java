@@ -1,6 +1,7 @@
 package com.example.leshik.moviedb;
 
 import android.content.ContentUris;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -9,7 +10,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.ShareActionProvider;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -186,6 +189,8 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
         inflater.inflate(R.menu.detail_fragment, menu);
         mMenu = menu;
         getLoaderManager().initLoader(FAVORITE_MARK_LOADER, null, this);
+
+        updateShareAction(menu.findItem(R.id.action_share), mMovieTitle, mPosterName);
     }
 
     @Override
@@ -254,6 +259,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
                     // Setting all view's content
                     mPosterName = data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_POSTER_PATH);
                     mMovieTitle = data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_ORIGINAL_TITLE);
+                    updateShareAction(mMenu.findItem(R.id.action_share), mMovieTitle, mPosterName);
                     Picasso.with(getActivity())
                             .load(Utils.getPosterSmallUri(mPosterName))
                             .into(mPosterImage);
@@ -357,5 +363,16 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
          * DetailFragmentCallback for when an item has been selected.
          */
         void onImageClicked(int movieId, String posterName, String movieTitle);
+    }
+
+    void updateShareAction(MenuItem menuItem, String title, String poster) {
+        // Setup share provider
+        ShareActionProvider myShareActionProvider =
+                (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
+
+        // create intent
+        Intent myShareIntent = Utils.getShareIntent(getContext(), title, poster);
+        // set intent into provider
+        myShareActionProvider.setShareIntent(myShareIntent);
     }
 }
