@@ -209,5 +209,17 @@ public final class Utils {
         Utils.twoPane = twoPane;
     }
 
+    public static Intent getShareIntent(Context context, String title, String poster) {
+        Intent i = new Intent(Intent.ACTION_SEND);
+        i.putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.share_action_subject) + title);
 
+        String content = new StringBuilder()
+                .append(title + "\n")
+                .append(getPosterSmallUri(poster).toString())
+                .toString();
+        i.putExtra(Intent.EXTRA_TEXT, content);
+        i.setType("text/*");
+
+        return i;
+    }
 }

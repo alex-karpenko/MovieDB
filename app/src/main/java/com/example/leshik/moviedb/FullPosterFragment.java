@@ -75,12 +75,7 @@ public class FullPosterFragment extends Fragment implements LoaderManager.Loader
                 (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
 
         // create intent
-        Intent myShareIntent = new Intent(Intent.ACTION_SEND);
-        // TODO: 19.01.2017 : change type to html?
-        myShareIntent.setType("text/*");
-        // TODO: 19.01.2017 : create html page with content of the movie
-        String contentToSend = Utils.getPosterFullUri(mPosterName).toString();
-        myShareIntent.putExtra(Intent.EXTRA_TEXT, contentToSend);
+        Intent myShareIntent = Utils.getShareIntent(getContext(), mMovieTitle, mPosterName);
         // set intent into provider
         myShareActionProvider.setShareIntent(myShareIntent);
     }
