@@ -214,7 +214,7 @@ public final class Utils {
         i.putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.share_action_subject) + title);
 
         String content = new StringBuilder()
-                .append(title + "\n")
+                .append(title + "\n\n")
                 .append(getPosterSmallUri(poster).toString())
                 .toString();
         i.putExtra(Intent.EXTRA_TEXT, content);
