@@ -42,6 +42,7 @@ public class MoviesProvider extends ContentProvider {
         return true;
     }
 
+    // URI matcher method
     @Nullable
     @Override
     public String getType(Uri uri) {
@@ -90,6 +91,7 @@ public class MoviesProvider extends ContentProvider {
         final int match = sUriMatcher.match(uri);
         String newSortOrder = sortOrder;
 
+        // if sort order not specified - we use own sorting, specific for every table
         switch (match) {
             case MOVIES:
                 if (newSortOrder == null) newSortOrder = MoviesContract.Movies.COLUMN_NAME_MOVIE_ID;
@@ -292,6 +294,8 @@ public class MoviesProvider extends ContentProvider {
         return returnUri;
     }
 
+    // helper method for bulk insert
+    // use it with tables, where PK is integer autoincrement
     private int bulkInsertHelper_integerId(SQLiteDatabase db, ContentValues[] values, String tableName, String idName) {
         int result = 0;
 
@@ -311,6 +315,7 @@ public class MoviesProvider extends ContentProvider {
         return result;
     }
 
+    // .. and 2-nd method for tables where PK is String
     private int bulkInsertHelper_stringId(SQLiteDatabase db, ContentValues[] values, String tableName, String idName) {
         int result = 0;
 
