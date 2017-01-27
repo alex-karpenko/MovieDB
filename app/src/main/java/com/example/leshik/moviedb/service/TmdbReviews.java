@@ -4,6 +4,11 @@ package com.example.leshik.moviedb.service;
  * Created by Leshik on 08.01.2017.
  */
 
+/**
+ * template class to convert JSON answer from API to data class
+ * use it to convert lists of reviews of specific movie
+ */
+
 import android.content.ContentValues;
 
 import com.example.leshik.moviedb.model.MoviesContract;
@@ -47,6 +52,7 @@ public class TmdbReviews {
     @Expose
     public Integer totalResults;
 
+    // helper method to get a list of reviews to insert via content provider
     public ContentValues[] getReviewsContentValues() {
         if (reviewsResults == null) return null;
 

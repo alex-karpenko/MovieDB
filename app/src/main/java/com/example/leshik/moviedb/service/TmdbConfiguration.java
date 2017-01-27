@@ -9,6 +9,11 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
+/**
+ * template class to convert JSON answer with configuration from API to data class
+ */
+
+
 class Images {
 
     @SerializedName("base_url")

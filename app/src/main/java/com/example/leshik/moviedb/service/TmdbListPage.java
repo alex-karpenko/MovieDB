@@ -12,6 +12,12 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
+/**
+ * template class to convert JSON answer from API to data class
+ * use it to convert lists of popular and top rated movies
+ */
+
+
 class ListResult {
 
     @SerializedName("poster_path")
@@ -74,6 +80,8 @@ public class TmdbListPage {
     @Expose
     public Integer totalPages;
 
+    // helper method to create array of popular movies
+    // use it as a parameter to bulkInsert method
     public ContentValues[] getPopularContentValues() {
         if (listResults == null) return null;
 
@@ -92,6 +100,8 @@ public class TmdbListPage {
         return returnValues;
     }
 
+    // helper method to create array of toprated movies
+    // use it as a parameter to bulkInsert method
     public ContentValues[] getTopratedContentValues() {
         if (listResults == null) return null;
 
@@ -110,6 +120,7 @@ public class TmdbListPage {
         return returnValues;
     }
 
+    // helper method to create array of movies from lists of popular and rated films
     public ContentValues[] getMoviesContentValues() {
         if (listResults == null) return null;
 
