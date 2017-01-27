@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Utils.loadDefaultPreferences(this);
-        Utils.applyCurrentTheme(this);
+//        Utils.applyCurrentTheme(this);
 
         super.onCreate(savedInstanceState);
 
@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
         CacheUpdateService.startActionUpdateConfiguration(this);
 
         setContentView(R.layout.activity_main);
+
         if (findViewById(R.id.detail_container) != null) {
             Utils.setTwoPane(true);
         } else Utils.setTwoPane(false);
