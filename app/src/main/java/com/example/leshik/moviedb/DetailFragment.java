@@ -216,7 +216,8 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
         getLoaderManager().initLoader(FAVORITE_MARK_LOADER, null, this);
 
         // and update share action intent
-        updateShareAction(menu.findItem(R.id.action_share), mMovieTitle, mPosterName);
+        if (menu != null)
+            updateShareAction(menu.findItem(R.id.action_share), mMovieTitle, mPosterName);
     }
 
     @Override
@@ -291,7 +292,8 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
                     // update variables for share action provider
                     mPosterName = data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_POSTER_PATH);
                     mMovieTitle = data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_ORIGINAL_TITLE);
-                    updateShareAction(mMenu.findItem(R.id.action_share), mMovieTitle, mPosterName);
+                    if (mMenu != null)
+                        updateShareAction(mMenu.findItem(R.id.action_share), mMovieTitle, mPosterName);
                     // load poster image
                     Picasso.with(getActivity())
                             .load(Utils.getPosterSmallUri(mPosterName))
