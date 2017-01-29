@@ -45,11 +45,14 @@ public class FullPosterActivity extends AppCompatActivity {
      */
     private static final int UI_ANIMATION_DELAY = 300;
 
+    // queue handler
     private final Handler mHideHandler = new Handler();
 
+    // views to fast access
     private View mContentView;
     private TextView mTitleView;
 
+    // runnable to hide views after start
     private final Runnable mHideRunnable = new Runnable() {
         @Override
         public void run() {
@@ -57,6 +60,7 @@ public class FullPosterActivity extends AppCompatActivity {
         }
     };
 
+    // runnable to hide views by touch
     private final Runnable mHidePart2Runnable = new Runnable() {
         @SuppressLint("InlinedApi")
         @Override
@@ -70,6 +74,7 @@ public class FullPosterActivity extends AppCompatActivity {
         }
     };
 
+    // runnable to show views by touch
     private final Runnable mShowPart2Runnable = new Runnable() {
         @Override
         public void run() {
@@ -91,11 +96,14 @@ public class FullPosterActivity extends AppCompatActivity {
 
         Toolbar mToolbar = (Toolbar) findViewById(R.id.poster_toolbar);
         setSupportActionBar(mToolbar);
-        mToolbar.getBackground().setAlpha(100);
+        // set semi-transparent toolbar's background
+        mToolbar.getBackground().setAlpha(128);
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
+            // show up button
             actionBar.setDisplayHomeAsUpEnabled(true);
+            // and hide title
             actionBar.setDisplayShowTitleEnabled(false);
         }
 
@@ -104,13 +112,14 @@ public class FullPosterActivity extends AppCompatActivity {
         mContentView = findViewById(R.id.fullscreen_content);
         mTitleView = (TextView) findViewById(R.id.full_poster_title);
 
-        // get poster image name from intent
         if (savedInstanceState == null) {
+            // get poster image name from intent
             Intent intent = getIntent();
             posterName = intent.getStringExtra(ARG_POSTER_NAME);
             movieId = intent.getIntExtra(ARG_MOVIE_ID, -1);
             movieTitle = intent.getStringExtra(ARG_MOVIE_TITLE);
         } else {
+            // ... or from saved state
             posterName = savedInstanceState.getString(ARG_POSTER_NAME, "");
             movieId = savedInstanceState.getInt(ARG_MOVIE_ID, -1);
             movieTitle = savedInstanceState.getString(ARG_MOVIE_TITLE, "");
@@ -158,6 +167,7 @@ public class FullPosterActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        // set touch listener on image view to toggle toolbar/title visibility state
         TouchImageView imageView = (TouchImageView) mContentView.findViewById(R.id.full_poster_image);
         if (imageView != null) {
             imageView.setOnTouchListener(new View.OnTouchListener() {
@@ -176,6 +186,7 @@ public class FullPosterActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
+        // clear touch listener
         TouchImageView imageView = (TouchImageView) mContentView.findViewById(R.id.full_poster_image);
         if (imageView != null) {
             imageView.setOnTouchListener(null);
@@ -195,6 +206,7 @@ public class FullPosterActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    // method to toggle visibility state of toolbar and title
     private void toggle() {
         if (mVisible) {
             hide();
@@ -203,6 +215,7 @@ public class FullPosterActivity extends AppCompatActivity {
         }
     }
 
+    // hide toolbar an title
     private void hide() {
         mVisible = false;
         // Schedule a runnable to remove the status and navigation bar after a delay
@@ -210,6 +223,7 @@ public class FullPosterActivity extends AppCompatActivity {
         mHideHandler.postDelayed(mHidePart2Runnable, UI_ANIMATION_DELAY);
     }
 
+    // show toolbar and title
     @SuppressLint("InlinedApi")
     private void show() {
         mVisible = true;

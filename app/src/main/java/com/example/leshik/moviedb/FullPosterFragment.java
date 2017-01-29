@@ -27,10 +27,12 @@ import com.squareup.picasso.Picasso;
  * create an instance of this fragment.
  */
 public class FullPosterFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+    // state and fragment's arguments markers
     private static final String ARG_POSTER_NAME = "POSTER_NAME";
     private static final String ARG_MOVIE_ID = "MOVIE_ID";
     private static final String ARG_MOVIE_TITLE = "MOVIE_TITLE";
 
+    // content loader's number
     private static final int FAVORITE_MARK_LOADER = 3;
 
     private String mPosterName;
@@ -54,9 +56,11 @@ public class FullPosterFragment extends Fragment implements LoaderManager.Loader
     public static FullPosterFragment newInstance(int movie_id, String posterName, String movieTitle) {
         FullPosterFragment fragment = new FullPosterFragment();
         Bundle args = new Bundle();
+        // set variables to argument's bundle
         args.putString(ARG_POSTER_NAME, posterName);
         args.putInt(ARG_MOVIE_ID, movie_id);
         args.putString(ARG_MOVIE_TITLE, movieTitle);
+        // create fragment
         fragment.setArguments(args);
         return fragment;
     }
@@ -85,6 +89,7 @@ public class FullPosterFragment extends Fragment implements LoaderManager.Loader
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
+        // set state variables from saved state or argument's bundle
         if (savedInstanceState == null) {
             if (getArguments() != null) {
                 mPosterName = getArguments().getString(ARG_POSTER_NAME);
@@ -110,8 +115,11 @@ public class FullPosterFragment extends Fragment implements LoaderManager.Loader
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_favorite) {
+            // toggle favorite flag
             isFavorite = !isFavorite;
+            // change mark on the toolbar
             Utils.setFavoriteIcon(isFavorite, mMenu);
+            // and update state in db table via intent service
             CacheUpdateService.startActionUpdateFavorite(getActivity(), mMovieId, isFavorite);
             return true;
         }
@@ -152,6 +160,7 @@ public class FullPosterFragment extends Fragment implements LoaderManager.Loader
         switch (loader.getId()) {
             case FAVORITE_MARK_LOADER:
                 isFavorite = false;
+                // set favorite mark if table contain row with our movie_id
                 if (data != null && data.moveToFirst()) {
                     isFavorite = true;
                 }
