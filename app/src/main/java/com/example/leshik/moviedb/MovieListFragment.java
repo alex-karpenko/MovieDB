@@ -28,6 +28,7 @@ import java.util.Calendar;
 /**
  * Main screen fragment with list of movie's posters,
  * placed in a RecycleView.
+ * There are three types of this fragment for popular, top rated and favorites lists
  * <p>
  */
 public class MovieListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,
@@ -43,14 +44,19 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
     // Current fragment type
     private int fragmentTabType = FAVORITES_TAB_FRAGMENT;
 
-    private MoviesRecycleListAdapter mAdapter;
+    // views in the fragment
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
 
+    private MoviesRecycleListAdapter mAdapter;
+
+    // for control auto content loading
     private boolean loadingCache = false;
+    // start auto loading after this threshold (multiplied by number of the items in list row)
     private int scrollingThreshold = 5;
 
+    // swipe refresh callback
     @Override
     public void onRefresh() {
         updateCurrentPageCache();
@@ -85,6 +91,7 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.movies_list);
 
+        // store view's references
         mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swiperefresh);
         mSwipeRefreshLayout.setOnRefreshListener(this);
 
@@ -99,7 +106,9 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
 
         // Set up scroll listener for auto load list's tail
         if (fragmentTabType == POPULAR_TAB_FRAGMENT || fragmentTabType == TOPRATED_TAB_FRAGMENT) {
+            // set scrolling threshold
             scrollingThreshold = scrollingThreshold * Utils.calculateNoOfColumns(getActivity());
+            // set scroll listener
             mRecyclerView.addOnScrollListener(new AutoLoadingScrollListener());
         }
 
@@ -127,7 +136,9 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
+            // set refresh mart to on
             mSwipeRefreshLayout.setRefreshing(true);
+            // and update current page
             updateCurrentPageCache();
 
             return true;
@@ -136,18 +147,21 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
         return super.onOptionsItemSelected(item);
     }
 
+    // clear popular cache and preload 1-st page and configures count of pages
     private void updatePopularCache() {
         CacheUpdateService.startActionUpdatePopular(getActivity(), -1);
         for (int i = 2; i <= Utils.getCachePreloadPages(); i++)
             CacheUpdateService.startActionUpdatePopular(getActivity(), i);
     }
 
+    // clear toprated cache and preload 1-st page and configures count of pages
     private void updateTopratedCache() {
         CacheUpdateService.startActionUpdateToprated(getActivity(), -1);
         for (int i = 2; i <= Utils.getCachePreloadPages(); i++)
             CacheUpdateService.startActionUpdateToprated(getActivity(), i);
     }
 
+    // update cache for current page type
     private void updateCurrentPageCache() {
         switch (fragmentTabType) {
             case POPULAR_TAB_FRAGMENT:
@@ -157,11 +171,13 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
                 updateTopratedCache();
                 break;
             case FAVORITES_TAB_FRAGMENT:
+                // no actions, but set off refresh mark
                 mSwipeRefreshLayout.setRefreshing(false);
                 break;
         }
     }
 
+    // check if cache is expired and start updating if need
     private void updateCurrentPageCacheIfNeed() {
         long currentTime = Calendar.getInstance().getTimeInMillis();
         long lastUpdateTime;
@@ -227,14 +243,17 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
         loadingCache = false;
     }
 
+    // listener for check every scroll event on list view and start loading cache content
+    // when scrolled to the end of cached data
     private class AutoLoadingScrollListener extends RecyclerView.OnScrollListener {
         @Override
         public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
             super.onScrolled(recyclerView, dx, dy);
-            if (loadingCache) return;
+            if (loadingCache) return; // immediate return if we in loading state
 
-            int totalItems = mLayoutManager.getItemCount();
-            int lastVisibleItem = ((LinearLayoutManager) mLayoutManager).findLastVisibleItemPosition();
+            int totalItems = mLayoutManager.getItemCount(); // total items in the view (in the cursor)
+            int lastVisibleItem = ((LinearLayoutManager) mLayoutManager).findLastVisibleItemPosition(); // last visible item
+            // if last view under threshold position - start loading cache
             if (lastVisibleItem + scrollingThreshold >= totalItems) {
                 long maxPages;
                 int currentPage = totalItems / Utils.getCachePageSize();

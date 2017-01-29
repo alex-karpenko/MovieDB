@@ -7,6 +7,8 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 /**
  * Created by Leshik on 07.01.2017.
+ * Adapter class to fill main screen pager with fragments
+ * (popular, top rated and favorites)
  */
 
 class MainPagerAdapter extends FragmentPagerAdapter {

@@ -15,6 +15,8 @@ import com.squareup.picasso.Picasso;
 
 /**
  * Created by Leshik on 27.12.2016.
+ *
+ * Adapter class to fill in movies lists
  */
 
 class MoviesRecycleListAdapter extends CursorRecyclerViewAdapter<MoviesRecycleListAdapter.ViewHolder> {
