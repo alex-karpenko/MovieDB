@@ -15,6 +15,7 @@ import android.view.MenuItem;
  */
 public class DetailActivity extends AppCompatActivity implements DetailFragment.Callback {
     private static final String TAG = "DetailActivity";
+    // marker string and variable to state saving
     private static final String MOVIE_URI = "MOVIE_URI";
     Uri mUri;
 
@@ -43,18 +44,20 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
             mUri = savedInstanceState.getParcelable(MOVIE_URI);
         }
 
+        // create fragment with all details info and add (or replace) it
         Bundle args = new Bundle();
         args.putParcelable(DetailFragment.FRAGMENT_MOVIE_URI, mUri);
 
         DetailFragment fragment = new DetailFragment();
         fragment.setArguments(args);
 
-        // add new fragment with detail info
         if (savedInstanceState != null) {
+            // replace fragment if it is not a new activity
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.detail_container, fragment)
                     .commit();
         } else {
+            // add new fragment with detail info if no saved state
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.detail_container, fragment)
                     .commit();
@@ -71,6 +74,7 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
     @Override
     protected void onResume() {
         super.onResume();
+        // restart activity after theme change
         Utils.restartActivityIfNeed(this);
     }
 
@@ -91,6 +95,7 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
                 startActivity(new Intent(this, SettingsActivity.class));
                 return true;
             case android.R.id.home:
+                // up toolbar button pressed
                 finish();
                 return true;
         }
@@ -101,6 +106,8 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
 
     @Override
     public void onImageClicked(int movieId, String posterName, String movieTitle) {
+        // callback method that called when poster image is clicked
+        // start full poster view activity
         Utils.startFullPosterActivity(this, movieId, posterName, movieTitle);
     }
 }
