@@ -27,13 +27,17 @@ import com.squareup.picasso.Picasso;
  * create an instance of this fragment.
  */
 public class FullPosterFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+    // state and fragment's arguments markers
     private static final String ARG_POSTER_NAME = "POSTER_NAME";
     private static final String ARG_MOVIE_ID = "MOVIE_ID";
+    private static final String ARG_MOVIE_TITLE = "MOVIE_TITLE";
 
+    // content loader's number
     private static final int FAVORITE_MARK_LOADER = 3;
 
     private String mPosterName;
     private int mMovieId;
+    private String mMovieTitle;
 
     private Menu mMenu;
     private boolean isFavorite;
@@ -49,11 +53,14 @@ public class FullPosterFragment extends Fragment implements LoaderManager.Loader
      * @param posterName - file name of poster image.
      * @return A new instance of fragment FullPosterFragment.
      */
-    public static FullPosterFragment newInstance(int movie_id, String posterName) {
+    public static FullPosterFragment newInstance(int movie_id, String posterName, String movieTitle) {
         FullPosterFragment fragment = new FullPosterFragment();
         Bundle args = new Bundle();
+        // set variables to argument's bundle
         args.putString(ARG_POSTER_NAME, posterName);
         args.putInt(ARG_MOVIE_ID, movie_id);
+        args.putString(ARG_MOVIE_TITLE, movieTitle);
+        // create fragment
         fragment.setArguments(args);
         return fragment;
     }
@@ -72,12 +79,7 @@ public class FullPosterFragment extends Fragment implements LoaderManager.Loader
                 (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
 
         // create intent
-        Intent myShareIntent = new Intent(Intent.ACTION_SEND);
-        // TODO: 19.01.2017 : change type to html?
-        myShareIntent.setType("text/*");
-        // TODO: 19.01.2017 : create html page with content of the movie
-        String contentToSend = Utils.getPosterFullUri(mPosterName).toString();
-        myShareIntent.putExtra(Intent.EXTRA_TEXT, contentToSend);
+        Intent myShareIntent = Utils.getShareIntent(getContext(), mMovieTitle, mPosterName);
         // set intent into provider
         myShareActionProvider.setShareIntent(myShareIntent);
     }
@@ -87,14 +89,17 @@ public class FullPosterFragment extends Fragment implements LoaderManager.Loader
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
+        // set state variables from saved state or argument's bundle
         if (savedInstanceState == null) {
             if (getArguments() != null) {
                 mPosterName = getArguments().getString(ARG_POSTER_NAME);
                 mMovieId = getArguments().getInt(ARG_MOVIE_ID, -1);
+                mMovieTitle = getArguments().getString(ARG_MOVIE_TITLE);
             }
         } else {
             mPosterName = savedInstanceState.getString(ARG_POSTER_NAME);
             mMovieId = savedInstanceState.getInt(ARG_MOVIE_ID);
+            mMovieTitle = savedInstanceState.getString(ARG_MOVIE_TITLE);
         }
     }
 
@@ -103,14 +108,18 @@ public class FullPosterFragment extends Fragment implements LoaderManager.Loader
         super.onSaveInstanceState(outState);
         outState.putString(ARG_POSTER_NAME, mPosterName);
         outState.putInt(ARG_MOVIE_ID, mMovieId);
+        outState.putString(ARG_MOVIE_TITLE, mMovieTitle);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_favorite) {
+            // toggle favorite flag
             isFavorite = !isFavorite;
+            // change mark on the toolbar
             Utils.setFavoriteIcon(isFavorite, mMenu);
+            // and update state in db table via intent service
             CacheUpdateService.startActionUpdateFavorite(getActivity(), mMovieId, isFavorite);
             return true;
         }
@@ -151,6 +160,7 @@ public class FullPosterFragment extends Fragment implements LoaderManager.Loader
         switch (loader.getId()) {
             case FAVORITE_MARK_LOADER:
                 isFavorite = false;
+                // set favorite mark if table contain row with our movie_id
                 if (data != null && data.moveToFirst()) {
                     isFavorite = true;
                 }

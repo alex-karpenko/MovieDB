@@ -9,7 +9,8 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 
 public class MoviesDbHelper extends SQLiteOpenHelper {
-    public static final String DATABASE_NAME = "movies.db";
+    // db name and version constants
+    static final String DATABASE_NAME = "movies.db";
     private static final int DATABASE_VERSION = 1;
 
     public MoviesDbHelper(Context context) {
@@ -50,7 +51,7 @@ public class MoviesDbHelper extends SQLiteOpenHelper {
     @Override
     public void onConfigure(SQLiteDatabase db) {
         super.onConfigure(db);
-        // To force foreign keys to work ...
+        // To force foreign keys working ...
         db.setForeignKeyConstraintsEnabled(true);
     }
 }

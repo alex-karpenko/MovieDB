@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.TextView;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -18,11 +19,13 @@ import android.view.View;
  */
 public class FullPosterActivity extends AppCompatActivity {
     public static final String ARG_POSTER_NAME = "POSTER_NAME";
+    public static final String ARG_MOVIE_TITLE = "MOVIE_TITLE";
     public static final String ARG_MOVIE_ID = "MOVIE_ID";
 
     private boolean mVisible;
     private int movieId;
     private String posterName;
+    private String movieTitle;
 
     /**
      * Whether or not the system UI should be auto-hidden after
@@ -42,10 +45,14 @@ public class FullPosterActivity extends AppCompatActivity {
      */
     private static final int UI_ANIMATION_DELAY = 300;
 
+    // queue handler
     private final Handler mHideHandler = new Handler();
 
+    // views to fast access
     private View mContentView;
+    private TextView mTitleView;
 
+    // runnable to hide views after start
     private final Runnable mHideRunnable = new Runnable() {
         @Override
         public void run() {
@@ -53,6 +60,7 @@ public class FullPosterActivity extends AppCompatActivity {
         }
     };
 
+    // runnable to hide views by touch
     private final Runnable mHidePart2Runnable = new Runnable() {
         @SuppressLint("InlinedApi")
         @Override
@@ -62,9 +70,11 @@ public class FullPosterActivity extends AppCompatActivity {
             if (actionBar != null) {
                 actionBar.hide();
             }
+            if (mTitleView != null) mTitleView.setVisibility(View.INVISIBLE);
         }
     };
 
+    // runnable to show views by touch
     private final Runnable mShowPart2Runnable = new Runnable() {
         @Override
         public void run() {
@@ -73,6 +83,7 @@ public class FullPosterActivity extends AppCompatActivity {
             if (actionBar != null) {
                 actionBar.show();
             }
+            if (mTitleView != null) mTitleView.setVisibility(View.VISIBLE);
         }
     };
 
@@ -85,30 +96,39 @@ public class FullPosterActivity extends AppCompatActivity {
 
         Toolbar mToolbar = (Toolbar) findViewById(R.id.poster_toolbar);
         setSupportActionBar(mToolbar);
-        mToolbar.getBackground().setAlpha(100);
+        // set semi-transparent toolbar's background
+        mToolbar.getBackground().setAlpha(128);
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
+            // show up button
             actionBar.setDisplayHomeAsUpEnabled(true);
+            // and hide title
             actionBar.setDisplayShowTitleEnabled(false);
         }
 
         mVisible = true;
 
         mContentView = findViewById(R.id.fullscreen_content);
+        mTitleView = (TextView) findViewById(R.id.full_poster_title);
 
-        // get poster image name from intent
         if (savedInstanceState == null) {
+            // get poster image name from intent
             Intent intent = getIntent();
             posterName = intent.getStringExtra(ARG_POSTER_NAME);
             movieId = intent.getIntExtra(ARG_MOVIE_ID, -1);
+            movieTitle = intent.getStringExtra(ARG_MOVIE_TITLE);
         } else {
+            // ... or from saved state
             posterName = savedInstanceState.getString(ARG_POSTER_NAME, "");
             movieId = savedInstanceState.getInt(ARG_MOVIE_ID, -1);
+            movieTitle = savedInstanceState.getString(ARG_MOVIE_TITLE, "");
         }
 
+        mTitleView.setText(movieTitle);
+
         // Inflate new fragment full screen poster image
-        FullPosterFragment fragment = FullPosterFragment.newInstance(movieId, posterName);
+        FullPosterFragment fragment = FullPosterFragment.newInstance(movieId, posterName, movieTitle);
         if (savedInstanceState != null) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fullscreen_content, fragment)
@@ -125,6 +145,7 @@ public class FullPosterActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         outState.putString(ARG_POSTER_NAME, posterName);
         outState.putInt(ARG_MOVIE_ID, movieId);
+        outState.putString(ARG_MOVIE_TITLE, movieTitle);
     }
 
     @Override
@@ -146,6 +167,7 @@ public class FullPosterActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        // set touch listener on image view to toggle toolbar/title visibility state
         TouchImageView imageView = (TouchImageView) mContentView.findViewById(R.id.full_poster_image);
         if (imageView != null) {
             imageView.setOnTouchListener(new View.OnTouchListener() {
@@ -164,6 +186,7 @@ public class FullPosterActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
+        // clear touch listener
         TouchImageView imageView = (TouchImageView) mContentView.findViewById(R.id.full_poster_image);
         if (imageView != null) {
             imageView.setOnTouchListener(null);
@@ -183,6 +206,7 @@ public class FullPosterActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    // method to toggle visibility state of toolbar and title
     private void toggle() {
         if (mVisible) {
             hide();
@@ -191,6 +215,7 @@ public class FullPosterActivity extends AppCompatActivity {
         }
     }
 
+    // hide toolbar an title
     private void hide() {
         mVisible = false;
         // Schedule a runnable to remove the status and navigation bar after a delay
@@ -198,6 +223,7 @@ public class FullPosterActivity extends AppCompatActivity {
         mHideHandler.postDelayed(mHidePart2Runnable, UI_ANIMATION_DELAY);
     }
 
+    // show toolbar and title
     @SuppressLint("InlinedApi")
     private void show() {
         mVisible = true;

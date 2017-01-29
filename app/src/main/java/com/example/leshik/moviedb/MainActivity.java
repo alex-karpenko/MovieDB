@@ -2,7 +2,6 @@ package com.example.leshik.moviedb;
 
 import android.app.ActivityOptions;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
@@ -17,31 +16,38 @@ import com.example.leshik.moviedb.service.CacheUpdateService;
 
 public class MainActivity extends AppCompatActivity implements MovieListFragment.Callback, DetailFragment.Callback {
     private static final String TAG = "MainActivity";
+    // tags to saved state bundle
     private static final String STATE_CURRENT_PAGE = "STATE_CURRENT_PAGE";
     private static final String STATE_SELECTED_URI = "STATE_SELECTED_URI";
 
+    // to store titles of the tabs (popular, top rated, favorites)
     public static String[] tabFragmentNames;
 
+    // adapter to create fragments to pager
     private MainPagerAdapter mPagerAdapter;
+
     private ViewPager mViewPager;
     private TabLayout mTabLayout;
 
+    // current selected movie (for two pane view)
     private Uri selectedMovieUri = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Utils.loadDefaultPreferences(this);
-        Utils.applyCurrentTheme(this);
+//        Utils.applyCurrentTheme(this);
 
         super.onCreate(savedInstanceState);
 
-        // Every time when activity created - update configuration from the TMDB
+        // restore base URLs from shared config
         Utils.basePosterUrl = Utils.getStringCachePreference(this, R.string.base_potser_url);
         Utils.basePosterSecureUrl = Utils.getStringCachePreference(this, R.string.base_potser_secure_url);
-
+        // Every time when activity created - update configuration from the TMDB
         CacheUpdateService.startActionUpdateConfiguration(this);
 
         setContentView(R.layout.activity_main);
+
+        // check if the details container is present - two pane layout was loaded
         if (findViewById(R.id.detail_container) != null) {
             Utils.setTwoPane(true);
         } else Utils.setTwoPane(false);
@@ -49,23 +55,25 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
         Toolbar mToolbar = (Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(mToolbar);
 
+        // create pager adapter and set it to the pager view
         mPagerAdapter = new MainPagerAdapter(getSupportFragmentManager());
         mViewPager = (ViewPager) findViewById(R.id.main_pager);
         mViewPager.setAdapter(mPagerAdapter);
 
         // Get list of tab's titles from resources
-        Resources res = getResources();
-        tabFragmentNames = res.getStringArray(R.array.main_tab_names);
+        tabFragmentNames = getResources().getStringArray(R.array.main_tab_names);
 
         // Assign pager to tab layout
         mTabLayout = (TabLayout) findViewById(R.id.main_tabs);
         mTabLayout.setupWithViewPager(mViewPager);
 
+        // restore state, if it was save
         if (savedInstanceState != null) {
             int selectedTab = savedInstanceState.getInt(STATE_CURRENT_PAGE);
             selectedMovieUri = savedInstanceState.getParcelable(STATE_SELECTED_URI);
             mViewPager.setCurrentItem(selectedTab);
 
+            // restore content of the details fragment if it present
             if (selectedMovieUri != null && Utils.isTwoPane()) {
                 // replace fragment into details frame
                 Bundle args = new Bundle();
@@ -91,6 +99,7 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
     @Override
     protected void onResume() {
         super.onResume();
+        // if theme was changed - restart activity
         Utils.restartActivityIfNeed(this);
     }
 
@@ -115,14 +124,15 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
         return super.onOptionsItemSelected(item);
     }
 
+    // listener action - if image from the list pressed - start details activity or update detail frame (if two panes)
     @Override
     public void onItemSelected(Uri movieUri, ImageView posterView) {
         selectedMovieUri = movieUri;
 
-        Intent intent = new Intent(this, DetailActivity.class)
-                .setData(movieUri);
-
         if (!Utils.isTwoPane()) {
+            Intent intent = new Intent(this, DetailActivity.class)
+                    .setData(movieUri);
+
             // If one pane - start details activity
             // If Lollipop or higher - start activity with image animation
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
@@ -148,8 +158,9 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
         }
     }
 
+    // callback method from details fragment - called when poster image pressed to start full poster view
     @Override
-    public void onImageClicked(int movieId, String posterName) {
-        Utils.startFullPosterActivity(this, movieId, posterName);
+    public void onImageClicked(int movieId, String posterName, String movieTitle) {
+        Utils.startFullPosterActivity(this, movieId, posterName, movieTitle);
     }
 }

@@ -22,4 +22,14 @@
         android:background="?attr/colorPrimary"
         android:elevation="4dp" />
 
+    <TextView
+        android:id="@+id/full_poster_title"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_gravity="bottom"
+        android:background="@color/grey_overlay"
+        android:gravity="center_vertical"
+        android:paddingLeft="@dimen/detail_left_margin"
+        android:paddingRight="@dimen/detail_right_margin" />
+
 </FrameLayout>

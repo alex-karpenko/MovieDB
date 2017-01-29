@@ -31,9 +31,10 @@ public final class Utils {
 
     // Number of pages to preload if cache is empty
     private static int cachePreloadPages = 2;
-
+    // default page size of popular and toprated list
     private static int cachePageSize = 20;
 
+    // is main screen has two panes
     private static boolean twoPane = false;
 
     // cache update interval in milliseconds
@@ -57,16 +58,19 @@ public final class Utils {
     private Utils() {
     }
 
+    // retrieve stored preference variable (Long)
     static long getLongCachePreference(Context context, int key) {
         SharedPreferences prefs = context.getSharedPreferences(CACHE_PREFS_NAME, 0);
         return prefs.getLong(context.getString(key), -1);
     }
 
+    // retrieve stored preference variable (String)
     static String getStringCachePreference(Context context, int key) {
         SharedPreferences prefs = context.getSharedPreferences(CACHE_PREFS_NAME, 0);
         return prefs.getString(context.getString(key), null);
     }
 
+    // calculate number of GridLayout columns based on screen width
     public static int calculateNoOfColumns(Context context) {
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
         float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
@@ -76,6 +80,7 @@ public final class Utils {
         }
         int noOfColumns = (int) (dpWidth / 180);
         if (noOfColumns == 1) noOfColumns = 2;
+
         return noOfColumns;
     }
 
@@ -92,6 +97,7 @@ public final class Utils {
         }
     }
 
+    // change favorite icons resource IDs based on the current theme
     static void setupThemeIcons(Context context) {
         TypedValue val = new TypedValue();
         context.getTheme().resolveAttribute(R.attr.isLightTheme, val, true);
@@ -106,18 +112,21 @@ public final class Utils {
         }
     }
 
+    // return URI with small width poster image
     static Uri getPosterSmallUri(String poster) {
         return Uri.parse(basePosterSecureUrl
                 + posterSmallWidthStr
                 + poster);
     }
 
+    // return URI with full size poster image
     static Uri getPosterFullUri(String poster) {
         return Uri.parse(basePosterSecureUrl
                 + posterFullWidthStr
                 + poster);
     }
 
+    // update favorite icon in the menu
     static void setFavoriteIcon(boolean flag, Menu menu) {
         int favIcon;
         if (flag) favIcon = iconFavoriteBlack;
@@ -128,6 +137,8 @@ public final class Utils {
         }
     }
 
+    // change current theme setting based on the theme name from preferences
+    // and schedule activity restart if theme changed
     static void setCurrentTheme(Context context, String themeName) {
         int themeId = R.style.AppThemeDark;
 
@@ -140,15 +151,18 @@ public final class Utils {
         currentTheme = themeId;
     }
 
+    // return curent theme resource ID
     public static int getCurrentTheme() {
         return currentTheme;
     }
 
+    // apply current theme to the context and change icons set
     static void applyCurrentTheme(Context context) {
         context.setTheme(getCurrentTheme());
         setupThemeIcons(context);
     }
 
+    // load preferences from shared preferences file
     public static void loadDefaultPreferences(Context context) {
         // set defaults, if need
         PreferenceManager.setDefaultValues(context, R.xml.pref_general, false);
@@ -163,27 +177,33 @@ public final class Utils {
                 getString(context.getString(R.string.pref_cache_key), "0")) * 60 * 60 * 1000);
     }
 
+    // return configured interval of cache update
     public static long getCacheUpdateInterval() {
         return cacheUpdateInterval;
     }
 
+    // set cache update interval
     public static void setCacheUpdateInterval(long cacheUpdateInterval) {
         Utils.cacheUpdateInterval = cacheUpdateInterval;
     }
 
+    // set restart activity flag to schedule restart it
     public static void scheduleActivityRestart() {
         restartActivity = true;
     }
 
+    // restart application if this was planned by setting restartActivity flag
     public static void restartActivityIfNeed(Activity context) {
         if (restartActivity) {
             restartActivity = false;
+            // start "root" activity with ACTIVITY_CLEAR_TOP flag
             Intent i = context.getBaseContext().getPackageManager().getLaunchIntentForPackage(context.getBaseContext().getPackageName());
             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             context.startActivity(i);
         }
     }
 
+    // getter/setter for default number of cache preload pages
     public static int getCachePreloadPages() {
         return cachePreloadPages;
     }
@@ -192,14 +212,17 @@ public final class Utils {
         return cachePageSize;
     }
 
-    public static void startFullPosterActivity(Context context, int movieId, String posterName) {
+    // start activity to show full poster image
+    public static void startFullPosterActivity(Context context, int movieId, String posterName, String movieTitle) {
         Intent intent = new Intent(context, FullPosterActivity.class);
         intent.putExtra(FullPosterActivity.ARG_POSTER_NAME, posterName);
         intent.putExtra(FullPosterActivity.ARG_MOVIE_ID, movieId);
+        intent.putExtra(FullPosterActivity.ARG_MOVIE_TITLE, movieTitle);
         context.startActivity(intent);
 
     }
 
+    // getter/setter for two pane flag
     public static boolean isTwoPane() {
         return twoPane;
     }
@@ -208,5 +231,21 @@ public final class Utils {
         Utils.twoPane = twoPane;
     }
 
+    // create and return share action intent
+    // TODO: 29.01.2017 develop normal method for create fine html-based letter
+    public static Intent getShareIntent(Context context, String title, String poster) {
+        Intent i = new Intent(Intent.ACTION_SEND);
+        // letter subject
+        i.putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.share_action_subject) + title);
 
+        // letter content
+        String content = new StringBuilder()
+                .append(title + "\n\n")
+                .append(getPosterSmallUri(poster).toString())
+                .toString();
+        i.putExtra(Intent.EXTRA_TEXT, content);
+        i.setType("text/*");
+
+        return i;
+    }
 }

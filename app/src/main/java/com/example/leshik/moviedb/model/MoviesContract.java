@@ -65,6 +65,7 @@ public final class MoviesContract {
                 COLUMN_NAME_RUNTIME,
                 COLUMN_NAME_LAST_UPDATED
         };
+        // ... and indexes for it
         public static final int DETAIL_PROJECTION_INDEX_ID = 0;
         public static final int DETAIL_PROJECTION_INDEX_MOVIE_ID = 1;
         public static final int DETAIL_PROJECTION_INDEX_ORIGINAL_TITLE = 2;
@@ -223,6 +224,9 @@ public final class MoviesContract {
                 " WHERE " + Movies.TABLE_NAME + "." + Movies.COLUMN_NAME_MOVIE_ID + "=" +
                 TABLE_NAME + "." + COLUMN_NAME_MOVIE_ID +
                 ")";
+        // query to find next (max+1) sort_id
+        // we use it while insert new row,
+        // because sqlite3 does not allow second autoincrement field
         static final String MAX_SORT_ID_SELECT_STATEMENT = "(SELECT " +
                 "MAX(" + COLUMN_NAME_SORT_ID + ") + 1 " +
                 " FROM " + TABLE_NAME +
@@ -232,7 +236,6 @@ public final class MoviesContract {
                 COLUMN_NAME_SORT_ID,
                 COLUMN_NAME_MOVIE_ID,
                 Movies.COLUMN_NAME_POSTER_PATH};
-
 
         // URI build method
         public static Uri buildUri(long id) {
@@ -287,6 +290,7 @@ public final class MoviesContract {
                 COLUMN_NAME_TYPE,
                 COLUMN_NAME_NAME
         };
+        // ... and indexes for it
         public static final int DETAIL_PROJECTION_INDEX_ID = 0;
         public static final int DETAIL_PROJECTION_INDEX_MOVIE_ID = 1;
         public static final int DETAIL_PROJECTION_INDEX_VIDEO_ID = 2;
@@ -294,12 +298,14 @@ public final class MoviesContract {
         public static final int DETAIL_PROJECTION_INDEX_SITE = 4;
         public static final int DETAIL_PROJECTION_INDEX_SIZE = 5;
         public static final int DETAIL_PROJECTION_INDEX_TYPE = 6;
-        public static final int DETAIL_PROJECTION_INDEX_NAME = 6;
-        // URI build method
+        public static final int DETAIL_PROJECTION_INDEX_NAME = 7;
+
+        // URI build method with video_id
         public static Uri buildUri(String id) {
             return Uri.withAppendedPath(CONTENT_URI, id);
         }
 
+        // ... and with movie_id
         public static Uri buildUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
@@ -345,6 +351,7 @@ public final class MoviesContract {
                 COLUMN_NAME_CONTENT,
                 COLUMN_NAME_URL
         };
+        // ... and indexes for it
         public static final int DETAIL_PROJECTION_INDEX_ID = 0;
         public static final int DETAIL_PROJECTION_INDEX_MOVIE_ID = 1;
         public static final int DETAIL_PROJECTION_INDEX_REVIEW_ID = 2;
@@ -352,11 +359,12 @@ public final class MoviesContract {
         public static final int DETAIL_PROJECTION_INDEX_CONTENT = 4;
         public static final int DETAIL_PROJECTION_INDEX_URL = 5;
 
-        // URI build method
+        // URI build method with review_id
         public static Uri buildUri(String id) {
             return Uri.withAppendedPath(CONTENT_URI, id);
         }
 
+        // ... and with movie_id
         public static Uri buildUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }

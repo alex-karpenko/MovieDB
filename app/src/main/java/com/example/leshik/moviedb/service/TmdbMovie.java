@@ -12,6 +12,12 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
+/**
+ * template class to convert JSON answer from API to data class
+ * use it to convert information about specific movie
+ */
+
+
 class BelongsToCollection {
 
     @SerializedName("id")
@@ -151,6 +157,7 @@ public class TmdbMovie {
     @Expose
     public Integer voteCount;
 
+    // helper class to get values for table row to insert
     public ContentValues getMovieContentValues() {
         ContentValues returnValues = new ContentValues();
 

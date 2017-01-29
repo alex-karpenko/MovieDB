@@ -4,6 +4,11 @@ package com.example.leshik.moviedb.service;
  * Created by Leshik on 08.01.2017.
  */
 
+/**
+ * template class to convert JSON answer from API to data class
+ * use it to convert lists of videos of specific movie
+ */
+
 import android.content.ContentValues;
 
 import com.example.leshik.moviedb.model.MoviesContract;
@@ -50,6 +55,7 @@ public class TmdbVideos {
     @Expose
     public List<VideosResult> videosResults = null;
 
+    // helper method to get a list of videos to insert via content provider
     public ContentValues[] getVideosContentValues() {
         if (videosResults == null) return null;
 

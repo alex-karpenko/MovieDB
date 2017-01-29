@@ -26,7 +26,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 public class CacheUpdateService extends IntentService {
     private static final String LOG_TAG = CacheUpdateService.class.getSimpleName();
-    // IntentService can perform
+    // IntentService can perform next actions
     static final String ACTION_UPDATE_MOVIE = "com.example.leshik.moviedb.service.action.UPDATE_MOVIE";
     static final String ACTION_UPDATE_POPULAR = "com.example.leshik.moviedb.service.action.UPDATE_POPULAR";
     static final String ACTION_UPDATE_TOPRATED = "com.example.leshik.moviedb.service.action.UPDATE_TOPRATED";
@@ -39,6 +39,7 @@ public class CacheUpdateService extends IntentService {
     static final String EXTRA_PARAM_PAGE = "com.example.leshik.moviedb.service.extra.PAGE";
     // movie_id for update movies
     static final String EXTRA_PARAM_MOVIE_ID = "com.example.leshik.moviedb.service.extra.MOVIE_ID";
+    // favorite flag for update (insert/delete) favorite's state
     static final String EXTRA_PARAM_FAVORITE_FLAG = "com.example.leshik.moviedb.service.extra.FAVORITE_FLAG";
     // File name to store shared preferences by cache update service
     public static final String CACHE_PREFS_NAME = "cache_prefs";
@@ -51,6 +52,8 @@ public class CacheUpdateService extends IntentService {
     /**
      * Starts this service to perform action UpdateMovie with the given parameters. If
      * the service is already performing a task this action will be queued.
+     * @param context - calling context
+     * @param movie_id - movie_id of the film to update
      *
      * @see IntentService
      */
@@ -64,6 +67,8 @@ public class CacheUpdateService extends IntentService {
     /**
      * Starts this service to perform action UpdateVideos with the given parameters. If
      * the service is already performing a task this action will be queued.
+     * @param context - calling context
+     * @param movie_id - movie_id of the film to update list of videos
      *
      * @see IntentService
      */
@@ -78,6 +83,9 @@ public class CacheUpdateService extends IntentService {
      * Starts this service to perform action UpdateReviews with the given parameters. If
      * the service is already performing a task this action will be queued.
      *
+     * @param context - calling context
+     * @param movie_id - movie_id of the film to update list of videos
+     * @param page - number of the review list page to update
      * @see IntentService
      */
     public static void startActionUpdateReviews(Context context, int movie_id, int page) {
@@ -91,6 +99,10 @@ public class CacheUpdateService extends IntentService {
     /**
      * Starts this service to perform action UpdateMovie with the given parameters. If
      * the service is already performing a task this action will be queued.
+     * @param context - calling context
+     * @param movie_id - movie_id of the film to update
+     * @param isFavorite - if true - insert movie into favorites table
+     *                     if false - remove from table
      *
      * @see IntentService
      */
@@ -106,6 +118,9 @@ public class CacheUpdateService extends IntentService {
      * Starts this service to perform action UpdatePopular with the given parameters. If
      * the service is already performing a task this action will be queued.
      *
+     * @param context - calling context
+     * @param page - page number to update
+     *
      * @see IntentService
      */
     public static void startActionUpdatePopular(Context context, int page) {
@@ -118,6 +133,9 @@ public class CacheUpdateService extends IntentService {
     /**
      * Starts this service to perform action UpdateToprated with the given parameters. If
      * the service is already performing a task this action will be queued.
+     *
+     * @param context - calling context
+     * @param page - page number to update
      *
      * @see IntentService
      */
@@ -132,6 +150,8 @@ public class CacheUpdateService extends IntentService {
      * Starts this service to perform action UpdateConfiguration with the given parameters. If
      * the service is already performing a task this action will be queued.
      *
+     * @param context - calling context
+     *
      * @see IntentService
      */
     public static void startActionUpdateConfiguration(Context context) {
@@ -140,6 +160,8 @@ public class CacheUpdateService extends IntentService {
         context.startService(intent);
     }
 
+    // entry method
+    // it receives intent, checks actions and call handlers with proper parameters
     @Override
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
@@ -191,10 +213,10 @@ public class CacheUpdateService extends IntentService {
         TmdbMovie movie;
 
         try {
-            // Execute and insert(a-la update) movies table via content provider call
+            // Execute and insert(a-la update) movies into table via content provider call
             movie = movieCall.execute().body();
             ContentValues values = movie.getMovieContentValues();
-            // Set last updated value
+            // Set last update time value
             long currentTime = Calendar.getInstance().getTimeInMillis();
             values.put(MoviesContract.Movies.COLUMN_NAME_LAST_UPDATED, currentTime);
             // Update movie
@@ -261,7 +283,7 @@ public class CacheUpdateService extends IntentService {
             // Insert reviews table via content provider calls
             getContentResolver().bulkInsert(MoviesContract.Reviews.CONTENT_URI, reviewsPage.getReviewsContentValues());
 
-            // queue fetching the next page if present
+            // queue fetching the next page if present (recursion)
             if (reviewsPage.page < reviewsPage.totalPages)
                 startActionUpdateReviews(getApplicationContext(), movie_id, requestPage + 1);
         } catch (IOException e) {
@@ -270,18 +292,21 @@ public class CacheUpdateService extends IntentService {
     }
 
     /**
-     * Handle action UpdateMovie in the provided background thread with the provided
+     * Handle action UpdateFavorite in the provided background thread with the provided
      * parameters.
      */
     private void handleActionUpdateFavorite(long movie_id, boolean isFavorite) {
         if (movie_id <= 0) return;
 
         if (isFavorite) {
+            // to set favorite we have to insert row in table
+            // without sort_id, because content provider's insert method state it for itself
             ContentValues values = new ContentValues();
             values.put(MoviesContract.Favorites.COLUMN_NAME_MOVIE_ID, movie_id);
             values.put(MoviesContract.Favorites.COLUMN_NAME_SORT_ID, -1);
             getContentResolver().insert(MoviesContract.Favorites.CONTENT_URI, values);
         } else {
+            // or simply remove row from favorite's table
             getContentResolver().delete(MoviesContract.Favorites.buildUri(movie_id), null, null);
         }
     }
@@ -307,7 +332,7 @@ public class CacheUpdateService extends IntentService {
             listPage = popularCall.execute().body();
 
             if (page <= 0) {
-                // If page number is not positive - first delete all data from popular table
+                // If page number is not positive - first delete all data (but not first page) from popular table
                 // and update last_update_time in the preferences
                 getContentResolver().
                         delete(MoviesContract.Popular.CONTENT_URI,
@@ -349,7 +374,7 @@ public class CacheUpdateService extends IntentService {
         try {
             listPage = topratedCall.execute().body();
             if (page <= 0) {
-                // If page number is not positive - first delete all data from popular table
+                // If page number is not positive - first delete all data (but not first page) from popular table
                 // and update last_update_time in the preferences
                 getContentResolver()
                         .delete(MoviesContract.Toprated.CONTENT_URI,
@@ -389,9 +414,11 @@ public class CacheUpdateService extends IntentService {
             TmdbConfiguration config = configCall.execute().body();
             Utils.basePosterUrl = config.images.baseUrl;
             Utils.basePosterSecureUrl = config.images.secureBaseUrl;
+
             Utils.posterSizes = new String[config.images.posterSizes.size()];
             for (int i = 0; i < config.images.posterSizes.size(); i++)
                 Utils.posterSizes[i] = config.images.posterSizes.get(i);
+
             // Store config values into shared preferences
             updateCachePreference(R.string.base_potser_url, config.images.baseUrl);
             updateCachePreference(R.string.base_potser_secure_url, config.images.secureBaseUrl);
