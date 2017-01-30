@@ -1,0 +1,16 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/full_poster_fragment_frame"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:background="@color/black_overlay"
+    tools:context="com.example.leshik.moviedb.FullPosterFragment">
+
+    <com.example.leshik.moviedb.TouchImageView
+        android:id="@+id/full_poster_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:transitionName="@string/poster_image" />
+
+</FrameLayout>

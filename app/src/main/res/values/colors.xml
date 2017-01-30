@@ -3,7 +3,15 @@
     <color name="colorPrimary">#353535</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
-    <color name="colorDetailTitleBackground">#00b4b4</color>
+    <color name="colorDetailTitleBackgroundLight">#00b4b4</color>
     <color name="colorDetailTitleForeground">#ffffff</color>
     <color name="colorOverviewForeground">#404040</color>
+
+    <color name="black_overlay">#ff000000</color>
+    <color name="grey_overlay">#80000000</color>
+    <color name="colorDividerDark">#ffffffff</color>
+    <color name="colorDividerLight">#ff000000</color>
+    <color name="colorDivider">#ff808080</color>
+
+    <color name="colorTitleBackground">#40808080</color>
 </resources>
