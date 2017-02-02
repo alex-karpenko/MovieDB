@@ -40,6 +40,7 @@ public class FullPosterFragment extends Fragment implements LoaderManager.Loader
     private String mMovieTitle;
 
     private Menu mMenu;
+    private ShareActionProvider mShareActionProvider;
     private boolean isFavorite;
 
     public FullPosterFragment() {
@@ -72,16 +73,16 @@ public class FullPosterFragment extends Fragment implements LoaderManager.Loader
         getLoaderManager().initLoader(FAVORITE_MARK_LOADER, null, this);
 
         // Setup share provider
-        // get provider's menu item
-        MenuItem shareItem = menu.findItem(R.id.action_share);
-        // ... and get provider fro it
-        ShareActionProvider myShareActionProvider =
-                (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
+        // and update share action intent
+        if (menu != null) {
+            mShareActionProvider = new ShareActionProvider(getContext());
+            MenuItemCompat.setActionProvider(menu.findItem(R.id.action_share), mShareActionProvider);
 
-        // create intent
-        Intent myShareIntent = Utils.getShareIntent(getContext(), mMovieTitle, mPosterName);
-        // set intent into provider
-        myShareActionProvider.setShareIntent(myShareIntent);
+            // create intent
+            Intent myShareIntent = Utils.getShareIntent(getContext(), mMovieTitle, mPosterName);
+            // set intent into provider
+            mShareActionProvider.setShareIntent(myShareIntent);
+        }
     }
 
     @Override
