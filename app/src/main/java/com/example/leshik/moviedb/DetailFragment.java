@@ -70,6 +70,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
     private SimpleCursorAdapter mReviewsListAdapter;
 
     private Menu mMenu;
+    private ShareActionProvider mShareActionProvider;
 
     // variables to store data for updating share action intent
     private String mPosterName;
@@ -216,8 +217,11 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
         getLoaderManager().initLoader(FAVORITE_MARK_LOADER, null, this);
 
         // and update share action intent
-        if (menu != null)
-            updateShareAction(menu.findItem(R.id.action_share), mMovieTitle, mPosterName);
+        if (menu != null) {
+            mShareActionProvider = new ShareActionProvider(getContext());
+            MenuItemCompat.setActionProvider(menu.findItem(R.id.action_share), mShareActionProvider);
+            updateShareAction(mMovieTitle, mPosterName);
+        }
     }
 
     @Override
@@ -293,7 +297,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
                     mPosterName = data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_POSTER_PATH);
                     mMovieTitle = data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_ORIGINAL_TITLE);
                     if (mMenu != null)
-                        updateShareAction(mMenu.findItem(R.id.action_share), mMovieTitle, mPosterName);
+                        updateShareAction(mMovieTitle, mPosterName);
                     // load poster image
                     Picasso.with(getActivity())
                             .load(Utils.getPosterSmallUri(mPosterName))
@@ -419,18 +423,13 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
     /**
      * Method to update share action intent after loading movie data
      *
-     * @param menuItem
      * @param title
      * @param poster
      */
-    void updateShareAction(MenuItem menuItem, String title, String poster) {
-        // Setup share provider
-        ShareActionProvider myShareActionProvider =
-                (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
-
+    void updateShareAction(String title, String poster) {
         // create intent
         Intent myShareIntent = Utils.getShareIntent(getContext(), title, poster);
         // set intent into provider
-        myShareActionProvider.setShareIntent(myShareIntent);
+        if (mShareActionProvider != null) mShareActionProvider.setShareIntent(myShareIntent);
     }
 }
