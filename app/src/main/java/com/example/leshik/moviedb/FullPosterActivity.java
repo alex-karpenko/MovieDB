@@ -9,7 +9,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 
@@ -20,7 +19,7 @@ import butterknife.ButterKnife;
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class FullPosterActivity extends AppCompatActivity {
+public class FullPosterActivity extends AppCompatActivity implements FullPosterFragment.OnImageClickCallback {
     public static final String ARG_POSTER_NAME = "POSTER_NAME";
     public static final String ARG_MOVIE_TITLE = "MOVIE_TITLE";
     public static final String ARG_MOVIE_ID = "MOVIE_ID";
@@ -169,35 +168,6 @@ public class FullPosterActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        // set touch listener on image view to toggle toolbar/title visibility state
-        TouchImageView imageView = (TouchImageView) mContentView.findViewById(R.id.full_poster_image);
-        if (imageView != null) {
-            imageView.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View view, MotionEvent motionEvent) {
-                    if (AUTO_HIDE) {
-                        delayedHide(AUTO_HIDE_DELAY_MILLIS);
-                    }
-                    toggle();
-                    return true;
-                }
-            });
-        }
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        // clear touch listener
-        TouchImageView imageView = (TouchImageView) mContentView.findViewById(R.id.full_poster_image);
-        if (imageView != null) {
-            imageView.setOnTouchListener(null);
-        }
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
@@ -245,5 +215,13 @@ public class FullPosterActivity extends AppCompatActivity {
         mHideHandler.removeCallbacks(mHidePart2Runnable);
         mHideHandler.removeCallbacks(mShowPart2Runnable);
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
+    }
+
+    @Override
+    public void onImageClicked() {
+        if (AUTO_HIDE) {
+            delayedHide(AUTO_HIDE_DELAY_MILLIS);
+        }
+        toggle();
     }
 }
