@@ -1,12 +1,12 @@
 package com.example.leshik.moviedb;
 
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -23,6 +23,10 @@ import com.example.leshik.moviedb.model.MoviesContract;
 import com.example.leshik.moviedb.service.CacheUpdateService;
 
 import java.util.Calendar;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
 
 /**
@@ -45,8 +49,12 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
     private int fragmentTabType = FAVORITES_TAB_FRAGMENT;
 
     // views in the fragment
-    private SwipeRefreshLayout mSwipeRefreshLayout;
-    private RecyclerView mRecyclerView;
+    @BindView(R.id.swiperefresh)
+    protected SwipeRefreshLayout mSwipeRefreshLayout;
+    @BindView(R.id.movies_list)
+    protected RecyclerView mRecyclerView;
+    private Unbinder unbinder;
+
     private RecyclerView.LayoutManager mLayoutManager;
 
     private MoviesRecycleListAdapter mAdapter;
@@ -89,10 +97,9 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
 
         // Inflate fragment
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.movies_list);
+        unbinder = ButterKnife.bind(this, rootView);
 
         // store view's references
-        mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swiperefresh);
         mSwipeRefreshLayout.setOnRefreshListener(this);
 
         // Create layout manager and attach it to recycle view
@@ -113,6 +120,12 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
         }
 
         return rootView;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 
     @Override
