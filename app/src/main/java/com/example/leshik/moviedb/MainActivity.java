@@ -14,6 +14,9 @@ import android.widget.ImageView;
 
 import com.example.leshik.moviedb.service.CacheUpdateService;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class MainActivity extends AppCompatActivity implements MovieListFragment.Callback, DetailFragment.Callback {
     private static final String TAG = "MainActivity";
     // tags to saved state bundle
@@ -26,8 +29,12 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
     // adapter to create fragments to pager
     private MainPagerAdapter mPagerAdapter;
 
-    private ViewPager mViewPager;
-    private TabLayout mTabLayout;
+    @BindView(R.id.main_pager)
+    protected ViewPager mViewPager;
+    @BindView(R.id.main_tabs)
+    protected TabLayout mTabLayout;
+    @BindView(R.id.main_toolbar)
+    protected Toolbar mToolbar;
 
     // current selected movie (for two pane view)
     private Uri selectedMovieUri = null;
@@ -35,8 +42,6 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Utils.loadDefaultPreferences(this);
-//        Utils.applyCurrentTheme(this);
-
         super.onCreate(savedInstanceState);
 
         // restore base URLs from shared config
@@ -46,25 +51,23 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
         CacheUpdateService.startActionUpdateConfiguration(this);
 
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
 
         // check if the details container is present - two pane layout was loaded
         if (findViewById(R.id.detail_container) != null) {
             Utils.setTwoPane(true);
         } else Utils.setTwoPane(false);
 
-        Toolbar mToolbar = (Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(mToolbar);
 
         // create pager adapter and set it to the pager view
         mPagerAdapter = new MainPagerAdapter(getSupportFragmentManager());
-        mViewPager = (ViewPager) findViewById(R.id.main_pager);
         mViewPager.setAdapter(mPagerAdapter);
 
         // Get list of tab's titles from resources
         tabFragmentNames = getResources().getStringArray(R.array.main_tab_names);
 
         // Assign pager to tab layout
-        mTabLayout = (TabLayout) findViewById(R.id.main_tabs);
         mTabLayout.setupWithViewPager(mViewPager);
 
         // restore state, if it was save

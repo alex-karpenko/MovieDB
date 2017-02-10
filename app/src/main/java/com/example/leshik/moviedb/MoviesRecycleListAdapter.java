@@ -13,6 +13,9 @@ import android.widget.ImageView;
 import com.example.leshik.moviedb.model.MoviesContract;
 import com.squareup.picasso.Picasso;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * Created by Leshik on 27.12.2016.
  *
@@ -52,11 +55,12 @@ class MoviesRecycleListAdapter extends CursorRecyclerViewAdapter<MoviesRecycleLi
 
 
     static class ViewHolder extends RecyclerView.ViewHolder {
+        @BindView(R.id.poster_image)
         ImageView mPosterView;
 
         ViewHolder(View itemView) {
             super(itemView);
-            mPosterView = (ImageView) itemView.findViewById(R.id.poster_image);
+            ButterKnife.bind(this, itemView);
         }
     }
 }

@@ -20,6 +20,10 @@ import com.example.leshik.moviedb.model.MoviesContract;
 import com.example.leshik.moviedb.service.CacheUpdateService;
 import com.squareup.picasso.Picasso;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -42,6 +46,11 @@ public class FullPosterFragment extends Fragment implements LoaderManager.Loader
     private Menu mMenu;
     private ShareActionProvider mShareActionProvider;
     private boolean isFavorite;
+
+    @BindView(R.id.full_poster_image)
+    protected TouchImageView mPosterImage;
+    private Unbinder unbinder;
+
 
     public FullPosterFragment() {
         // Required empty public constructor
@@ -131,15 +140,21 @@ public class FullPosterFragment extends Fragment implements LoaderManager.Loader
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View rootView = inflater.inflate(R.layout.fragment_full_poster, container, false);
-
         // Inflate the layout for this fragment
-        TouchImageView mPosterImage = (TouchImageView) rootView.findViewById(R.id.full_poster_image);
+        View rootView = inflater.inflate(R.layout.fragment_full_poster, container, false);
+        unbinder = ButterKnife.bind(this, rootView);
+
         Picasso.with(getActivity())
                 .load(Utils.getPosterFullUri(mPosterName))
                 .into(mPosterImage);
 
         return rootView;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 
     @Override

@@ -9,6 +9,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * Activity class for deal with detail movie information
  * It starts from MainActivity by clicking on the poster image in list
@@ -19,13 +22,17 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
     private static final String MOVIE_URI = "MOVIE_URI";
     Uri mUri;
 
+    @BindView(R.id.detail_toolbar)
+    protected Toolbar mToolbar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Utils.applyCurrentTheme(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
-        Toolbar mToolbar = (Toolbar) findViewById(R.id.detail_toolbar);
+        ButterKnife.bind(this);
+
         setSupportActionBar(mToolbar);
 
         // Get a support ActionBar corresponding to this toolbar

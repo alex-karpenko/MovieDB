@@ -13,6 +13,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
@@ -49,8 +52,12 @@ public class FullPosterActivity extends AppCompatActivity {
     private final Handler mHideHandler = new Handler();
 
     // views to fast access
-    private View mContentView;
-    private TextView mTitleView;
+    @BindView(R.id.fullscreen_content)
+    protected View mContentView;
+    @BindView(R.id.full_poster_title)
+    protected TextView mTitleView;
+    @BindView(R.id.poster_toolbar)
+    protected Toolbar mToolbar;
 
     // runnable to hide views after start
     private final Runnable mHideRunnable = new Runnable() {
@@ -93,8 +100,8 @@ public class FullPosterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_full_poster);
+        ButterKnife.bind(this);
 
-        Toolbar mToolbar = (Toolbar) findViewById(R.id.poster_toolbar);
         setSupportActionBar(mToolbar);
         // set semi-transparent toolbar's background
         mToolbar.getBackground().setAlpha(128);
@@ -108,9 +115,6 @@ public class FullPosterActivity extends AppCompatActivity {
         }
 
         mVisible = true;
-
-        mContentView = findViewById(R.id.fullscreen_content);
-        mTitleView = (TextView) findViewById(R.id.full_poster_title);
 
         if (savedInstanceState == null) {
             // get poster image name from intent
