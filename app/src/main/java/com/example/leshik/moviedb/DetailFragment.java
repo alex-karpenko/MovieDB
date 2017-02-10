@@ -32,6 +32,10 @@ import com.squareup.picasso.Picasso;
 
 import java.util.Calendar;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
+
 /**
  * Fragment class with detail info about movie
  * Information. From intent gets URI with movie
@@ -51,20 +55,33 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
     private long movieId;
 
     // references for all views
-    private ImageView mPosterImage;
-    private TextView mTitleText;
-    private TextView mReleasedText;
-    private TextView mRuntimeText;
-    private TextView mRatingText;
-    private TextView mOverviewText;
+    @BindView(R.id.poster_image)
+    protected ImageView mPosterImage;
+    @BindView(R.id.detail_title)
+    protected TextView mTitleText;
+    @BindView(R.id.detail_released)
+    protected TextView mReleasedText;
+    @BindView(R.id.detail_runtime)
+    protected TextView mRuntimeText;
+    @BindView(R.id.detail_rating)
+    protected TextView mRatingText;
+    @BindView(R.id.detail_overview)
+    protected TextView mOverviewText;
 
-    private SwipeRefreshLayout mSwipeRefreshLayout;
+    @BindView(R.id.swiperefresh)
+    protected SwipeRefreshLayout mSwipeRefreshLayout;
 
-    private LinearLayout mVideosListLayout;
-    private LinearLayout mReviewsListLayout;
+    @BindView(R.id.videos_layout)
+    protected LinearLayout mVideosListLayout;
+    @BindView(R.id.reviews_layout)
+    protected LinearLayout mReviewsListLayout;
 
-    private TableLayout mReviewsListTable;
-    private TableLayout mVideosListTable;
+    @BindView(R.id.videos_list)
+    protected TableLayout mVideosListTable;
+    @BindView(R.id.reviews_list)
+    protected TableLayout mReviewsListTable;
+
+    private Unbinder unbinder;
 
     private SimpleCursorAdapter mVideosListAdapter;
     private SimpleCursorAdapter mReviewsListAdapter;
@@ -107,29 +124,12 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
 
         // Inflate fragment
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
+        unbinder = ButterKnife.bind(this, rootView);
 
-        // Store views references for faster access during updates
-        mPosterImage = (ImageView) rootView.findViewById(R.id.poster_image);
-        mTitleText = (TextView) rootView.findViewById(R.id.detail_title);
-        mReleasedText = (TextView) rootView.findViewById(R.id.detail_released);
-        mRuntimeText = (TextView) rootView.findViewById(R.id.detail_runtime);
-        mRatingText = (TextView) rootView.findViewById(R.id.detail_rating);
-        mOverviewText = (TextView) rootView.findViewById(R.id.detail_overview);
-
-        // for swipe refresh
-        mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swiperefresh);
         mSwipeRefreshLayout.setOnRefreshListener(this);
 
-        // list of videos (as table)
-        mVideosListLayout = (LinearLayout) rootView.findViewById(R.id.videos_layout);
-        mVideosListTable = (TableLayout) rootView.findViewById(R.id.videos_list);
         // hide it until load data
         mVideosListLayout.setVisibility(View.GONE);
-
-        // list on reviews (as table)
-        mReviewsListLayout = (LinearLayout) rootView.findViewById(R.id.reviews_layout);
-        mReviewsListTable = (TableLayout) rootView.findViewById(R.id.reviews_list);
-        // hide it until load data
         mReviewsListLayout.setVisibility(View.GONE);
 
         // set videos list adapter with empty cursor
@@ -146,7 +146,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
             public boolean setViewValue(View view, Cursor cursor, int i) {
                 if (i == MoviesContract.Videos.DETAIL_PROJECTION_INDEX_NAME) {
                     // text view with video title
-                    TextView titleView = (TextView) view.findViewById(R.id.videos_list_item_title);
+                    TextView titleView = ButterKnife.findById(view, R.id.videos_list_item_title);
                     titleView.setText(cursor.getString(i)); // set text from cursor data
                     // tag view with youtube video key
                     view.setTag(cursor.getString(MoviesContract.Videos.DETAIL_PROJECTION_INDEX_KEY));
@@ -196,6 +196,12 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
         });
 
         return rootView;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 
     @Override
