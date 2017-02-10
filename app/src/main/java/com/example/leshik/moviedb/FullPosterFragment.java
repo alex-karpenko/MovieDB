@@ -18,11 +18,14 @@ import android.view.ViewGroup;
 
 import com.example.leshik.moviedb.model.MoviesContract;
 import com.example.leshik.moviedb.service.CacheUpdateService;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import uk.co.senab.photoview.PhotoView;
+import uk.co.senab.photoview.PhotoViewAttacher;
 
 
 /**
@@ -31,6 +34,7 @@ import butterknife.Unbinder;
  * create an instance of this fragment.
  */
 public class FullPosterFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+    private static final String TAG = "FullPosterFragment";
     // state and fragment's arguments markers
     private static final String ARG_POSTER_NAME = "POSTER_NAME";
     private static final String ARG_MOVIE_ID = "MOVIE_ID";
@@ -48,7 +52,7 @@ public class FullPosterFragment extends Fragment implements LoaderManager.Loader
     private boolean isFavorite;
 
     @BindView(R.id.full_poster_image)
-    protected TouchImageView mPosterImage;
+    protected PhotoView mPosterImage;
     private Unbinder unbinder;
 
 
@@ -144,9 +148,31 @@ public class FullPosterFragment extends Fragment implements LoaderManager.Loader
         View rootView = inflater.inflate(R.layout.fragment_full_poster, container, false);
         unbinder = ButterKnife.bind(this, rootView);
 
+        final PhotoViewAttacher attacher = new PhotoViewAttacher(mPosterImage);
+        attacher.setOnPhotoTapListener(new PhotoViewAttacher.OnPhotoTapListener() {
+            @Override
+            public void onPhotoTap(View view, float x, float y) {
+                onImageClicked();
+            }
+
+            @Override
+            public void onOutsidePhotoTap() {
+                onImageClicked();
+            }
+        });
+
         Picasso.with(getActivity())
                 .load(Utils.getPosterFullUri(mPosterName))
-                .into(mPosterImage);
+                .into(mPosterImage, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        attacher.update();
+                    }
+
+                    @Override
+                    public void onError() {
+                    }
+                });
 
         return rootView;
     }
@@ -189,5 +215,13 @@ public class FullPosterFragment extends Fragment implements LoaderManager.Loader
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
+    }
+
+    interface OnImageClickCallback {
+        void onImageClicked();
+    }
+
+    private void onImageClicked() {
+        ((FullPosterActivity) getActivity()).onImageClicked();
     }
 }
