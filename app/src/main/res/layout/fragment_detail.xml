@@ -52,6 +52,7 @@
                     android:cropToPadding="true"
                     android:paddingLeft="@dimen/detail_left_margin"
                     android:paddingTop="@dimen/detail_interviews_padding"
+                    android:src="@mipmap/interstellar"
                     android:transitionName="@string/poster_image" />
 
                 <!-- text info (release date, rating) -->
@@ -103,6 +104,19 @@
                 <!-- end of middle block (poster + info) -->
             </LinearLayout>
 
+            <!-- homepage -->
+            <TextView
+                android:id="@+id/detail_homepage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingEnd="@dimen/detail_right_margin"
+                android:paddingLeft="@dimen/detail_left_margin"
+                android:paddingRight="@dimen/detail_right_margin"
+                android:paddingStart="@dimen/detail_left_margin"
+                android:paddingTop="@dimen/detail_title_vertical_margin"
+                android:text="---"
+                android:autoLink="web"
+                android:visibility="gone" />
             <!-- Overview -->
             <TextView
                 android:id="@+id/detail_overview"
