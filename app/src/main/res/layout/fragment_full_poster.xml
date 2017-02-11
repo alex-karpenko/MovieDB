@@ -7,6 +7,13 @@
     android:background="@color/black_overlay"
     tools:context="com.example.leshik.moviedb.FullPosterFragment">
 
+    <android.support.v4.widget.ContentLoadingProgressBar
+        android:id="@+id/full_poster_progressbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_gravity="center" />
+
     <uk.co.senab.photoview.PhotoView
         android:id="@+id/full_poster_image"
         android:layout_width="match_parent"

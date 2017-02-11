@@ -8,6 +8,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.ContentLoadingProgressBar;
 import android.support.v7.widget.ShareActionProvider;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -53,6 +54,8 @@ public class FullPosterFragment extends Fragment implements LoaderManager.Loader
 
     @BindView(R.id.full_poster_image)
     protected PhotoView mPosterImage;
+    @BindView(R.id.full_poster_progressbar)
+    protected ContentLoadingProgressBar mProgressBar;
     private Unbinder unbinder;
 
 
@@ -161,11 +164,14 @@ public class FullPosterFragment extends Fragment implements LoaderManager.Loader
             }
         });
 
+        mProgressBar.show();
+
         Picasso.with(getActivity())
                 .load(Utils.getPosterFullUri(mPosterName))
                 .into(mPosterImage, new Callback() {
                     @Override
                     public void onSuccess() {
+                        mProgressBar.hide();
                         attacher.update();
                     }
 
