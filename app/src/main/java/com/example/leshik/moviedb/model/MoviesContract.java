@@ -63,7 +63,8 @@ public final class MoviesContract {
                 COLUMN_NAME_RELEASE_DATE,
                 COLUMN_NAME_VOTE_AVERAGE,
                 COLUMN_NAME_RUNTIME,
-                COLUMN_NAME_LAST_UPDATED
+                COLUMN_NAME_LAST_UPDATED,
+                COLUMN_NAME_HOMEPAGE
         };
         // ... and indexes for it
         public static final int DETAIL_PROJECTION_INDEX_ID = 0;
@@ -75,6 +76,7 @@ public final class MoviesContract {
         public static final int DETAIL_PROJECTION_INDEX_VOTE_AVERAGE = 6;
         public static final int DETAIL_PROJECTION_INDEX_RUNTIME = 7;
         public static final int DETAIL_PROJECTION_INDEX_LAST_UPDATED = 8;
+        public static final int DETAIL_PROJECTION_INDEX_HOMEPAGE = 9;
         // Create table sql-statement
         static final String CREATE_TABLE_STATEMENT = "CREATE TABLE " + TABLE_NAME + " (" +
                 _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
