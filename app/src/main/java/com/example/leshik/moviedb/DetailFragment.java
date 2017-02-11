@@ -67,6 +67,8 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
     protected TextView mRatingText;
     @BindView(R.id.detail_overview)
     protected TextView mOverviewText;
+    @BindView(R.id.detail_homepage)
+    protected TextView mHomepageText;
 
     @BindView(R.id.swiperefresh)
     protected SwipeRefreshLayout mSwipeRefreshLayout;
@@ -320,6 +322,16 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
                         mRuntimeText.setText("-");
                     }
                     mRatingText.setText(String.format("%.1f/10", data.getFloat(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_VOTE_AVERAGE)));
+
+                    // Set homepage link, if present
+                    String homePage = data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_HOMEPAGE);
+                    if (homePage != null && homePage.length() > 0) {
+                        mHomepageText.setText("Homepage: " + homePage);
+                        mHomepageText.setVisibility(View.VISIBLE);
+                    } else {
+                        mHomepageText.setVisibility(View.GONE);
+                    }
+
                     mOverviewText.setText(data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_OVERVIEW));
                 }
                 // Update movie cache if need
