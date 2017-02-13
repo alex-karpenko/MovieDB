@@ -6,10 +6,12 @@ package com.example.leshik.moviedb.service;
 
 import android.content.ContentValues;
 
+import com.example.leshik.moviedb.model.Movie;
 import com.example.leshik.moviedb.model.MoviesContract;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -174,5 +176,25 @@ public class TmdbMovie {
         returnValues.put(MoviesContract.Movies.COLUMN_NAME_RUNTIME, runtime);
 
         return returnValues;
+    }
+
+    // helper class to fill values as realm POJO class instance
+    public Movie getMovieInstance() {
+        Movie movie = new Movie();
+
+        movie.setMovieId(id);
+        movie.setOriginalTitle(originalTitle);
+        movie.setOverview(overview);
+        movie.setReleaseDate(releaseDate);
+        movie.setVoteAverage(voteAverage);
+        movie.setPopularity(popularity);
+        movie.setPosterPath(posterPath);
+        movie.setHomePage(homepage);
+        movie.setAdult(adult);
+        movie.setVideo(video);
+        movie.setRunTime(runtime);
+        movie.setLastUpdate(Calendar.getInstance().getTimeInMillis());
+
+        return movie;
     }
 }

@@ -6,11 +6,14 @@ package com.example.leshik.moviedb.service;
 
 import android.content.ContentValues;
 
+import com.example.leshik.moviedb.model.Movie;
 import com.example.leshik.moviedb.model.MoviesContract;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
+
+import io.realm.RealmList;
 
 /**
  * template class to convert JSON answer from API to data class
@@ -141,6 +144,31 @@ public class TmdbListPage {
             returnValues[i].put(MoviesContract.Movies.COLUMN_NAME_POSTER_PATH, res.posterPath);
             returnValues[i].put(MoviesContract.Movies.COLUMN_NAME_ADULT, res.adult);
             returnValues[i].put(MoviesContract.Movies.COLUMN_NAME_VIDEO, res.video);
+        }
+
+        return returnValues;
+    }
+
+    public RealmList<Movie> getMoviesListInstance() {
+        if (listResults == null) return null;
+
+        int resultsSize = listResults.size();
+        if (resultsSize == 0) return null;
+
+        RealmList<Movie> returnValues = new RealmList<>();
+        for (int i = 0; i < resultsSize; i++) {
+            ListResult res = listResults.get(i);
+            Movie movie = new Movie();
+            movie.setMovieId(res.id);
+            movie.setOriginalTitle(res.originalTitle);
+            movie.setOverview(res.overview);
+            movie.setReleaseDate(res.releaseDate);
+            movie.setVoteAverage(res.voteAverage);
+            movie.setPopularity(res.popularity);
+            movie.setPosterPath(res.posterPath);
+            movie.setAdult(res.adult);
+            movie.setVideo(res.video);
+            returnValues.add(movie);
         }
 
         return returnValues;
