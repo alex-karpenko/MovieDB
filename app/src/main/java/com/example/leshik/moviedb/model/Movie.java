@@ -1,9 +1,9 @@
 package com.example.leshik.moviedb.model;
 
 import io.realm.Realm;
+import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
-import io.realm.annotations.Required;
 
 /**
  * Created by alex on 2/12/17.
@@ -11,18 +11,13 @@ import io.realm.annotations.Required;
 
 public class Movie extends RealmObject {
     @PrimaryKey
-    private int movieId;
+    private long movieId;
 
-    @Required
     private String originalTitle;
-    @Required
     private String overview;
-    @Required
     private String releaseDate;
-    @Required
     private Float voteAverage;
     private Float popularity;
-    @Required
     private String posterPath;
     private String homePage;
     private Boolean adult;
@@ -30,12 +25,18 @@ public class Movie extends RealmObject {
     private Integer runTime;
     private Long lastUpdate;
 
+    private RealmList<Video> videos;
+    private RealmList<Review> reviews;
+
+    private Integer favoritePosition;
+    private Integer popularPosition;
+    private Integer topratedPosition;
 
     public void updateNullFieldsFromExist(Realm realm) {
         Movie movie = realm.where(Movie.class).equalTo("movieId", getMovieId()).findFirst();
         if (movie != null) {
             if (originalTitle == null) originalTitle = movie.getOriginalTitle();
-            if (overview == null) originalTitle = movie.getOriginalTitle();
+            if (overview == null) originalTitle = movie.getOverview();
             if (releaseDate == null) releaseDate = movie.getReleaseDate();
             if (voteAverage == null) voteAverage = movie.getVoteAverage();
             if (popularity == null) popularity = movie.getPopularity();
@@ -47,11 +48,11 @@ public class Movie extends RealmObject {
         }
     }
 
-    public int getMovieId() {
+    public long getMovieId() {
         return movieId;
     }
 
-    public void setMovieId(int movieId) {
+    public void setMovieId(long movieId) {
         this.movieId = movieId;
     }
 
@@ -141,5 +142,45 @@ public class Movie extends RealmObject {
 
     public void setLastUpdate(Long lastUpdate) {
         this.lastUpdate = lastUpdate;
+    }
+
+    public Integer getFavoritePosition() {
+        return favoritePosition;
+    }
+
+    public void setFavoritePosition(Integer favoritePosition) {
+        this.favoritePosition = favoritePosition;
+    }
+
+    public Integer getPopularPosition() {
+        return popularPosition;
+    }
+
+    public void setPopularPosition(Integer popularPosition) {
+        this.popularPosition = popularPosition;
+    }
+
+    public Integer getTopratedPosition() {
+        return topratedPosition;
+    }
+
+    public void setTopratedPosition(Integer topratedPosition) {
+        this.topratedPosition = topratedPosition;
+    }
+
+    public RealmList<Video> getVideos() {
+        return videos;
+    }
+
+    public void setVideos(RealmList<Video> videos) {
+        this.videos = videos;
+    }
+
+    public RealmList<Review> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(RealmList<Review> reviews) {
+        this.reviews = reviews;
     }
 }
