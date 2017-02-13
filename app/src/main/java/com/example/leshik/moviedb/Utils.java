@@ -248,4 +248,8 @@ public final class Utils {
 
         return i;
     }
+
+    public static String getApiKey() {
+        return BuildConfig.THE_MOVIE_DB_API_KEY;
+    }
 }
