@@ -9,6 +9,7 @@ import com.example.leshik.moviedb.data.interfaces.MovieInteractor;
 import com.example.leshik.moviedb.data.model.Movie;
 
 import io.reactivex.Observable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
@@ -31,21 +32,16 @@ public class Repository implements MovieInteractor {
 
         movieFromDb = readMovieFromDb(movieId);
         movieFromApi = readMovieFromApi(movieId)
-                .map(new Function<Movie, Long>() {
+                .doOnNext(new Consumer<Movie>() {
                     @Override
-                    public Long apply(Movie movie) throws Exception {
-                        return writeMovieToDb(movie);
-                    }
-                })
-                .map(new Function<Long, Movie>() {
-                    @Override
-                    public Movie apply(Long aLong) throws Exception {
-                        return readMovieFromDb(aLong);
+                    public void accept(Movie movie) throws Exception {
+                        writeMovieToDb(movie);
                     }
                 });
 
-        if (movieFromDb != null)
-            movieFromApi = movieFromApi.mergeWith(Observable.just(movieFromDb));
+        if (movieFromDb != null) {
+            movieFromApi = movieFromApi.mergeWith(Observable.just(movieFromDb).subscribeOn(Schedulers.io()));
+        }
 
         return movieFromApi;
     }
@@ -61,7 +57,7 @@ public class Repository implements MovieInteractor {
     Movie findMovieFromDb(Realm realm, long movieId) {
         Movie movie = realm.where(Movie.class).equalTo("movieId", movieId).findFirst();
         if (movie != null && movie.isValid()) return realm.copyFromRealm(movie);
-            else return null;
+        else return null;
     }
 
     long writeMovieToDb(final Movie newMovie) {
