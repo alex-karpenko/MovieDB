@@ -9,5 +9,7 @@ import io.reactivex.Observable;
  */
 
 public interface MovieInteractor {
-    Observable<Movie> getMovie(long movieId);
+    Observable<Movie> getMovie(long movieId, boolean forceReload);
+
+    void setFavoriteFlag(long movieId, boolean isFavorite);
 }

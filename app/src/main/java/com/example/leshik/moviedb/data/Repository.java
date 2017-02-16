@@ -13,6 +13,7 @@ import com.example.leshik.moviedb.data.model.Review;
 import com.example.leshik.moviedb.data.model.Video;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.functions.BiFunction;
@@ -33,7 +34,7 @@ public class Repository implements MovieInteractor {
     }
 
     @Override
-    public Observable<Movie> getMovie(final long movieId) {
+    public Observable<Movie> getMovie(final long movieId, boolean forceReload) {
         Observable<Movie> movieFromApi;
         Movie movieFromDb;
 
@@ -59,14 +60,56 @@ public class Repository implements MovieInteractor {
                         writeMovieToDb(movie);
                     }
                 })
+                .map(new Function<Movie, Movie>() {
+                    @Override
+                    public Movie apply(Movie movie) throws Exception {
+                        movie.setOriginalTitle("API: " + movie.getOriginalTitle());
+                        return movie;
+                    }
+                })
+                .delay(1, TimeUnit.SECONDS)
         ;
 
         if (movieFromDb != null) {
             movieFromApi = movieFromApi
-                    .mergeWith(Observable.just(movieFromDb).subscribeOn(Schedulers.io()));
+                    .mergeWith(
+                            Observable.just(movieFromDb)
+                                    .subscribeOn(Schedulers.io())
+                                    .map(new Function<Movie, Movie>() {
+                                        @Override
+                                        public Movie apply(Movie movie) throws Exception {
+                                            movie.setOriginalTitle("DB: " + movie.getOriginalTitle());
+                                            return movie;
+                                        }
+                                    }));
         }
 
         return movieFromApi;
+    }
+
+    @Override
+    public void setFavoriteFlag(final long movieId, final boolean isFavorite) {
+        Realm realm = DataUtils.getRealmInstance(context);
+
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                Movie movie = realm.where(Movie.class).equalTo("movieId", movieId).findFirst();
+                if (movie != null) {
+                    if (isFavorite) {
+                        Integer newPosition;
+                        Number max = realm.where(Movie.class).max("favoritePosition");
+                        if (max == null) newPosition = 1;
+                        else newPosition = max.intValue() + 1;
+                        movie.setFavoritePosition(newPosition);
+                    } else {
+                        movie.setFavoritePosition(-1);
+                    }
+                }
+            }
+        });
+
+        realm.close();
     }
 
     private ApiService getApiServiceInstance() {
@@ -83,7 +126,8 @@ public class Repository implements MovieInteractor {
 
     private Movie findMovieFromDb(Realm realm, long movieId) {
         Movie movie = realm.where(Movie.class).equalTo("movieId", movieId).findFirst();
-        if (movie != null && movie.isValid()) return realm.copyFromRealm(movie);
+        if (movie != null && movie.isValid())
+            return realm.copyFromRealm(movie);
         else return null;
     }
 
@@ -138,7 +182,6 @@ public class Repository implements MovieInteractor {
 
     private Observable<List<Review>> readReviewListFromApi(final long movieId) {
         final ApiService service = getApiServiceInstance();
-        final int totalPages = 0;
 
         Observable<List<Review>> reviewList =
                 service.getReviews(movieId, Utils.getApiKey(), 1)
@@ -146,7 +189,6 @@ public class Repository implements MovieInteractor {
                         .map(new Function<ReviewsResponse, List<Review>>() {
                             @Override
                             public List<Review> apply(ReviewsResponse reviewsResponse) throws Exception {
-//                        totalPages = reviewsResponse.totalPages;
                                 return reviewsResponse.getReviewListInstance();
                             }
                         });

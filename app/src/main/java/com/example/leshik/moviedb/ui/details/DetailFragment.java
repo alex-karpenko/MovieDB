@@ -2,7 +2,6 @@ package com.example.leshik.moviedb.ui.details;
 
 import android.content.ContentUris;
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -18,17 +17,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
 import com.example.leshik.moviedb.R;
 import com.example.leshik.moviedb.Utils;
-import com.example.leshik.moviedb.data.MoviesContract;
 import com.example.leshik.moviedb.data.Repository;
 import com.example.leshik.moviedb.data.interfaces.MovieInteractor;
 import com.example.leshik.moviedb.data.model.Movie;
-import com.example.leshik.moviedb.service.CacheUpdateService;
+import com.example.leshik.moviedb.data.model.Review;
+import com.example.leshik.moviedb.data.model.Video;
 import com.ms.square.android.expandabletextview.ExpandableTextView;
 import com.squareup.picasso.Picasso;
 
@@ -81,9 +79,6 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
     protected TableLayout mReviewsListTable;
 
     private Unbinder unbinder;
-
-    private SimpleCursorAdapter mVideosListAdapter;
-    private SimpleCursorAdapter mReviewsListAdapter;
 
     private Menu mMenu;
     private ShareActionProvider mShareActionProvider;
@@ -146,56 +141,6 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
         mSwipeRefreshLayout.setOnRefreshListener(this);
 
-        // set videos list adapter with empty cursor
-        mVideosListAdapter = new SimpleCursorAdapter(getContext(),
-                R.layout.videos_list_item,
-                null, // cursor
-                new String[]{MoviesContract.Videos.COLUMN_NAME_NAME},
-                new int[]{R.id.videos_list_item_frame}, // dest. view is root table (for create onClick listener for whole view)
-                0);
-        // we need separate view binder because our view is not a simple text view
-        // and we need onClick listener to start video watching via youtube
-        mVideosListAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
-            @Override
-            public boolean setViewValue(View view, Cursor cursor, int i) {
-                if (i == MoviesContract.Videos.DETAIL_PROJECTION_INDEX_NAME) {
-                    // text view with video title
-                    TextView titleView = ButterKnife.findById(view, R.id.videos_list_item_title);
-                    titleView.setText(cursor.getString(i)); // set text from cursor data
-                    // tag view with youtube video key
-                    view.setTag(cursor.getString(MoviesContract.Videos.DETAIL_PROJECTION_INDEX_KEY));
-                    view.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            // start video watching, key of the video we extract from view's tag
-                            Utils.watchYoutubeVideo(getContext(), (String) view.getTag());
-                        }
-                    });
-                    return true;
-                }
-                return false;
-            }
-        });
-
-        // adapter for reviews
-        mReviewsListAdapter = new SimpleCursorAdapter(getContext(),
-                R.layout.reviews_list_item,
-                null, // cursor
-                new String[]{MoviesContract.Reviews.COLUMN_NAME_AUTHOR, MoviesContract.Reviews.COLUMN_NAME_CONTENT},
-                new int[]{R.id.reviews_list_item_author, R.id.reviews_list_item_content},
-                0);
-        // we need separate view binder because our view is not a simple text
-        mReviewsListAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
-            @Override
-            public boolean setViewValue(View view, Cursor cursor, int i) {
-                if (i == MoviesContract.Reviews.DETAIL_PROJECTION_INDEX_CONTENT) {
-                    ((ExpandableTextView) view).setText(cursor.getString(i));
-                    return true;
-                }
-                return false;
-            }
-        });
-
         isFavorite = false;
 
         // set onClick listener for poster image
@@ -209,22 +154,14 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
             }
         });
 
-        subscription.add(mRepository
-                .getMovie(movieId)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<Movie>() {
-                    @Override
-                    public void accept(Movie movie) throws Exception {
-                        updateUi(movie);
-                    }
-                }));
+        subscribeToMovie(movieId, false);
 
         return rootView;
     }
 
     @Override
     public void onDestroyView() {
-        subscription.dispose();
+        unsubscribeFromMovie();
         unbinder.unbind();
 
         super.onDestroyView();
@@ -242,6 +179,8 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
             mShareActionProvider = new ShareActionProvider(getContext());
             MenuItemCompat.setActionProvider(menu.findItem(R.id.action_share), mShareActionProvider);
             updateShareAction(mMovieTitle, mPosterName);
+
+            Utils.setFavoriteIcon(isFavorite, mMenu);
         }
     }
 
@@ -260,8 +199,9 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
             isFavorite = !isFavorite;
             // and change mark on the menu with dependence on the theme
             Utils.setFavoriteIcon(isFavorite, mMenu);
-            // update favorites table via service on work thread
-            CacheUpdateService.startActionUpdateFavorite(getActivity(), movieId, isFavorite);
+            // update favorite flag in the db
+            mRepository.setFavoriteFlag(movieId, isFavorite);
+
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -269,6 +209,18 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     // starting intent services to update cache tables
     void refreshCurrentMovie() {
+        // TODO: rewrite Repository.getMovie() to be able to check update interval and to force reload movie
+
+        subscription.clear();
+        subscription.add(mRepository
+                .getMovie(movieId, true)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<Movie>() {
+                    @Override
+                    public void accept(Movie movie) throws Exception {
+                        updateUi(movie);
+                    }
+                }));
     }
 
     // swipe refresh layout callback
@@ -303,12 +255,16 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
     }
 
     private void updateUi(Movie movie) {
+        // stop refresh circle
+        mSwipeRefreshLayout.setRefreshing(false);
+
         // update variables for share action provider
         mPosterName = movie.getPosterPath();
         mMovieTitle = movie.getOriginalTitle();
 
         if (mMenu != null)
             updateShareAction(mMovieTitle, mPosterName);
+
         // load poster image
         Picasso.with(getActivity())
                 .load(Utils.getPosterSmallUri(mPosterName))
@@ -326,7 +282,7 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
         } else {
             mRuntimeText.setText("-");
         }
-        
+
         mRatingText.setText(String.format("%.1f/10", movie.getVoteAverage()));
 
         // Set homepage link, if present
@@ -339,5 +295,73 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
         }
 
         mOverviewText.setText(movie.getOverview());
+
+        // Inflater for creating reviews and videos lists
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+        // Review list
+        mReviewsListTable.removeAllViews();
+        if (movie.getReviews() != null && movie.getReviews().size() > 0) {
+            for (Review r : movie.getReviews()) {
+                View v = inflater.inflate(R.layout.reviews_list_item, mReviewsListTable, false);
+
+                TextView authorView = ButterKnife.findById(v, R.id.reviews_list_item_author);
+                ExpandableTextView contentView = ButterKnife.findById(v, R.id.reviews_list_item_content);
+
+                authorView.setText(r.getAuthor());
+                contentView.setText(r.getContent());
+
+                mReviewsListTable.addView(v);
+            }
+
+            mReviewsListLayout.setVisibility(View.VISIBLE);
+        } else mReviewsListLayout.setVisibility(View.GONE);
+
+        // Video list
+        mVideosListTable.removeAllViews();
+        if (movie.getVideos() != null && movie.getVideos().size() > 0) {
+            for (Video video : movie.getVideos()) {
+                View v = inflater.inflate(R.layout.videos_list_item, mVideosListTable, false);
+
+                TextView titleView = ButterKnife.findById(v, R.id.videos_list_item_title);
+                titleView.setText(video.getName());
+
+                // setup listener
+                v.setTag(video.getKey());
+                v.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        // start video watching, key of the video we extract from view's tag
+                        Utils.watchYoutubeVideo(getContext(), (String) view.getTag());
+                    }
+                });
+
+                mVideosListTable.addView(v);
+            }
+            mVideosListLayout.setVisibility(View.VISIBLE);
+        } else mVideosListLayout.setVisibility(View.GONE);
+
+        // Favorite mark
+        isFavorite = false;
+        if (movie.getFavoritePosition() != null && movie.getFavoritePosition() >= 0) {
+            isFavorite = true;
+        }
+        // and update mark
+        Utils.setFavoriteIcon(isFavorite, mMenu);
+    }
+
+    private void subscribeToMovie(long movieId, boolean forceReload) {
+        subscription.add(mRepository.getMovie(movieId, forceReload)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<Movie>() {
+                    @Override
+                    public void accept(Movie movie) throws Exception {
+                        updateUi(movie);
+                    }
+                }));
+
+    }
+
+    private void unsubscribeFromMovie() {
+        subscription.dispose();
     }
 }
