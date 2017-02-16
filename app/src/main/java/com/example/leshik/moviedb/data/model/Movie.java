@@ -1,6 +1,7 @@
 package com.example.leshik.moviedb.data.model;
 
-import io.realm.Realm;
+import java.util.List;
+
 import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
@@ -180,6 +181,15 @@ public class Movie extends RealmObject {
         this.videos = videos;
     }
 
+    public void setVideos(List<Video> videos) {
+        if (this.videos == null)
+            this.videos = new RealmList<>();
+
+        if (videos != null)
+            for (Video v : videos)
+                this.videos.add(v);
+    }
+
     public RealmList<Review> getReviews() {
         return reviews;
     }
@@ -187,4 +197,12 @@ public class Movie extends RealmObject {
     public void setReviews(RealmList<Review> reviews) {
         this.reviews = reviews;
     }
+
+    public void setReviews(List<Review> reviews) {
+        if (this.reviews == null)
+            this.reviews = new RealmList<>();
+        if (reviews != null)
+            for (Review r : reviews) this.reviews.add(r);
+    }
+
 }

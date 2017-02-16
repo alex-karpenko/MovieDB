@@ -146,10 +146,6 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
         mSwipeRefreshLayout.setOnRefreshListener(this);
 
-        // hide it until load data
-        mVideosListLayout.setVisibility(View.GONE);
-        mReviewsListLayout.setVisibility(View.GONE);
-
         // set videos list adapter with empty cursor
         mVideosListAdapter = new SimpleCursorAdapter(getContext(),
                 R.layout.videos_list_item,

@@ -9,9 +9,11 @@ package com.example.leshik.moviedb.data.api;
  * use it to convert lists of reviews of specific movie
  */
 
+import com.example.leshik.moviedb.data.model.Review;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
 import java.util.List;
 
 class ReviewsResult {
@@ -49,4 +51,20 @@ public class ReviewsResponse {
     @Expose
     public Integer totalResults;
 
+    public List<Review> getReviewListInstance() {
+        List<Review> reviewList = new ArrayList<>();
+
+        for (ReviewsResult r : reviewsResults) {
+            Review review = new Review();
+
+            review.setMovieId(id);
+            review.setReviewId(r.id);
+            review.setAuthor(r.author);
+            review.setContent(r.content);
+            review.setUrl(r.url);
+
+            reviewList.add(review);
+        }
+        return reviewList;
+    }
 }

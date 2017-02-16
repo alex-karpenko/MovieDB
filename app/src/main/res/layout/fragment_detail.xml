@@ -128,7 +128,8 @@
                 android:id="@+id/videos_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <TextView
                     android:id="@+id/videos_list_title"
@@ -164,7 +165,8 @@
                 android:id="@+id/reviews_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <TextView
                     android:id="@+id/reviews_list_title"

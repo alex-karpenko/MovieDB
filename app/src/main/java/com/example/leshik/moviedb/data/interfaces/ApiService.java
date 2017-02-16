@@ -5,7 +5,6 @@ import com.example.leshik.moviedb.data.api.ListPageResponse;
 import com.example.leshik.moviedb.data.api.MovieResponse;
 import com.example.leshik.moviedb.data.api.ReviewsResponse;
 import com.example.leshik.moviedb.data.api.VideosResponse;
-import com.example.leshik.moviedb.service.TmdbListPage;
 
 import io.reactivex.Observable;
 import retrofit2.http.GET;
@@ -30,11 +29,11 @@ public interface ApiService {
 
     // retrieve list of videos of the movie
     @GET("movie/{movie_id}/videos")
-    Observable<VideosResponse> getVideos(@Query("api_key") String apiKey, @Path("movie_id") long movie_id);
+    Observable<VideosResponse> getVideos(@Path("movie_id") long movie_id, @Query("api_key") String apiKey);
 
     // retrieve list of reviews of the movie
     @GET("movie/{movie_id}/reviews")
-    Observable<ReviewsResponse> getReviews(@Query("api_key") String apiKey, @Path("movie_id") long movie_id, @Query("page") int page);
+    Observable<ReviewsResponse> getReviews(@Path("movie_id") long movie_id, @Query("api_key") String apiKey, @Query("page") int page);
 
     // retrieve list of movies sorted by popularity
     @GET("movie/popular")
