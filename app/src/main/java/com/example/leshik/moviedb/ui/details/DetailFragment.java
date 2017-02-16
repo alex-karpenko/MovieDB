@@ -1,4 +1,4 @@
-package com.example.leshik.moviedb;
+package com.example.leshik.moviedb.ui.details;
 
 import android.content.ContentUris;
 import android.content.Intent;
@@ -7,9 +7,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.ShareActionProvider;
@@ -25,30 +22,30 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
+import com.example.leshik.moviedb.R;
+import com.example.leshik.moviedb.Utils;
 import com.example.leshik.moviedb.data.MoviesContract;
+import com.example.leshik.moviedb.data.Repository;
+import com.example.leshik.moviedb.data.interfaces.MovieInteractor;
+import com.example.leshik.moviedb.data.model.Movie;
 import com.example.leshik.moviedb.service.CacheUpdateService;
 import com.ms.square.android.expandabletextview.ExpandableTextView;
 import com.squareup.picasso.Picasso;
 
-import java.util.Calendar;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Consumer;
 
 /**
  * Fragment class with detail info about movie
  * Information. From intent gets URI with movie
  */
-public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>, SwipeRefreshLayout.OnRefreshListener {
+public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     private static final String TAG = "DetailFragment";
-    // data tag to pass data via args bundle
-    private static final int MOVIE_LOADER = 2;
-    private static final int FAVORITE_MARK_LOADER = 3;
-    private static final int VIDEOS_LOADER = 4;
-    private static final int REVIEWS_LOADER = 5;
-
-    // fragment args and state mark
+    // fragment args
     public static final String FRAGMENT_MOVIE_URI = "FRAGMENT_MOVIE_URI";
     // state variables
     private Uri mUri;
@@ -98,6 +95,23 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
     // favorite flag
     private boolean isFavorite;
 
+    MovieInteractor mRepository;
+    CompositeDisposable subscription = new CompositeDisposable();
+
+    public DetailFragment() {
+        // Required empty public constructor
+    }
+
+    public static DetailFragment newInstance(Uri uri) {
+        DetailFragment fragment = new DetailFragment();
+        Bundle args = new Bundle();
+
+        args.putParcelable(FRAGMENT_MOVIE_URI, uri);
+        fragment.setArguments(args);
+
+        return fragment;
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -107,6 +121,8 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
         if (savedInstanceState != null) {
             mUri = savedInstanceState.getParcelable(FRAGMENT_MOVIE_URI);
         }
+
+        mRepository = new Repository(getActivity().getApplicationContext());
     }
 
     @Override
@@ -197,22 +213,25 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
             }
         });
 
+        subscription.add(mRepository
+                .getMovie(movieId)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<Movie>() {
+                    @Override
+                    public void accept(Movie movie) throws Exception {
+                        updateUi(movie);
+                    }
+                }));
+
         return rootView;
     }
 
     @Override
     public void onDestroyView() {
-        super.onDestroyView();
+        subscription.dispose();
         unbinder.unbind();
-    }
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        // create loaders
-        getLoaderManager().initLoader(MOVIE_LOADER, null, this);
-        getLoaderManager().initLoader(VIDEOS_LOADER, null, this);
-        getLoaderManager().initLoader(REVIEWS_LOADER, null, this);
+        super.onDestroyView();
     }
 
     @Override
@@ -221,8 +240,6 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
 
         // store ref. to the menu to update favorite mark
         mMenu = menu;
-        // and create loader for the fav.mark icon
-        getLoaderManager().initLoader(FAVORITE_MARK_LOADER, null, this);
 
         // and update share action intent
         if (menu != null) {
@@ -239,7 +256,7 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
             // set refresh mark
             mSwipeRefreshLayout.setRefreshing(true);
             // and start update action
-            refreshCurrentMovieReverseOrder();
+            refreshCurrentMovie();
             return true;
         }
         if (id == R.id.action_favorite) {
@@ -254,176 +271,14 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int loaderId, Bundle args) {
-        switch (loaderId) {
-            case MOVIE_LOADER:
-                if (mUri != null) {
-                    return new CursorLoader(getActivity(),
-                            mUri,
-                            MoviesContract.Movies.DETAIL_PROJECTION,
-                            null, null, null);
-                }
-                break;
-            case VIDEOS_LOADER:
-                mVideosListLayout.setVisibility(View.GONE);
-                if (movieId > 0) {
-                    return new CursorLoader(getActivity(),
-                            MoviesContract.Videos.buildUri(movieId),
-                            MoviesContract.Videos.DETAIL_PROJECTION,
-                            null, null, null);
-                }
-                break;
-            case REVIEWS_LOADER:
-                mReviewsListLayout.setVisibility(View.GONE);
-                if (movieId > 0) {
-                    return new CursorLoader(getActivity(),
-                            MoviesContract.Reviews.buildUri(movieId),
-                            MoviesContract.Reviews.DETAIL_PROJECTION,
-                            null, null, null);
-                }
-                break;
-            case FAVORITE_MARK_LOADER:
-                if (movieId > 0) {
-                    return new CursorLoader(getActivity(),
-                            MoviesContract.Favorites.buildUri(movieId),
-                            null, null, null, null);
-                }
-                break;
-        }
-        return null;
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        switch (loader.getId()) {
-            case MOVIE_LOADER:
-                // stop refresh mark view
-                mSwipeRefreshLayout.setRefreshing(false);
-                if (data != null && data.moveToFirst()) {
-                    // update variables for share action provider
-                    mPosterName = data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_POSTER_PATH);
-                    mMovieTitle = data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_ORIGINAL_TITLE);
-                    if (mMenu != null)
-                        updateShareAction(mMovieTitle, mPosterName);
-                    // load poster image
-                    Picasso.with(getActivity())
-                            .load(Utils.getPosterSmallUri(mPosterName))
-                            .into(mPosterImage);
-                    // Setting all view's content
-                    mTitleText.setText(data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_ORIGINAL_TITLE));
-                    mReleasedText.setText(data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_RELEASE_DATE));
-                    // TODO: make mRuntimeText formatting more reliable
-                    if (data.getInt(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_RUNTIME) > 0) {
-                        mRuntimeText.setText(String.format("%d %s",
-                                data.getInt(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_RUNTIME),
-                                getString(R.string.runtime_minutes_text)));
-                    } else {
-                        mRuntimeText.setText("-");
-                    }
-                    mRatingText.setText(String.format("%.1f/10", data.getFloat(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_VOTE_AVERAGE)));
-
-                    // Set homepage link, if present
-                    String homePage = data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_HOMEPAGE);
-                    if (homePage != null && homePage.length() > 0) {
-                        mHomepageText.setText("Homepage: " + homePage);
-                        mHomepageText.setVisibility(View.VISIBLE);
-                    } else {
-                        mHomepageText.setVisibility(View.GONE);
-                    }
-
-                    mOverviewText.setText(data.getString(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_OVERVIEW));
-                }
-                // Update movie cache if need
-                long lastUpdateTime = data.getLong(MoviesContract.Movies.DETAIL_PROJECTION_INDEX_LAST_UPDATED);
-                if (Utils.getCacheUpdateInterval() > 0 || lastUpdateTime <= 0) {
-                    long currentTime = Calendar.getInstance().getTimeInMillis();
-                    if ((currentTime - lastUpdateTime) >= Utils.getCacheUpdateInterval()) {
-                        refreshCurrentMovie();
-                    }
-                }
-                break;
-
-            case FAVORITE_MARK_LOADER:
-                isFavorite = false;
-                // set favorite mark if record in the favorites table is present
-                if (data != null && data.moveToFirst()) {
-                    isFavorite = true;
-                }
-                // and update mark
-                Utils.setFavoriteIcon(isFavorite, mMenu);
-                break;
-
-            case VIDEOS_LOADER:
-                // remove all views in table layout
-                mVideosListTable.removeAllViews();
-                if (data != null) {
-                    // set cursor to the adapter
-                    mVideosListAdapter.swapCursor(data);
-                    if (data.moveToFirst() && data.getCount() > 0) {
-                        // and insert table row for every record
-                        int rowsCount = mVideosListAdapter.getCount();
-                        for (int i = 0; i < rowsCount; i++) {
-                            // get view via adapter
-                            View v = mVideosListAdapter.getView(i, null, mVideosListTable);
-                            // add row in the layout
-                            mVideosListTable.addView(v);
-                        }
-                        // set whole layout visible
-                        mVideosListLayout.setVisibility(View.VISIBLE);
-                    }
-                    // if cursor is empty - hide whole table layout
-                } else mVideosListLayout.setVisibility(View.GONE);
-                break;
-
-            case REVIEWS_LOADER:
-                // view comments above on videos list - all same ...
-                mReviewsListTable.removeAllViews();
-                if (data != null) {
-                    mReviewsListAdapter.swapCursor(data);
-                    if (data.moveToFirst() && data.getCount() > 0) {
-                        int rowsCount = mReviewsListAdapter.getCount();
-                        for (int i = 0; i < rowsCount; i++) {
-                            View v = mReviewsListAdapter.getView(i, null, mReviewsListTable);
-                            mReviewsListTable.addView(v);
-                        }
-                        mReviewsListLayout.setVisibility(View.VISIBLE);
-                    }
-                } else mReviewsListLayout.setVisibility(View.GONE);
-                break;
-        }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        switch (loader.getId()) {
-            case VIDEOS_LOADER:
-                if (mVideosListAdapter != null) mVideosListAdapter.swapCursor(null);
-                break;
-            case REVIEWS_LOADER:
-                if (mReviewsListAdapter != null) mReviewsListAdapter.swapCursor(null);
-                break;
-        }
-    }
-
     // starting intent services to update cache tables
     void refreshCurrentMovie() {
-        CacheUpdateService.startActionUpdateMovie(getActivity(), (int) movieId);
-        CacheUpdateService.startActionUpdateVideos(getActivity(), (int) movieId);
-        CacheUpdateService.startActionUpdateReviews(getActivity(), (int) movieId, -1);
-    }
-
-    // starting intent services to update cache tables in reverse order (movies at last)
-    void refreshCurrentMovieReverseOrder() {
-        CacheUpdateService.startActionUpdateVideos(getActivity(), (int) movieId);
-        CacheUpdateService.startActionUpdateReviews(getActivity(), (int) movieId, -1);
-        CacheUpdateService.startActionUpdateMovie(getActivity(), (int) movieId);
     }
 
     // swipe refresh layout callback
     @Override
     public void onRefresh() {
-        refreshCurrentMovieReverseOrder();
+        refreshCurrentMovie();
     }
 
     /**
@@ -449,5 +304,44 @@ public class DetailFragment extends Fragment implements LoaderCallbacks<Cursor>,
         Intent myShareIntent = Utils.getShareIntent(getContext(), title, poster);
         // set intent into provider
         if (mShareActionProvider != null) mShareActionProvider.setShareIntent(myShareIntent);
+    }
+
+    private void updateUi(Movie movie) {
+        // update variables for share action provider
+        mPosterName = movie.getPosterPath();
+        mMovieTitle = movie.getOriginalTitle();
+
+        if (mMenu != null)
+            updateShareAction(mMovieTitle, mPosterName);
+        // load poster image
+        Picasso.with(getActivity())
+                .load(Utils.getPosterSmallUri(mPosterName))
+                .into(mPosterImage);
+
+        // Setting all view's content
+        mTitleText.setText(movie.getOriginalTitle());
+        mReleasedText.setText(movie.getReleaseDate());
+
+        // TODO: make mRuntimeText formatting more reliable
+        if (movie.getRunTime() > 0) {
+            mRuntimeText.setText(String.format("%d %s",
+                    movie.getRunTime(),
+                    getString(R.string.runtime_minutes_text)));
+        } else {
+            mRuntimeText.setText("-");
+        }
+        
+        mRatingText.setText(String.format("%.1f/10", movie.getVoteAverage()));
+
+        // Set homepage link, if present
+        String homePage = movie.getHomePage();
+        if (homePage != null && homePage.length() > 0) {
+            mHomepageText.setText("Homepage: " + homePage);
+            mHomepageText.setVisibility(View.VISIBLE);
+        } else {
+            mHomepageText.setVisibility(View.GONE);
+        }
+
+        mOverviewText.setText(movie.getOverview());
     }
 }

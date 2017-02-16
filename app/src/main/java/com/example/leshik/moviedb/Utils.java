@@ -20,6 +20,7 @@ import static com.example.leshik.moviedb.service.CacheUpdateService.CACHE_PREFS_
 
 public final class Utils {
     private static final String TAG = "Utils";
+
     // Base URLs to deal with TMBD API
     public static final String baseApiUrl = "http://api.themoviedb.org/3/";
     public static final String baseApiSecureUrl = "https://api.themoviedb.org/3/";
@@ -113,7 +114,7 @@ public final class Utils {
     }
 
     // return URI with small width poster image
-    static Uri getPosterSmallUri(String poster) {
+    public static Uri getPosterSmallUri(String poster) {
         return Uri.parse(basePosterSecureUrl
                 + posterSmallWidthStr
                 + poster);
@@ -127,7 +128,7 @@ public final class Utils {
     }
 
     // update favorite icon in the menu
-    static void setFavoriteIcon(boolean flag, Menu menu) {
+    public static void setFavoriteIcon(boolean flag, Menu menu) {
         int favIcon;
         if (flag) favIcon = iconFavoriteBlack;
         else favIcon = iconFavoriteOutline;
@@ -157,7 +158,7 @@ public final class Utils {
     }
 
     // apply current theme to the context and change icons set
-    static void applyCurrentTheme(Context context) {
+    public static void applyCurrentTheme(Context context) {
         context.setTheme(getCurrentTheme());
         setupThemeIcons(context);
     }
@@ -252,4 +253,9 @@ public final class Utils {
     public static String getApiKey() {
         return BuildConfig.THE_MOVIE_DB_API_KEY;
     }
+
+    public static String getBaseApiUrl() {
+        return baseApiUrl;
+    }
+
 }

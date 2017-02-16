@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 
-import com.example.leshik.moviedb.model.MoviesContract;
+import com.example.leshik.moviedb.data.MoviesContract;
 import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;

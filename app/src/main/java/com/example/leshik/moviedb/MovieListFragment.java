@@ -19,7 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.example.leshik.moviedb.model.MoviesContract;
+import com.example.leshik.moviedb.data.MoviesContract;
 import com.example.leshik.moviedb.service.CacheUpdateService;
 
 import java.util.Calendar;

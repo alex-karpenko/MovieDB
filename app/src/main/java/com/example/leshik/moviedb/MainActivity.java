@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 
 import com.example.leshik.moviedb.service.CacheUpdateService;
+import com.example.leshik.moviedb.ui.details.*;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -133,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
         selectedMovieUri = movieUri;
 
         if (!Utils.isTwoPane()) {
-            Intent intent = new Intent(this, DetailActivity.class)
+            Intent intent = new Intent(this, com.example.leshik.moviedb.ui.details.DetailActivity.class)
                     .setData(movieUri);
 
             // If one pane - start details activity

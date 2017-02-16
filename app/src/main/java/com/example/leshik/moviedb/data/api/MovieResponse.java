@@ -1,13 +1,10 @@
-package com.example.leshik.moviedb.service;
+package com.example.leshik.moviedb.data.api;
 
 /**
  * Created by Leshik on 19.12.2016.
  */
 
-import android.content.ContentValues;
-
 import com.example.leshik.moviedb.data.model.Movie;
-import com.example.leshik.moviedb.data.MoviesContract;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -81,7 +78,7 @@ class SpokenLanguage {
 
 }
 
-public class TmdbMovie {
+public class MovieResponse {
 
     @SerializedName("adult")
     @Expose
@@ -159,22 +156,23 @@ public class TmdbMovie {
     @Expose
     public Integer voteCount;
 
-    // helper class to get values for table row to insert
-    public ContentValues getMovieContentValues() {
-        ContentValues returnValues = new ContentValues();
+    // helper class to fill values as realm POJO class instance
+    public Movie getMovieInstance() {
+        Movie movie = new Movie();
 
-        returnValues.put(MoviesContract.Movies.COLUMN_NAME_MOVIE_ID, id);
-        returnValues.put(MoviesContract.Movies.COLUMN_NAME_ORIGINAL_TITLE, originalTitle);
-        returnValues.put(MoviesContract.Movies.COLUMN_NAME_OVERVIEW, overview);
-        returnValues.put(MoviesContract.Movies.COLUMN_NAME_RELEASE_DATE, releaseDate);
-        returnValues.put(MoviesContract.Movies.COLUMN_NAME_VOTE_AVERAGE, voteAverage);
-        returnValues.put(MoviesContract.Movies.COLUMN_NAME_POPULARITY, popularity);
-        returnValues.put(MoviesContract.Movies.COLUMN_NAME_POSTER_PATH, posterPath);
-        returnValues.put(MoviesContract.Movies.COLUMN_NAME_HOMEPAGE, homepage);
-        returnValues.put(MoviesContract.Movies.COLUMN_NAME_ADULT, adult);
-        returnValues.put(MoviesContract.Movies.COLUMN_NAME_VIDEO, video);
-        returnValues.put(MoviesContract.Movies.COLUMN_NAME_RUNTIME, runtime);
+        movie.setMovieId(id);
+        movie.setOriginalTitle(originalTitle);
+        movie.setOverview(overview);
+        movie.setReleaseDate(releaseDate);
+        movie.setVoteAverage(voteAverage);
+        movie.setPopularity(popularity);
+        movie.setPosterPath(posterPath);
+        movie.setHomePage(homepage);
+        movie.setAdult(adult);
+        movie.setVideo(video);
+        movie.setRunTime(runtime);
+        movie.setLastUpdate(Calendar.getInstance().getTimeInMillis());
 
-        return returnValues;
+        return movie;
     }
 }

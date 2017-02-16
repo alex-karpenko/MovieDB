@@ -17,7 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.leshik.moviedb.model.MoviesContract;
+import com.example.leshik.moviedb.data.MoviesContract;
 import com.example.leshik.moviedb.service.CacheUpdateService;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;

@@ -6,8 +6,8 @@ package com.example.leshik.moviedb.service;
 
 import android.content.ContentValues;
 
-import com.example.leshik.moviedb.model.Movie;
-import com.example.leshik.moviedb.model.MoviesContract;
+import com.example.leshik.moviedb.data.model.Movie;
+import com.example.leshik.moviedb.data.MoviesContract;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 

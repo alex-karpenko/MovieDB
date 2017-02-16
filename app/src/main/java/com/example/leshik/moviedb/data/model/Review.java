@@ -1,4 +1,4 @@
-package com.example.leshik.moviedb.model;
+package com.example.leshik.moviedb.data.model;
 
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;

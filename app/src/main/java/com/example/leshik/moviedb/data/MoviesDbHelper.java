@@ -1,4 +1,4 @@
-package com.example.leshik.moviedb.model;
+package com.example.leshik.moviedb.data;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

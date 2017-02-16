@@ -9,7 +9,7 @@ import android.content.SharedPreferences;
 import com.example.leshik.moviedb.BuildConfig;
 import com.example.leshik.moviedb.R;
 import com.example.leshik.moviedb.Utils;
-import com.example.leshik.moviedb.model.MoviesContract;
+import com.example.leshik.moviedb.data.MoviesContract;
 
 import java.io.IOException;
 import java.util.Calendar;

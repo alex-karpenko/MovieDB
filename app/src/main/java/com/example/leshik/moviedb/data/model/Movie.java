@@ -1,4 +1,4 @@
-package com.example.leshik.moviedb.model;
+package com.example.leshik.moviedb.data.model;
 
 import io.realm.Realm;
 import io.realm.RealmList;
@@ -32,8 +32,7 @@ public class Movie extends RealmObject {
     private Integer popularPosition;
     private Integer topratedPosition;
 
-    public void updateNullFieldsFromExist(Realm realm) {
-        Movie movie = realm.where(Movie.class).equalTo("movieId", getMovieId()).findFirst();
+    public void updateNullFields(Movie movie) {
         if (movie != null) {
             if (originalTitle == null) originalTitle = movie.getOriginalTitle();
             if (overview == null) originalTitle = movie.getOverview();
@@ -45,6 +44,11 @@ public class Movie extends RealmObject {
             if (adult == null) adult = movie.getAdult();
             if (video == null) video = movie.getVideo();
             if (runTime == null) runTime = movie.getRunTime();
+            if (favoritePosition == null) favoritePosition = movie.getFavoritePosition();
+            if (popularPosition == null) popularPosition = movie.getPopularPosition();
+            if (topratedPosition == null) topratedPosition = movie.getTopratedPosition();
+            if (videos == null || videos.size() == 0) videos = movie.getVideos();
+            if (reviews == null || reviews.size() == 0) reviews = movie.getReviews();
         }
     }
 

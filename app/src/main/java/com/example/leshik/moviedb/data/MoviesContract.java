@@ -1,4 +1,4 @@
-package com.example.leshik.moviedb.model;
+package com.example.leshik.moviedb.data;
 
 import android.content.ContentResolver;
 import android.content.ContentUris;

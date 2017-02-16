@@ -25,7 +25,7 @@
                 android:value="com.example.leshik.moviedb.MainActivity" />
         </activity>
         <activity
-            android:name=".DetailActivity"
+            android:name=".ui.details.DetailActivity"
             android:label="@string/title_activity_detail"
             android:parentActivityName=".MainActivity">
             <meta-data
@@ -43,7 +43,7 @@
         </activity>
 
         <provider
-            android:name=".model.MoviesProvider"
+            android:name=".data.MoviesProvider"
             android:authorities="@string/content_authority"
             android:exported="false" />
 
