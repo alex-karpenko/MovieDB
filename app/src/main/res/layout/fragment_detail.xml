@@ -33,8 +33,7 @@
                 android:paddingRight="@dimen/detail_right_margin"
                 android:paddingStart="@dimen/detail_left_margin"
                 android:paddingTop="@dimen/detail_title_vertical_margin"
-                android:textSize="24sp"
-                tools:text="Original title" />
+                android:textSize="24sp" />
 
             <!-- Image, release date, rating -->
             <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -70,7 +69,6 @@
                         android:paddingRight="@dimen/detail_left_margin"
                         android:paddingStart="@dimen/detail_left_margin"
                         android:paddingTop="@dimen/detail_interviews_padding"
-                        android:text="Released"
                         android:textSize="18sp" />
                     <!-- runtime -->
                     <TextView
@@ -82,7 +80,6 @@
                         android:paddingRight="@dimen/detail_left_margin"
                         android:paddingStart="@dimen/detail_left_margin"
                         android:paddingTop="@dimen/detail_interviews_padding"
-                        android:text="-"
                         android:textSize="18sp"
                         android:textStyle="normal|italic" />
                     <!-- rating -->
@@ -95,7 +92,6 @@
                         android:paddingRight="@dimen/detail_left_margin"
                         android:paddingStart="@dimen/detail_left_margin"
                         android:paddingTop="@dimen/detail_interviews_padding"
-                        android:text="8.1/10"
                         android:textSize="14sp" />
 
                     <!-- end of text info block -->
@@ -113,7 +109,6 @@
                 android:paddingRight="@dimen/detail_right_margin"
                 android:paddingStart="@dimen/detail_left_margin"
                 android:paddingTop="@dimen/detail_title_vertical_margin"
-                android:text="---"
                 android:autoLink="web"
                 android:visibility="gone" />
             <!-- Overview -->
@@ -126,8 +121,7 @@
                 android:paddingLeft="@dimen/detail_left_margin"
                 android:paddingRight="@dimen/detail_right_margin"
                 android:paddingStart="@dimen/detail_left_margin"
-                android:paddingTop="@dimen/detail_title_vertical_margin"
-                android:text="Overview text" />
+                android:paddingTop="@dimen/detail_title_vertical_margin" />
 
             <!-- List of trailers -->
             <LinearLayout
