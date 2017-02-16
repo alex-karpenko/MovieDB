@@ -12,6 +12,7 @@ import com.example.leshik.moviedb.data.model.Movie;
 import com.example.leshik.moviedb.data.model.Review;
 import com.example.leshik.moviedb.data.model.Video;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -181,15 +182,35 @@ public class Repository implements MovieInteractor {
     }
 
     private Observable<List<Review>> readReviewListFromApi(final long movieId) {
+        return readReviewListPageFromApi(movieId, 1);
+    }
+
+    private Observable<List<Review>> readReviewListPageFromApi(final long movieId, final int startPage) {
         final ApiService service = getApiServiceInstance();
 
         Observable<List<Review>> reviewList =
-                service.getReviews(movieId, Utils.getApiKey(), 1)
+                service.getReviews(movieId, Utils.getApiKey(), startPage)
                         .subscribeOn(Schedulers.io())
                         .map(new Function<ReviewsResponse, List<Review>>() {
                             @Override
                             public List<Review> apply(ReviewsResponse reviewsResponse) throws Exception {
-                                return reviewsResponse.getReviewListInstance();
+                                int totalPages = reviewsResponse.totalPages;
+                                final List<Review> newList = new ArrayList<>();
+
+                                newList.addAll(reviewsResponse.getReviewListInstance());
+
+                                if (totalPages > startPage) {
+                                    readReviewListPageFromApi(movieId, startPage + 1)
+                                            .subscribeOn(Schedulers.io())
+                                            .subscribe(new Consumer<List<Review>>() {
+                                                @Override
+                                                public void accept(List<Review> reviews) throws Exception {
+                                                    newList.addAll(reviews);
+                                                }
+                                            });
+                                }
+
+                                return newList;
                             }
                         });
 
