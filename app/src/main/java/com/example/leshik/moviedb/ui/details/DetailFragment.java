@@ -90,7 +90,7 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
     // favorite flag
     private boolean isFavorite;
 
-    MovieInteractor mRepository;
+    MovieInteractor mMovieDataStorage;
     CompositeDisposable subscription = new CompositeDisposable();
 
     public DetailFragment() {
@@ -117,7 +117,8 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
             mUri = savedInstanceState.getParcelable(FRAGMENT_MOVIE_URI);
         }
 
-        mRepository = new DataStorage(getActivity().getApplicationContext());
+        // init data storage for movies info
+        mMovieDataStorage = new DataStorage(getActivity().getApplicationContext());
     }
 
     @Override
@@ -200,27 +201,11 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
             // and change mark on the menu with dependence on the theme
             Utils.setFavoriteIcon(isFavorite, mMenu);
             // update favorite flag in the db
-            mRepository.setFavoriteFlag(movieId, isFavorite);
+            mMovieDataStorage.setFavoriteFlag(movieId, isFavorite);
 
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    // starting intent services to update cache tables
-    void refreshCurrentMovie() {
-        // TODO: rewrite Repository.getMovie() to be able to check update interval and to force reload movie
-
-        subscription.clear();
-        subscription.add(mRepository
-                .getMovie(movieId, true)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<Movie>() {
-                    @Override
-                    public void accept(Movie movie) throws Exception {
-                        updateUi(movie);
-                    }
-                }));
     }
 
     // swipe refresh layout callback
@@ -350,7 +335,7 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
     }
 
     private void subscribeToMovie(long movieId, boolean forceReload) {
-        subscription.add(mRepository.getMovie(movieId, forceReload)
+        subscription.add(mMovieDataStorage.getMovie(movieId, forceReload)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<Movie>() {
                     @Override
@@ -358,10 +343,15 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
                         updateUi(movie);
                     }
                 }));
-
     }
 
     private void unsubscribeFromMovie() {
         subscription.dispose();
+    }
+
+    // starting intent services to update cache tables
+    void refreshCurrentMovie() {
+        subscription.clear();
+        subscribeToMovie(movieId, true);
     }
 }
