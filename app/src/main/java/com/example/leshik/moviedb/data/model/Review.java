@@ -1,6 +1,7 @@
 package com.example.leshik.moviedb.data.model;
 
 import io.realm.RealmObject;
+import io.realm.annotations.Index;
 import io.realm.annotations.PrimaryKey;
 
 /**
@@ -11,6 +12,7 @@ public class Review extends RealmObject {
     @PrimaryKey
     private String reviewId;
 
+    @Index
     private long movieId;
     private String author;
     private String content;

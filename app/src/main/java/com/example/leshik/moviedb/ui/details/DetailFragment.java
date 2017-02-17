@@ -22,7 +22,7 @@ import android.widget.TextView;
 
 import com.example.leshik.moviedb.R;
 import com.example.leshik.moviedb.Utils;
-import com.example.leshik.moviedb.data.Repository;
+import com.example.leshik.moviedb.data.DataStorage;
 import com.example.leshik.moviedb.data.interfaces.MovieInteractor;
 import com.example.leshik.moviedb.data.model.Movie;
 import com.example.leshik.moviedb.data.model.Review;
@@ -117,7 +117,7 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
             mUri = savedInstanceState.getParcelable(FRAGMENT_MOVIE_URI);
         }
 
-        mRepository = new Repository(getActivity().getApplicationContext());
+        mRepository = new DataStorage(getActivity().getApplicationContext());
     }
 
     @Override

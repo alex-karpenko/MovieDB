@@ -4,6 +4,7 @@ import java.util.List;
 
 import io.realm.RealmList;
 import io.realm.RealmObject;
+import io.realm.annotations.Index;
 import io.realm.annotations.PrimaryKey;
 
 /**
@@ -16,6 +17,7 @@ public class Movie extends RealmObject {
 
     private String originalTitle;
     private String overview;
+    @Index
     private String releaseDate;
     private Float voteAverage;
     private Float popularity;
@@ -29,8 +31,11 @@ public class Movie extends RealmObject {
     private RealmList<Video> videos;
     private RealmList<Review> reviews;
 
+    @Index
     private Integer favoritePosition;
+    @Index
     private Integer popularPosition;
+    @Index
     private Integer topratedPosition;
 
     public void updateNullFields(Movie movie) {
@@ -50,6 +55,7 @@ public class Movie extends RealmObject {
             if (topratedPosition == null) topratedPosition = movie.getTopratedPosition();
             if (videos == null || videos.size() == 0) videos = movie.getVideos();
             if (reviews == null || reviews.size() == 0) reviews = movie.getReviews();
+            if (lastUpdate == null) lastUpdate = movie.getLastUpdate();
         }
     }
 
@@ -142,6 +148,7 @@ public class Movie extends RealmObject {
     }
 
     public Long getLastUpdate() {
+        if (lastUpdate == null) return 0L;
         return lastUpdate;
     }
 

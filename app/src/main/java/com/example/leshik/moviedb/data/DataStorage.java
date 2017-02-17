@@ -1,6 +1,7 @@
 package com.example.leshik.moviedb.data;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.example.leshik.moviedb.Utils;
 import com.example.leshik.moviedb.data.api.MovieResponse;
@@ -13,8 +14,8 @@ import com.example.leshik.moviedb.data.model.Review;
 import com.example.leshik.moviedb.data.model.Video;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.functions.BiFunction;
@@ -27,10 +28,11 @@ import io.realm.Realm;
  * Created by alex on 2/14/17.
  */
 
-public class Repository implements MovieInteractor {
+public class DataStorage implements MovieInteractor {
+    private static final String TAG = "DataStorage";
     private Context context;
 
-    public Repository(Context context) {
+    public DataStorage(Context context) {
         this.context = context;
     }
 
@@ -38,8 +40,12 @@ public class Repository implements MovieInteractor {
     public Observable<Movie> getMovie(final long movieId, boolean forceReload) {
         Observable<Movie> movieFromApi;
         Movie movieFromDb;
+        Observable<Movie> returnObservable;
+        long currentTime = Calendar.getInstance().getTimeInMillis();
+        long cacheUpdateInterval = Utils.getCacheUpdateInterval();
 
         movieFromDb = readMovieFromDb(movieId);
+
         movieFromApi = readMovieFromApi(movieId)
                 .zipWith(readVideoListFromApi(movieId), new BiFunction<Movie, List<Video>, Movie>() {
                     @Override
@@ -60,32 +66,29 @@ public class Repository implements MovieInteractor {
                     public void accept(Movie movie) throws Exception {
                         writeMovieToDb(movie);
                     }
-                })
-                .map(new Function<Movie, Movie>() {
-                    @Override
-                    public Movie apply(Movie movie) throws Exception {
-                        movie.setOriginalTitle("API: " + movie.getOriginalTitle());
-                        return movie;
-                    }
-                })
-                .delay(1, TimeUnit.SECONDS)
-        ;
+                });
 
-        if (movieFromDb != null) {
-            movieFromApi = movieFromApi
-                    .mergeWith(
-                            Observable.just(movieFromDb)
-                                    .subscribeOn(Schedulers.io())
-                                    .map(new Function<Movie, Movie>() {
-                                        @Override
-                                        public Movie apply(Movie movie) throws Exception {
-                                            movie.setOriginalTitle("DB: " + movie.getOriginalTitle());
-                                            return movie;
-                                        }
-                                    }));
+        if (movieFromDb == null || forceReload) {
+            // 1) cache does not exist
+            // 2) forced cache reloading
+            //   - return api response only
+            Log.i(TAG, "getMovie: from API");
+            returnObservable = movieFromApi;
+        } else if (((movieFromDb.getLastUpdate() + cacheUpdateInterval) <= currentTime && cacheUpdateInterval > 0)
+                || (movieFromDb.getLastUpdate() <= 0 && cacheUpdateInterval <= 0)) {
+            // 1) cache exist but expired
+            // 2) cache has never been updated and update interval is "never"
+            //    - return cache data, and refresh cache from api
+            Log.i(TAG, "getMovie: from DB+API");
+            returnObservable = movieFromApi
+                    .mergeWith(Observable.just(movieFromDb));
+        } else {
+            // cache exist and fresh - return data from db only
+            Log.i(TAG, "getMovie: from DB");
+            returnObservable = Observable.just(movieFromDb);
         }
 
-        return movieFromApi;
+        return returnObservable.subscribeOn(Schedulers.io());
     }
 
     @Override
@@ -216,4 +219,11 @@ public class Repository implements MovieInteractor {
 
         return reviewList;
     }
+
+
+    private Movie markMovieTitle(Movie movie, String mark) {
+        movie.setOriginalTitle(mark + ": " + movie.getOriginalTitle());
+        return movie;
+    }
+
 }
