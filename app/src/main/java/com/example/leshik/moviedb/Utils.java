@@ -121,7 +121,7 @@ public final class Utils {
     }
 
     // return URI with full size poster image
-    static Uri getPosterFullUri(String poster) {
+    public static Uri getPosterFullUri(String poster) {
         return Uri.parse(basePosterSecureUrl
                 + posterFullWidthStr
                 + poster);
@@ -211,16 +211,6 @@ public final class Utils {
 
     public static int getCachePageSize() {
         return cachePageSize;
-    }
-
-    // start activity to show full poster image
-    public static void startFullPosterActivity(Context context, int movieId, String posterName, String movieTitle) {
-        Intent intent = new Intent(context, FullPosterActivity.class);
-        intent.putExtra(FullPosterActivity.ARG_POSTER_NAME, posterName);
-        intent.putExtra(FullPosterActivity.ARG_MOVIE_ID, movieId);
-        intent.putExtra(FullPosterActivity.ARG_MOVIE_TITLE, movieTitle);
-        context.startActivity(intent);
-
     }
 
     // getter/setter for two pane flag

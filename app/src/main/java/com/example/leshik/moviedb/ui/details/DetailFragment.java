@@ -149,7 +149,7 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
             @Override
             public void onClick(View v) {
                 if (mPosterName != null) {
-                    ((DetailFragment.Callback) getContext()).onImageClicked((int) movieId, mPosterName, mMovieTitle);
+                    ((DetailFragment.Callback) getContext()).onImageClicked(movieId);
                 }
             }
         });
@@ -211,18 +211,6 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
     @Override
     public void onRefresh() {
         refreshCurrentMovie();
-    }
-
-    /**
-     * A callback interface that all activities containing this fragment must
-     * implement. This mechanism allows activities to be notified of poster image
-     * clicked.
-     */
-    public interface Callback {
-        /**
-         * DetailFragmentCallback for when an item has been selected.
-         */
-        void onImageClicked(int movieId, String posterName, String movieTitle);
     }
 
     /**
@@ -351,5 +339,17 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
     void refreshCurrentMovie() {
         subscription.clear();
         subscribeToMovie(movieId, true);
+    }
+
+    /**
+     * A callback interface that all activities containing this fragment must
+     * implement. This mechanism allows activities to be notified of poster image
+     * clicked.
+     */
+    public interface Callback {
+        /**
+         * DetailFragmentCallback for when an item has been selected.
+         */
+        void onImageClicked(long movieId);
     }
 }

@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import com.example.leshik.moviedb.R;
 import com.example.leshik.moviedb.SettingsActivity;
 import com.example.leshik.moviedb.Utils;
+import com.example.leshik.moviedb.ui.poster.FullPosterActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -112,9 +113,9 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
 
 
     @Override
-    public void onImageClicked(int movieId, String posterName, String movieTitle) {
+    public void onImageClicked(long movieId) {
         // callback method that called when poster image is clicked
         // start full poster view activity
-        Utils.startFullPosterActivity(this, movieId, posterName, movieTitle);
+        startActivity(FullPosterActivity.getIntentInstance(this, movieId));
     }
 }

@@ -1,12 +1,8 @@
-package com.example.leshik.moviedb;
+package com.example.leshik.moviedb.ui.poster;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.ContentLoadingProgressBar;
 import android.support.v7.widget.ShareActionProvider;
@@ -17,14 +13,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.leshik.moviedb.data.MoviesContract;
-import com.example.leshik.moviedb.service.CacheUpdateService;
+import com.example.leshik.moviedb.R;
+import com.example.leshik.moviedb.Utils;
+import com.example.leshik.moviedb.data.MovieRepository;
+import com.example.leshik.moviedb.data.model.Movie;
+import com.example.leshik.moviedb.ui.viewmodels.MovieViewModel;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Consumer;
 import uk.co.senab.photoview.PhotoView;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
@@ -34,29 +35,29 @@ import uk.co.senab.photoview.PhotoViewAttacher;
  * Use the {@link FullPosterFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class FullPosterFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class FullPosterFragment extends Fragment {
     private static final String TAG = "FullPosterFragment";
     // state and fragment's arguments markers
-    private static final String ARG_POSTER_NAME = "POSTER_NAME";
     private static final String ARG_MOVIE_ID = "MOVIE_ID";
-    private static final String ARG_MOVIE_TITLE = "MOVIE_TITLE";
 
-    // content loader's number
-    private static final int FAVORITE_MARK_LOADER = 3;
-
-    private String mPosterName;
-    private int mMovieId;
-    private String mMovieTitle;
+    private long mMovieId;
 
     private Menu mMenu;
     private ShareActionProvider mShareActionProvider;
     private boolean isFavorite;
+    private String mMovieTitle;
+    private String mPosterName;
 
     @BindView(R.id.full_poster_image)
     protected PhotoView mPosterImage;
     @BindView(R.id.full_poster_progressbar)
     protected ContentLoadingProgressBar mProgressBar;
+
     private Unbinder unbinder;
+    PhotoViewAttacher attacher;
+
+    MovieViewModel mViewModel;
+    CompositeDisposable subscription = new CompositeDisposable();
 
 
     public FullPosterFragment() {
@@ -67,16 +68,14 @@ public class FullPosterFragment extends Fragment implements LoaderManager.Loader
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param posterName - file name of poster image.
+     * @param movie_id - id onf the movie
      * @return A new instance of fragment FullPosterFragment.
      */
-    public static FullPosterFragment newInstance(int movie_id, String posterName, String movieTitle) {
+    public static FullPosterFragment newInstance(long movie_id) {
         FullPosterFragment fragment = new FullPosterFragment();
         Bundle args = new Bundle();
         // set variables to argument's bundle
-        args.putString(ARG_POSTER_NAME, posterName);
-        args.putInt(ARG_MOVIE_ID, movie_id);
-        args.putString(ARG_MOVIE_TITLE, movieTitle);
+        args.putLong(ARG_MOVIE_ID, movie_id);
         // create fragment
         fragment.setArguments(args);
         return fragment;
@@ -86,18 +85,15 @@ public class FullPosterFragment extends Fragment implements LoaderManager.Loader
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.poster_fragment, menu);
         mMenu = menu;
-        getLoaderManager().initLoader(FAVORITE_MARK_LOADER, null, this);
 
         // Setup share provider
         // and update share action intent
         if (menu != null) {
             mShareActionProvider = new ShareActionProvider(getContext());
             MenuItemCompat.setActionProvider(menu.findItem(R.id.action_share), mShareActionProvider);
+            updateShareAction(mMovieTitle, mPosterName);
 
-            // create intent
-            Intent myShareIntent = Utils.getShareIntent(getContext(), mMovieTitle, mPosterName);
-            // set intent into provider
-            mShareActionProvider.setShareIntent(myShareIntent);
+            Utils.setFavoriteIcon(isFavorite, mMenu);
         }
     }
 
@@ -109,23 +105,20 @@ public class FullPosterFragment extends Fragment implements LoaderManager.Loader
         // set state variables from saved state or argument's bundle
         if (savedInstanceState == null) {
             if (getArguments() != null) {
-                mPosterName = getArguments().getString(ARG_POSTER_NAME);
-                mMovieId = getArguments().getInt(ARG_MOVIE_ID, -1);
-                mMovieTitle = getArguments().getString(ARG_MOVIE_TITLE);
+                mMovieId = getArguments().getLong(ARG_MOVIE_ID, -1);
             }
         } else {
-            mPosterName = savedInstanceState.getString(ARG_POSTER_NAME);
-            mMovieId = savedInstanceState.getInt(ARG_MOVIE_ID);
-            mMovieTitle = savedInstanceState.getString(ARG_MOVIE_TITLE);
+            mMovieId = savedInstanceState.getLong(ARG_MOVIE_ID);
         }
+
+        // init view model
+        mViewModel = new MovieViewModel(new MovieRepository(getActivity().getApplicationContext()));
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString(ARG_POSTER_NAME, mPosterName);
-        outState.putInt(ARG_MOVIE_ID, mMovieId);
-        outState.putString(ARG_MOVIE_TITLE, mMovieTitle);
+        outState.putLong(ARG_MOVIE_ID, mMovieId);
     }
 
     @Override
@@ -136,8 +129,8 @@ public class FullPosterFragment extends Fragment implements LoaderManager.Loader
             isFavorite = !isFavorite;
             // change mark on the toolbar
             Utils.setFavoriteIcon(isFavorite, mMenu);
-            // and update state in db table via intent service
-            CacheUpdateService.startActionUpdateFavorite(getActivity(), mMovieId, isFavorite);
+            // update favorite flag in the db
+            mViewModel.setFavoriteFlag(mMovieId, isFavorite);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -151,7 +144,7 @@ public class FullPosterFragment extends Fragment implements LoaderManager.Loader
         View rootView = inflater.inflate(R.layout.fragment_full_poster, container, false);
         unbinder = ButterKnife.bind(this, rootView);
 
-        final PhotoViewAttacher attacher = new PhotoViewAttacher(mPosterImage);
+        attacher = new PhotoViewAttacher(mPosterImage);
         attacher.setOnPhotoTapListener(new PhotoViewAttacher.OnPhotoTapListener() {
             @Override
             public void onPhotoTap(View view, float x, float y) {
@@ -166,8 +159,37 @@ public class FullPosterFragment extends Fragment implements LoaderManager.Loader
 
         mProgressBar.show();
 
+        subscribeToMovie(mMovieId);
+
+        return rootView;
+    }
+
+    @Override
+    public void onDestroyView() {
+        unsubscribeFromMovie();
+        unbinder.unbind();
+
+        super.onDestroyView();
+    }
+
+    interface OnImageClickCallback {
+        void onImageClicked();
+    }
+
+    private void onImageClicked() {
+        ((FullPosterActivity) getActivity()).onImageClicked();
+    }
+
+    private void updateUi(Movie movie) {
+        // update variables for share action provider
+        mPosterName = movie.getPosterPath();
+        mMovieTitle = movie.getOriginalTitle();
+
+        if (mMenu != null)
+            updateShareAction(mMovieTitle, mPosterName);
+
         Picasso.with(getActivity())
-                .load(Utils.getPosterFullUri(mPosterName))
+                .load(Utils.getPosterFullUri(movie.getPosterPath()))
                 .into(mPosterImage, new Callback() {
                     @Override
                     public void onSuccess() {
@@ -180,54 +202,39 @@ public class FullPosterFragment extends Fragment implements LoaderManager.Loader
                     }
                 });
 
-        return rootView;
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
-    }
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        switch (id) {
-            case FAVORITE_MARK_LOADER:
-                if (mMovieId > 0) {
-                    return new CursorLoader(getActivity(),
-                            MoviesContract.Favorites.buildUri(mMovieId),
-                            null, null, null, null);
-                }
-                break;
+        // Favorite mark set
+        isFavorite = false;
+        if (movie.getFavoritePosition() != null && movie.getFavoritePosition() >= 0) {
+            isFavorite = true;
         }
-        return null;
+        // and update it
+        Utils.setFavoriteIcon(isFavorite, mMenu);
     }
 
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        switch (loader.getId()) {
-            case FAVORITE_MARK_LOADER:
-                isFavorite = false;
-                // set favorite mark if table contain row with our movie_id
-                if (data != null && data.moveToFirst()) {
-                    isFavorite = true;
-                }
-                Utils.setFavoriteIcon(isFavorite, mMenu);
-                break;
-        }
-
+    /**
+     * Method to update share action intent after loading movie data
+     *
+     * @param title
+     * @param poster
+     */
+    void updateShareAction(String title, String poster) {
+        // create intent
+        Intent myShareIntent = Utils.getShareIntent(getContext(), title, poster);
+        // set intent into provider
+        if (mShareActionProvider != null) mShareActionProvider.setShareIntent(myShareIntent);
     }
 
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-
+    private void subscribeToMovie(long movieId) {
+        subscription.add(mViewModel.getMovie(movieId, false)
+                .subscribe(new Consumer<Movie>() {
+                    @Override
+                    public void accept(Movie movie) throws Exception {
+                        updateUi(movie);
+                    }
+                }));
     }
 
-    interface OnImageClickCallback {
-        void onImageClicked();
-    }
-
-    private void onImageClicked() {
-        ((FullPosterActivity) getActivity()).onImageClicked();
+    private void unsubscribeFromMovie() {
+        subscription.dispose();
     }
 }

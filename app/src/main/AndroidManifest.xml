@@ -33,7 +33,7 @@
                 android:value="com.example.leshik.moviedb.MainActivity" />
         </activity>
         <activity
-            android:name=".FullPosterActivity"
+            android:name=".ui.poster.FullPosterActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_full_poster"
             android:parentActivityName=".ui.details.DetailActivity">

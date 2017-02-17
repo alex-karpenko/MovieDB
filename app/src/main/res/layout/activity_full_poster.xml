@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/black_overlay"
     android:orientation="vertical"
-    tools:context="com.example.leshik.moviedb.FullPosterActivity"
+    tools:context=".ui.poster.FullPosterActivity"
     tools:ignore="MergeRootFrame">
 
     <FrameLayout

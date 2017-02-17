@@ -1,6 +1,7 @@
-package com.example.leshik.moviedb;
+package com.example.leshik.moviedb.ui.poster;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -12,22 +13,29 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.example.leshik.moviedb.R;
+import com.example.leshik.moviedb.Utils;
+import com.example.leshik.moviedb.data.MovieRepository;
+import com.example.leshik.moviedb.data.model.Movie;
+import com.example.leshik.moviedb.ui.viewmodels.MovieViewModel;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Consumer;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
 public class FullPosterActivity extends AppCompatActivity implements FullPosterFragment.OnImageClickCallback {
-    public static final String ARG_POSTER_NAME = "POSTER_NAME";
-    public static final String ARG_MOVIE_TITLE = "MOVIE_TITLE";
+    private static final String TAG = "FullPosterActivity";
+
     public static final String ARG_MOVIE_ID = "MOVIE_ID";
 
     private boolean mVisible;
-    private int movieId;
-    private String posterName;
-    private String movieTitle;
+    private long movieId;
 
     /**
      * Whether or not the system UI should be auto-hidden after
@@ -51,12 +59,21 @@ public class FullPosterActivity extends AppCompatActivity implements FullPosterF
     private final Handler mHideHandler = new Handler();
 
     // views to fast access
-    @BindView(R.id.fullscreen_content)
-    protected View mContentView;
     @BindView(R.id.full_poster_title)
     protected TextView mTitleView;
     @BindView(R.id.poster_toolbar)
     protected Toolbar mToolbar;
+
+    Unbinder unbinder;
+    MovieViewModel mViewModel;
+    CompositeDisposable subscription = new CompositeDisposable();
+
+    // helper method to create proper intent to start FullPosterActivity
+    static public Intent getIntentInstance(Context context, long movieId) {
+        Intent intent = new Intent(context, FullPosterActivity.class);
+        intent.putExtra(FullPosterActivity.ARG_MOVIE_ID, movieId);
+        return intent;
+    }
 
     // runnable to hide views after start
     private final Runnable mHideRunnable = new Runnable() {
@@ -98,8 +115,17 @@ public class FullPosterActivity extends AppCompatActivity implements FullPosterF
         Utils.applyCurrentTheme(this);
         super.onCreate(savedInstanceState);
 
+        if (savedInstanceState == null) {
+            // get poster image name from intent
+            Intent intent = getIntent();
+            movieId = intent.getLongExtra(ARG_MOVIE_ID, -1);
+        } else {
+            // ... or from saved state
+            movieId = savedInstanceState.getLong(ARG_MOVIE_ID, -1);
+        }
+
         setContentView(R.layout.activity_full_poster);
-        ButterKnife.bind(this);
+        unbinder = ButterKnife.bind(this);
 
         setSupportActionBar(mToolbar);
         // set semi-transparent toolbar's background
@@ -115,23 +141,8 @@ public class FullPosterActivity extends AppCompatActivity implements FullPosterF
 
         mVisible = true;
 
-        if (savedInstanceState == null) {
-            // get poster image name from intent
-            Intent intent = getIntent();
-            posterName = intent.getStringExtra(ARG_POSTER_NAME);
-            movieId = intent.getIntExtra(ARG_MOVIE_ID, -1);
-            movieTitle = intent.getStringExtra(ARG_MOVIE_TITLE);
-        } else {
-            // ... or from saved state
-            posterName = savedInstanceState.getString(ARG_POSTER_NAME, "");
-            movieId = savedInstanceState.getInt(ARG_MOVIE_ID, -1);
-            movieTitle = savedInstanceState.getString(ARG_MOVIE_TITLE, "");
-        }
-
-        mTitleView.setText(movieTitle);
-
         // Inflate new fragment full screen poster image
-        FullPosterFragment fragment = FullPosterFragment.newInstance(movieId, posterName, movieTitle);
+        FullPosterFragment fragment = FullPosterFragment.newInstance(movieId);
         if (savedInstanceState != null) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fullscreen_content, fragment)
@@ -141,14 +152,23 @@ public class FullPosterActivity extends AppCompatActivity implements FullPosterF
                     .add(R.id.fullscreen_content, fragment)
                     .commit();
         }
+
+        // init view model
+        mViewModel = new MovieViewModel(new MovieRepository(getApplicationContext()));
+        subscribeToMovie(movieId);
+    }
+
+    @Override
+    protected void onDestroy() {
+        unsubscribeFromMovie();
+        unbinder.unbind();
+        super.onDestroy();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString(ARG_POSTER_NAME, posterName);
-        outState.putInt(ARG_MOVIE_ID, movieId);
-        outState.putString(ARG_MOVIE_TITLE, movieTitle);
+        outState.putLong(ARG_MOVIE_ID, movieId);
     }
 
     @Override
@@ -223,5 +243,23 @@ public class FullPosterActivity extends AppCompatActivity implements FullPosterF
             delayedHide(AUTO_HIDE_DELAY_MILLIS);
         }
         toggle();
+    }
+
+    private void subscribeToMovie(long movieId) {
+        subscription.add(mViewModel.getMovie(movieId, false)
+                .subscribe(new Consumer<Movie>() {
+                    @Override
+                    public void accept(Movie movie) throws Exception {
+                        updateUi(movie);
+                    }
+                }));
+    }
+
+    private void unsubscribeFromMovie() {
+        subscription.dispose();
+    }
+
+    private void updateUi(Movie movie) {
+        mTitleView.setText(movie.getOriginalTitle());
     }
 }

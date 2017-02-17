@@ -13,7 +13,8 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 
 import com.example.leshik.moviedb.service.CacheUpdateService;
-import com.example.leshik.moviedb.ui.details.*;
+import com.example.leshik.moviedb.ui.details.DetailFragment;
+import com.example.leshik.moviedb.ui.poster.FullPosterActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -164,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
 
     // callback method from details fragment - called when poster image pressed to start full poster view
     @Override
-    public void onImageClicked(int movieId, String posterName, String movieTitle) {
-        Utils.startFullPosterActivity(this, movieId, posterName, movieTitle);
+    public void onImageClicked(long movieId) {
+        startActivity(FullPosterActivity.getIntentInstance(this, movieId));
     }
 }

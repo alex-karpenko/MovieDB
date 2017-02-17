@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:background="@color/black_overlay"
-    tools:context="com.example.leshik.moviedb.FullPosterFragment">
+    tools:context=".ui.poster.FullPosterActivity">
 
     <android.support.v4.widget.ContentLoadingProgressBar
         android:id="@+id/full_poster_progressbar"
