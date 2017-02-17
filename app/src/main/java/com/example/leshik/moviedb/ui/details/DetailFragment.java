@@ -22,18 +22,17 @@ import android.widget.TextView;
 
 import com.example.leshik.moviedb.R;
 import com.example.leshik.moviedb.Utils;
-import com.example.leshik.moviedb.data.DataStorage;
-import com.example.leshik.moviedb.data.interfaces.MovieInteractor;
+import com.example.leshik.moviedb.data.MovieRepository;
 import com.example.leshik.moviedb.data.model.Movie;
 import com.example.leshik.moviedb.data.model.Review;
 import com.example.leshik.moviedb.data.model.Video;
+import com.example.leshik.moviedb.ui.models.MovieViewModel;
 import com.ms.square.android.expandabletextview.ExpandableTextView;
 import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
 
@@ -90,7 +89,7 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
     // favorite flag
     private boolean isFavorite;
 
-    MovieInteractor mMovieDataStorage;
+    MovieViewModel mViewModel;
     CompositeDisposable subscription = new CompositeDisposable();
 
     public DetailFragment() {
@@ -117,8 +116,8 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
             mUri = savedInstanceState.getParcelable(FRAGMENT_MOVIE_URI);
         }
 
-        // init data storage for movies info
-        mMovieDataStorage = new DataStorage(getActivity().getApplicationContext());
+        // init vew model
+        mViewModel = new MovieViewModel(new MovieRepository(getActivity().getApplicationContext()));
     }
 
     @Override
@@ -201,7 +200,7 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
             // and change mark on the menu with dependence on the theme
             Utils.setFavoriteIcon(isFavorite, mMenu);
             // update favorite flag in the db
-            mMovieDataStorage.setFavoriteFlag(movieId, isFavorite);
+            mViewModel.setFavoriteFlag(movieId, isFavorite);
 
             return true;
         }
@@ -335,8 +334,7 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
     }
 
     private void subscribeToMovie(long movieId, boolean forceReload) {
-        subscription.add(mMovieDataStorage.getMovie(movieId, forceReload)
-                .observeOn(AndroidSchedulers.mainThread())
+        subscription.add(mViewModel.getMovie(movieId, forceReload)
                 .subscribe(new Consumer<Movie>() {
                     @Override
                     public void accept(Movie movie) throws Exception {

@@ -1,5 +1,6 @@
 package com.example.leshik.moviedb.data;
 
+import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
@@ -8,17 +9,14 @@ import com.example.leshik.moviedb.data.api.MovieResponse;
 import com.example.leshik.moviedb.data.api.ReviewsResponse;
 import com.example.leshik.moviedb.data.api.VideosResponse;
 import com.example.leshik.moviedb.data.interfaces.ApiService;
-import com.example.leshik.moviedb.data.interfaces.MovieInteractor;
 import com.example.leshik.moviedb.data.model.Movie;
 import com.example.leshik.moviedb.data.model.Review;
 import com.example.leshik.moviedb.data.model.Video;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import io.reactivex.Observable;
-import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
@@ -28,99 +26,23 @@ import io.realm.Realm;
  * Created by alex on 2/14/17.
  */
 
-public class DataStorage implements MovieInteractor {
+class DataStorage {
     private static final String TAG = "DataStorage";
     private Context context;
 
     public DataStorage(Context context) {
-        this.context = context;
-    }
-
-    @Override
-    public Observable<Movie> getMovie(final long movieId, boolean forceReload) {
-        Observable<Movie> movieFromApi;
-        Movie movieFromDb;
-        Observable<Movie> returnObservable;
-        long currentTime = Calendar.getInstance().getTimeInMillis();
-        long cacheUpdateInterval = Utils.getCacheUpdateInterval();
-
-        movieFromDb = readMovieFromDb(movieId);
-
-        movieFromApi = readMovieFromApi(movieId)
-                .zipWith(readVideoListFromApi(movieId), new BiFunction<Movie, List<Video>, Movie>() {
-                    @Override
-                    public Movie apply(Movie movie, List<Video> videos) throws Exception {
-                        movie.setVideos(videos);
-                        return movie;
-                    }
-                })
-                .zipWith(readReviewListFromApi(movieId), new BiFunction<Movie, List<Review>, Movie>() {
-                    @Override
-                    public Movie apply(Movie movie, List<Review> reviews) throws Exception {
-                        movie.setReviews(reviews);
-                        return movie;
-                    }
-                })
-                .doOnNext(new Consumer<Movie>() {
-                    @Override
-                    public void accept(Movie movie) throws Exception {
-                        writeMovieToDb(movie);
-                    }
-                });
-
-        if (movieFromDb == null || forceReload) {
-            // 1) cache does not exist
-            // 2) forced cache reloading
-            //   - return api response only
-            Log.i(TAG, "getMovie: from API");
-            returnObservable = movieFromApi;
-        } else if (((movieFromDb.getLastUpdate() + cacheUpdateInterval) <= currentTime && cacheUpdateInterval > 0)
-                || (movieFromDb.getLastUpdate() <= 0 && cacheUpdateInterval <= 0)) {
-            // 1) cache exist but expired
-            // 2) cache has never been updated and update interval is "never"
-            //    - return cache data, and refresh cache from api
-            Log.i(TAG, "getMovie: from DB+API");
-            returnObservable = movieFromApi
-                    .mergeWith(Observable.just(movieFromDb));
-        } else {
-            // cache exist and fresh - return data from db only
-            Log.i(TAG, "getMovie: from DB");
-            returnObservable = Observable.just(movieFromDb);
+        if (!(context instanceof Application)) {
+            Log.i(TAG, "DataStorage: context is not Application");
+            throw new IllegalArgumentException("DataStorage: context is not Application");
         }
-
-        return returnObservable.subscribeOn(Schedulers.io());
-    }
-
-    @Override
-    public void setFavoriteFlag(final long movieId, final boolean isFavorite) {
-        Realm realm = DataUtils.getRealmInstance(context);
-
-        realm.executeTransactionAsync(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                Movie movie = realm.where(Movie.class).equalTo("movieId", movieId).findFirst();
-                if (movie != null) {
-                    if (isFavorite) {
-                        Integer newPosition;
-                        Number max = realm.where(Movie.class).max("favoritePosition");
-                        if (max == null) newPosition = 1;
-                        else newPosition = max.intValue() + 1;
-                        movie.setFavoritePosition(newPosition);
-                    } else {
-                        movie.setFavoritePosition(-1);
-                    }
-                }
-            }
-        });
-
-        realm.close();
+        this.context = context;
     }
 
     private ApiService getApiServiceInstance() {
         return DataUtils.getServiceInstance(DataUtils.getRetrofitInstance(Utils.getBaseApiUrl()));
     }
 
-    private Movie readMovieFromDb(long movieId) {
+    Movie readMovieFromDb(long movieId) {
         Realm realm = DataUtils.getRealmInstance(context);
         Movie movie = findMovieFromDb(realm, movieId);
         realm.close();
@@ -135,7 +57,7 @@ public class DataStorage implements MovieInteractor {
         else return null;
     }
 
-    private long writeMovieToDb(final Movie newMovie) {
+    long writeMovieToDb(final Movie newMovie) {
         Realm realm = DataUtils.getRealmInstance(context);
 
         realm.executeTransactionAsync(new Realm.Transaction() {
@@ -152,7 +74,7 @@ public class DataStorage implements MovieInteractor {
         return newMovie.getMovieId();
     }
 
-    private Observable<Movie> readMovieFromApi(long movieId) {
+    Observable<Movie> readMovieFromApi(long movieId) {
         ApiService service = getApiServiceInstance();
 
         Observable<Movie> movie =
@@ -168,7 +90,7 @@ public class DataStorage implements MovieInteractor {
         return movie;
     }
 
-    private Observable<List<Video>> readVideoListFromApi(long movieId) {
+    Observable<List<Video>> readVideoListFromApi(long movieId) {
         ApiService service = getApiServiceInstance();
 
         Observable<List<Video>> videoList =
@@ -184,7 +106,7 @@ public class DataStorage implements MovieInteractor {
         return videoList;
     }
 
-    private Observable<List<Review>> readReviewListFromApi(final long movieId) {
+    Observable<List<Review>> readReviewListFromApi(final long movieId) {
         return readReviewListPageFromApi(movieId, 1);
     }
 
@@ -220,10 +142,27 @@ public class DataStorage implements MovieInteractor {
         return reviewList;
     }
 
+    void setFavoriteFlag(final long movieId, final boolean isFavorite) {
+        Realm realm = DataUtils.getRealmInstance(context);
 
-    private Movie markMovieTitle(Movie movie, String mark) {
-        movie.setOriginalTitle(mark + ": " + movie.getOriginalTitle());
-        return movie;
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                Movie movie = realm.where(Movie.class).equalTo("movieId", movieId).findFirst();
+                if (movie != null) {
+                    if (isFavorite) {
+                        Integer newPosition;
+                        Number max = realm.where(Movie.class).max("favoritePosition");
+                        if (max == null) newPosition = 1;
+                        else newPosition = max.intValue() + 1;
+                        movie.setFavoritePosition(newPosition);
+                    } else {
+                        movie.setFavoritePosition(-1);
+                    }
+                }
+            }
+        });
+
+        realm.close();
     }
-
 }
