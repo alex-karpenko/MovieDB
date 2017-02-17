@@ -10,7 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.leshik.moviedb.R;
-import com.example.leshik.moviedb.SettingsActivity;
+import com.example.leshik.moviedb.ui.settings.SettingsActivity;
 import com.example.leshik.moviedb.Utils;
 import com.example.leshik.moviedb.ui.poster.FullPosterActivity;
 

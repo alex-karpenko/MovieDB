@@ -140,7 +140,7 @@ public final class Utils {
 
     // change current theme setting based on the theme name from preferences
     // and schedule activity restart if theme changed
-    static void setCurrentTheme(Context context, String themeName) {
+    public static void setCurrentTheme(Context context, String themeName) {
         int themeId = R.style.AppThemeDark;
 
         if (themeName.equals(context.getString(R.string.pref_theme_dark)))

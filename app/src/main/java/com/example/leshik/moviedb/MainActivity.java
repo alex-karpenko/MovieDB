@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import com.example.leshik.moviedb.service.CacheUpdateService;
 import com.example.leshik.moviedb.ui.details.DetailFragment;
 import com.example.leshik.moviedb.ui.poster.FullPosterActivity;
+import com.example.leshik.moviedb.ui.settings.SettingsActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

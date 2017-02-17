@@ -1,10 +1,13 @@
-package com.example.leshik.moviedb;
+package com.example.leshik.moviedb.ui.settings;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+
+import com.example.leshik.moviedb.R;
+import com.example.leshik.moviedb.Utils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
