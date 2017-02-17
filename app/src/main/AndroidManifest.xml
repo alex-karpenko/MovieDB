@@ -36,10 +36,10 @@
             android:name=".FullPosterActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_full_poster"
-            android:parentActivityName=".DetailActivity">
+            android:parentActivityName=".ui.details.DetailActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.leshik.moviedb.DetailActivity" />
+                android:value="com.example.leshik.moviedb.ui.details.DetailActivity" />
         </activity>
 
         <provider
