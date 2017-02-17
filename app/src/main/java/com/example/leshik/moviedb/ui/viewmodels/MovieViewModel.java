@@ -1,4 +1,4 @@
-package com.example.leshik.moviedb.ui.models;
+package com.example.leshik.moviedb.ui.viewmodels;
 
 import com.example.leshik.moviedb.data.interfaces.MovieInteractor;
 import com.example.leshik.moviedb.data.model.Movie;

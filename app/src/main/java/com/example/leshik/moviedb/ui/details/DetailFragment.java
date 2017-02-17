@@ -26,7 +26,7 @@ import com.example.leshik.moviedb.data.MovieRepository;
 import com.example.leshik.moviedb.data.model.Movie;
 import com.example.leshik.moviedb.data.model.Review;
 import com.example.leshik.moviedb.data.model.Video;
-import com.example.leshik.moviedb.ui.models.MovieViewModel;
+import com.example.leshik.moviedb.ui.viewmodels.MovieViewModel;
 import com.ms.square.android.expandabletextview.ExpandableTextView;
 import com.squareup.picasso.Picasso;
 
