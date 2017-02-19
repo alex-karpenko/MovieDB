@@ -9,7 +9,31 @@ import io.reactivex.Observable;
  */
 
 public interface MovieInteractor {
-    Observable<Movie> getMovie(long movieId, boolean forceReload);
+    class MovieRequest {
+        private long movieId;
+        private boolean forceRefresh;
+        private boolean invertFavorite;
 
-    void setFavoriteFlag(long movieId, boolean isFavorite);
+        public MovieRequest(long movieId, boolean forceRefresh, boolean invertFavorite) {
+            this.movieId = movieId;
+            this.forceRefresh = forceRefresh;
+            this.invertFavorite = invertFavorite;
+        }
+
+        public long getMovieId() {
+            return movieId;
+        }
+
+        public boolean isForceRefresh() {
+            return forceRefresh;
+        }
+
+        public boolean isInvertFavorite() {
+            return invertFavorite;
+        }
+    }
+
+    Observable<Movie> getMovieObservable();
+
+    void sendRequest(MovieRequest request);
 }

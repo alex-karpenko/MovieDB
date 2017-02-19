@@ -4,7 +4,6 @@ import android.app.IntentService;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 
 import com.example.leshik.moviedb.BuildConfig;
 import com.example.leshik.moviedb.R;
@@ -338,7 +337,7 @@ public class CacheUpdateService extends IntentService {
                         delete(MoviesContract.Popular.CONTENT_URI,
                                 MoviesContract.Popular.COLUMN_NAME_SORT_ID + ">?",
                                 new String[]{String.valueOf(Utils.getCachePageSize())});
-                updateCachePreference(R.string.last_popular_update_time, Calendar.getInstance().getTimeInMillis());
+                Utils.setCachePreference(getBaseContext(), R.string.last_popular_update_time, Calendar.getInstance().getTimeInMillis());
             }
 
             // Insert movies and popular tables via content provider calls
@@ -347,8 +346,8 @@ public class CacheUpdateService extends IntentService {
                 getContentResolver().bulkInsert(MoviesContract.Popular.CONTENT_URI, listPage.getPopularContentValues());
 
                 // Update preferences to set number of pages and items
-                updateCachePreference(R.string.total_popular_pages, listPage.totalPages);
-                updateCachePreference(R.string.total_popular_items, listPage.totalResults);
+                Utils.setCachePreference(getBaseContext(), R.string.total_popular_pages, listPage.totalPages);
+                Utils.setCachePreference(getBaseContext(), R.string.total_popular_items, listPage.totalResults);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -380,7 +379,7 @@ public class CacheUpdateService extends IntentService {
                         .delete(MoviesContract.Toprated.CONTENT_URI,
                                 MoviesContract.Toprated.COLUMN_NAME_SORT_ID + ">?",
                                 new String[]{String.valueOf(Utils.getCachePageSize())});
-                updateCachePreference(R.string.last_toprated_update_time, Calendar.getInstance().getTimeInMillis());
+                Utils.setCachePreference(getBaseContext(), R.string.last_toprated_update_time, Calendar.getInstance().getTimeInMillis());
             }
 
             if (listPage.listResults.size() > 0) {
@@ -389,8 +388,8 @@ public class CacheUpdateService extends IntentService {
                 getContentResolver().bulkInsert(MoviesContract.Toprated.CONTENT_URI, listPage.getTopratedContentValues());
 
                 // Update preferences to set number of pages and items
-                updateCachePreference(R.string.total_toprated_pages, listPage.totalPages);
-                updateCachePreference(R.string.total_toprated_items, listPage.totalResults);
+                Utils.setCachePreference(getBaseContext(), R.string.total_toprated_pages, listPage.totalPages);
+                Utils.setCachePreference(getBaseContext(), R.string.total_toprated_items, listPage.totalResults);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -420,27 +419,11 @@ public class CacheUpdateService extends IntentService {
                 Utils.posterSizes[i] = config.images.posterSizes.get(i);
 
             // Store config values into shared preferences
-            updateCachePreference(R.string.base_potser_url, config.images.baseUrl);
-            updateCachePreference(R.string.base_potser_secure_url, config.images.secureBaseUrl);
+            Utils.setCachePreference(getBaseContext(), R.string.base_potser_url, config.images.baseUrl);
+            Utils.setCachePreference(getBaseContext(), R.string.base_potser_secure_url, config.images.secureBaseUrl);
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    // Helper method to update shared preferences by string value
-    public void updateCachePreference(int key, String value) {
-        SharedPreferences prefs = getSharedPreferences(CACHE_PREFS_NAME, 0);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(getString(key), value);
-        editor.commit();
-    }
-
-    // Helper method to update shared preferences by long value
-    public void updateCachePreference(int key, long value) {
-        SharedPreferences prefs = getSharedPreferences(CACHE_PREFS_NAME, 0);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putLong(getString(key), value);
-        editor.commit();
     }
 }
 

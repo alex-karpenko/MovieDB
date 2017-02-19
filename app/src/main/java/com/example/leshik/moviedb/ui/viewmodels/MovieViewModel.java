@@ -12,17 +12,28 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 
 public class MovieViewModel {
     private MovieInteractor mMovieInteractor;
+    private long movieId;
 
-    public MovieViewModel(MovieInteractor interactor) {
+    public MovieViewModel(long movieId, MovieInteractor interactor) {
+        this.movieId = movieId;
         mMovieInteractor = interactor;
     }
 
-    public Observable<Movie> getMovie(long movieId, boolean forceRefresh) {
-        return mMovieInteractor.getMovie(movieId, forceRefresh)
+    public Observable<Movie> getMovie() {
+        refresh();
+        return mMovieInteractor.getMovieObservable()
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public void setFavoriteFlag(long movieId, boolean flag) {
-        mMovieInteractor.setFavoriteFlag(movieId, flag);
+    public void invertFavorite() {
+        mMovieInteractor.sendRequest(new MovieInteractor.MovieRequest(movieId, false, true));
+    }
+
+    public void forceRefresh() {
+        mMovieInteractor.sendRequest(new MovieInteractor.MovieRequest(movieId, true, false));
+    }
+
+    public void refresh() {
+        mMovieInteractor.sendRequest(new MovieInteractor.MovieRequest(movieId, false, false));
     }
 }

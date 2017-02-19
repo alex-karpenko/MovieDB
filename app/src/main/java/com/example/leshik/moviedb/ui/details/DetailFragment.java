@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.ShareActionProvider;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -115,9 +116,6 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
         if (savedInstanceState != null) {
             mUri = savedInstanceState.getParcelable(FRAGMENT_MOVIE_URI);
         }
-
-        // init vew model
-        mViewModel = new MovieViewModel(new MovieRepository(getActivity().getApplicationContext()));
     }
 
     @Override
@@ -134,6 +132,9 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
         Bundle args = getArguments();
         if (args != null) mUri = args.getParcelable(FRAGMENT_MOVIE_URI);
         if (mUri != null) movieId = ContentUris.parseId(mUri);
+
+        // init vew model
+        mViewModel = new MovieViewModel(movieId, new MovieRepository(getActivity().getApplicationContext()));
 
         // Inflate fragment
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
@@ -154,7 +155,7 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
             }
         });
 
-        subscribeToMovie(movieId, false);
+        subscribeToMovie();
 
         return rootView;
     }
@@ -200,7 +201,7 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
             // and change mark on the menu with dependence on the theme
             Utils.setFavoriteIcon(isFavorite, mMenu);
             // update favorite flag in the db
-            mViewModel.setFavoriteFlag(movieId, isFavorite);
+            mViewModel.invertFavorite();
 
             return true;
         }
@@ -227,6 +228,8 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
     }
 
     private void updateUi(Movie movie) {
+        Log.i(TAG, "updateUi: +");
+
         // stop refresh circle
         mSwipeRefreshLayout.setRefreshing(false);
 
@@ -321,8 +324,8 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
         Utils.setFavoriteIcon(isFavorite, mMenu);
     }
 
-    private void subscribeToMovie(long movieId, boolean forceReload) {
-        subscription.add(mViewModel.getMovie(movieId, forceReload)
+    private void subscribeToMovie() {
+        subscription.add(mViewModel.getMovie()
                 .subscribe(new Consumer<Movie>() {
                     @Override
                     public void accept(Movie movie) throws Exception {
@@ -337,8 +340,7 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     // starting intent services to update cache tables
     void refreshCurrentMovie() {
-        subscription.clear();
-        subscribeToMovie(movieId, true);
+        mViewModel.forceRefresh();
     }
 
     /**

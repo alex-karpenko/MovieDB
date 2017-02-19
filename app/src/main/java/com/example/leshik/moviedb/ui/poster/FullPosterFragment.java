@@ -112,7 +112,7 @@ public class FullPosterFragment extends Fragment {
         }
 
         // init view model
-        mViewModel = new MovieViewModel(new MovieRepository(getActivity().getApplicationContext()));
+        mViewModel = new MovieViewModel(mMovieId, new MovieRepository(getActivity().getApplicationContext()));
     }
 
     @Override
@@ -130,7 +130,7 @@ public class FullPosterFragment extends Fragment {
             // change mark on the toolbar
             Utils.setFavoriteIcon(isFavorite, mMenu);
             // update favorite flag in the db
-            mViewModel.setFavoriteFlag(mMovieId, isFavorite);
+            mViewModel.invertFavorite();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -159,7 +159,7 @@ public class FullPosterFragment extends Fragment {
 
         mProgressBar.show();
 
-        subscribeToMovie(mMovieId);
+        subscribeToMovie();
 
         return rootView;
     }
@@ -224,8 +224,8 @@ public class FullPosterFragment extends Fragment {
         if (mShareActionProvider != null) mShareActionProvider.setShareIntent(myShareIntent);
     }
 
-    private void subscribeToMovie(long movieId) {
-        subscription.add(mViewModel.getMovie(movieId, false)
+    private void subscribeToMovie() {
+        subscription.add(mViewModel.getMovie()
                 .subscribe(new Consumer<Movie>() {
                     @Override
                     public void accept(Movie movie) throws Exception {

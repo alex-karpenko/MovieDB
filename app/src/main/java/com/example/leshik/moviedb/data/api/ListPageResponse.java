@@ -4,9 +4,11 @@ package com.example.leshik.moviedb.data.api;
  * Created by Leshik on 19.12.2016.
  */
 
+import com.example.leshik.moviedb.data.model.Movie;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,7 +18,6 @@ import java.util.List;
 
 
 class ListResult {
-
     @SerializedName("poster_path")
     @Expose
     public String posterPath;
@@ -63,6 +64,11 @@ class ListResult {
 }
 
 public class ListPageResponse {
+    private static final int PAGE_SIZE = 20;
+
+    private enum ListType {POPULAR, TOPRATED}
+
+    ;
 
     @SerializedName("page")
     @Expose
@@ -77,4 +83,54 @@ public class ListPageResponse {
     @Expose
     public Integer totalPages;
 
+    public List<Movie> getPopularListPageInstance() {
+        return getListPageInstance(ListType.POPULAR);
+    }
+
+    public List<Movie> getTopratedListPageInstance() {
+        return getListPageInstance(ListType.TOPRATED);
+    }
+
+    private List<Movie> getListPageInstance(ListType listType) {
+        int startPosition = (page - 1) * PAGE_SIZE + 1;
+        List<Movie> returnList = new ArrayList<>();
+
+        if (listResults != null) {
+            for (ListResult r : listResults) {
+                Movie movie = new Movie();
+
+                movie.setMovieId(r.id);
+                movie.setOriginalTitle(r.originalTitle);
+                movie.setOverview(r.overview);
+                movie.setReleaseDate(r.releaseDate);
+                movie.setVoteAverage(r.voteAverage);
+                movie.setPopularity(r.popularity);
+                movie.setPosterPath(r.posterPath);
+                movie.setHomePage(null);
+                movie.setAdult(r.adult);
+                movie.setVideo(r.video);
+                movie.setRunTime(null);
+                movie.setLastUpdate(null);
+                movie.setVideos(null);
+                movie.setReviews(null);
+                movie.setFavoritePosition(null);
+                movie.setPopularPosition(null);
+                movie.setTopratedPosition(null);
+
+                switch (listType) {
+                    case POPULAR:
+                        movie.setPopularPosition(startPosition);
+                        break;
+                    case TOPRATED:
+                        movie.setTopratedPosition(startPosition);
+                        break;
+                }
+                startPosition++;
+
+                returnList.add(movie);
+            }
+        }
+
+        return returnList;
+    }
 }

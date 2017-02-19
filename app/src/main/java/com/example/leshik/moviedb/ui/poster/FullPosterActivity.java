@@ -154,8 +154,8 @@ public class FullPosterActivity extends AppCompatActivity implements FullPosterF
         }
 
         // init view model
-        mViewModel = new MovieViewModel(new MovieRepository(getApplicationContext()));
-        subscribeToMovie(movieId);
+        mViewModel = new MovieViewModel(movieId, new MovieRepository(getApplicationContext()));
+        subscribeToMovie();
     }
 
     @Override
@@ -245,8 +245,8 @@ public class FullPosterActivity extends AppCompatActivity implements FullPosterF
         toggle();
     }
 
-    private void subscribeToMovie(long movieId) {
-        subscription.add(mViewModel.getMovie(movieId, false)
+    private void subscribeToMovie() {
+        subscription.add(mViewModel.getMovie()
                 .subscribe(new Consumer<Movie>() {
                     @Override
                     public void accept(Movie movie) throws Exception {

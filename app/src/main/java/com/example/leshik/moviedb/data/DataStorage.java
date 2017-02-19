@@ -4,7 +4,9 @@ import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
+import com.example.leshik.moviedb.R;
 import com.example.leshik.moviedb.Utils;
+import com.example.leshik.moviedb.data.api.ListPageResponse;
 import com.example.leshik.moviedb.data.api.MovieResponse;
 import com.example.leshik.moviedb.data.api.ReviewsResponse;
 import com.example.leshik.moviedb.data.api.VideosResponse;
@@ -60,7 +62,7 @@ class DataStorage {
     long writeMovieToDb(final Movie newMovie) {
         Realm realm = DataUtils.getRealmInstance(context);
 
-        realm.executeTransactionAsync(new Realm.Transaction() {
+        realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm transactionRealm) {
                 Movie movie = findMovieFromDb(transactionRealm, newMovie.getMovieId());
@@ -145,7 +147,7 @@ class DataStorage {
     void setFavoriteFlag(final long movieId, final boolean isFavorite) {
         Realm realm = DataUtils.getRealmInstance(context);
 
-        realm.executeTransactionAsync(new Realm.Transaction() {
+        realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 Movie movie = realm.where(Movie.class).equalTo("movieId", movieId).findFirst();
@@ -165,4 +167,28 @@ class DataStorage {
 
         realm.close();
     }
+
+    Observable<List<Movie>> readPopularListPageFromApi(int page) {
+        ApiService service = getApiServiceInstance();
+
+        Observable<List<Movie>> returnList =
+                service.getPopular(Utils.getApiKey(), page)
+                        .subscribeOn(Schedulers.io())
+                        .doOnNext(new Consumer<ListPageResponse>() {
+                            @Override
+                            public void accept(ListPageResponse listPageResponse) throws Exception {
+                                Utils.setCachePreference(context, R.string.total_popular_pages, listPageResponse.totalPages);
+                                Utils.setCachePreference(context, R.string.total_popular_items, listPageResponse.totalResults);
+                            }
+                        })
+                        .map(new Function<ListPageResponse, List<Movie>>() {
+                            @Override
+                            public List<Movie> apply(ListPageResponse listPageResponse) throws Exception {
+                                return listPageResponse.getPopularListPageInstance();
+                            }
+                        });
+
+        return returnList;
+    }
+
 }

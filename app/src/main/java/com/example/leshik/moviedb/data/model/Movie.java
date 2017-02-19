@@ -38,24 +38,24 @@ public class Movie extends RealmObject {
     @Index
     private Integer topratedPosition;
 
-    public void updateNullFields(Movie movie) {
-        if (movie != null) {
-            if (originalTitle == null) originalTitle = movie.getOriginalTitle();
-            if (overview == null) originalTitle = movie.getOverview();
-            if (releaseDate == null) releaseDate = movie.getReleaseDate();
-            if (voteAverage == null) voteAverage = movie.getVoteAverage();
-            if (popularity == null) popularity = movie.getPopularity();
-            if (posterPath == null) posterPath = movie.getPosterPath();
-            if (homePage == null) homePage = movie.getHomePage();
-            if (adult == null) adult = movie.getAdult();
-            if (video == null) video = movie.getVideo();
-            if (runTime == null) runTime = movie.getRunTime();
-            if (favoritePosition == null) favoritePosition = movie.getFavoritePosition();
-            if (popularPosition == null) popularPosition = movie.getPopularPosition();
-            if (topratedPosition == null) topratedPosition = movie.getTopratedPosition();
-            if (videos == null || videos.size() == 0) videos = movie.getVideos();
-            if (reviews == null || reviews.size() == 0) reviews = movie.getReviews();
-            if (lastUpdate == null) lastUpdate = movie.getLastUpdate();
+    public void updateNullFields(Movie existentMovie) {
+        if (existentMovie != null) {
+            if (originalTitle == null) originalTitle = existentMovie.getOriginalTitle();
+            if (overview == null) originalTitle = existentMovie.getOverview();
+            if (releaseDate == null) releaseDate = existentMovie.getReleaseDate();
+            if (voteAverage == null) voteAverage = existentMovie.getVoteAverage();
+            if (popularity == null) popularity = existentMovie.getPopularity();
+            if (posterPath == null) posterPath = existentMovie.getPosterPath();
+            if (homePage == null) homePage = existentMovie.getHomePage();
+            if (adult == null) adult = existentMovie.getAdult();
+            if (video == null) video = existentMovie.getVideo();
+            if (runTime == null) runTime = existentMovie.getRunTime();
+            if (favoritePosition == null) favoritePosition = existentMovie.getFavoritePosition();
+            if (popularPosition == null) popularPosition = existentMovie.getPopularPosition();
+            if (topratedPosition == null) topratedPosition = existentMovie.getTopratedPosition();
+            if (videos == null || videos.size() == 0) videos = existentMovie.getVideos();
+            if (reviews == null || reviews.size() == 0) reviews = existentMovie.getReviews();
+            if (lastUpdate == null) lastUpdate = existentMovie.getLastUpdate();
         }
     }
 
@@ -162,6 +162,11 @@ public class Movie extends RealmObject {
 
     public void setFavoritePosition(Integer favoritePosition) {
         this.favoritePosition = favoritePosition;
+    }
+
+    public boolean isFavorite() {
+        if (favoritePosition == null || favoritePosition <= 0) return false;
+        else return true;
     }
 
     public Integer getPopularPosition() {

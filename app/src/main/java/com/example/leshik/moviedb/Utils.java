@@ -71,6 +71,22 @@ public final class Utils {
         return prefs.getString(context.getString(key), null);
     }
 
+    // Helper method to update shared preferences by string value
+    public static void setCachePreference(Context context, int key, String value) {
+        SharedPreferences prefs = context.getSharedPreferences(CACHE_PREFS_NAME, 0);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(context.getString(key), value);
+        editor.commit();
+    }
+
+    // Helper method to update shared preferences by long value
+    public static void setCachePreference(Context context, int key, long value) {
+        SharedPreferences prefs = context.getSharedPreferences(CACHE_PREFS_NAME, 0);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putLong(context.getString(key), value);
+        editor.commit();
+    }
+
     // calculate number of GridLayout columns based on screen width
     public static int calculateNoOfColumns(Context context) {
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
