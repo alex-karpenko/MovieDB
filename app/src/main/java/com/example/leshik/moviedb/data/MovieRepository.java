@@ -28,12 +28,15 @@ import static io.reactivex.Observable.just;
 
 public class MovieRepository implements MovieInteractor {
     private static final String TAG = "MovieRepository";
-    private final DataStorage mDataStorage;
+    private final TmdbNetworkStorage mNetworkStorage;
+    private final RealmPersistentStorage mPersistentStorage;
     private static BehaviorSubject<MovieRequest> movieSubject = null;
     private static Observable<Movie> movieObservable = null;
 
     public MovieRepository(Context context) {
-        mDataStorage = new DataStorage(context);
+        // TODO: 01.03.2017 Must be refactored to reduce size of the such large method
+        mNetworkStorage = new TmdbNetworkStorage(Utils.getBaseApiUrl());
+        mPersistentStorage = new RealmPersistentStorage(context);
 
         if (movieSubject == null || movieObservable == null) {
             movieSubject = BehaviorSubject.create();
@@ -41,8 +44,8 @@ public class MovieRepository implements MovieInteractor {
                     .flatMap(new Function<MovieRequest, ObservableSource<Movie>>() {
                         @Override
                         public ObservableSource<Movie> apply(MovieRequest request) throws Exception {
-                            Observable<Movie> movieFromApi = mDataStorage.readMovieFromApi(request.getMovieId())
-                                    .zipWith(mDataStorage.readVideoListFromApi(request.getMovieId()),
+                            Observable<Movie> movieFromNetwork = mNetworkStorage.readMovie(request.getMovieId())
+                                    .zipWith(mNetworkStorage.readVideoList(request.getMovieId()),
                                             new BiFunction<Movie, List<Video>, Movie>() {
                                                 @Override
                                                 public Movie apply(Movie movie, List<Video> videos) throws Exception {
@@ -50,7 +53,7 @@ public class MovieRepository implements MovieInteractor {
                                                     return movie;
                                                 }
                                             })
-                                    .zipWith(mDataStorage.readReviewListFromApi(request.getMovieId()),
+                                    .zipWith(mNetworkStorage.readReviewList(request.getMovieId()),
                                             new BiFunction<Movie, List<Review>, Movie>() {
                                                 @Override
                                                 public Movie apply(Movie movie, List<Review> reviews) throws Exception {
@@ -61,41 +64,41 @@ public class MovieRepository implements MovieInteractor {
                                     .doOnNext(new Consumer<Movie>() {
                                         @Override
                                         public void accept(Movie movie) throws Exception {
-                                            mDataStorage.writeMovieToDb(movie);
+                                            mPersistentStorage.writeMovie(movie);
                                         }
                                     });
 
                             if (request.isForceRefresh()) {
                                 Log.i(TAG, "apply: from API");
-                                return movieFromApi;
+                                return movieFromNetwork;
                             }
 
-                            Movie movieFromDb = mDataStorage.readMovieFromDb(request.getMovieId());
-                            if (movieFromDb == null) {
+                            Movie movieFromCache = mPersistentStorage.readMovie(request.getMovieId());
+                            if (movieFromCache == null) {
                                 Log.i(TAG, "apply: from API");
-                                return movieFromApi;
+                                return movieFromNetwork;
                             }
 
                             if (request.isInvertFavorite()) {
-                                mDataStorage.setFavoriteFlag(request.getMovieId(), !movieFromDb.isFavorite());
-                                movieFromDb = mDataStorage.readMovieFromDb(request.getMovieId());
+                                mPersistentStorage.setFavoriteFlag(request.getMovieId(), !movieFromCache.isFavorite());
+                                movieFromCache = mPersistentStorage.readMovie(request.getMovieId());
                                 Log.i(TAG, "apply: from DB, invert favorite");
-                                return Observable.just(movieFromDb);
+                                return Observable.just(movieFromCache);
                             }
 
                             long currentTime = Calendar.getInstance().getTimeInMillis();
                             long cacheUpdateInterval = Utils.getCacheUpdateInterval();
-                            if (((movieFromDb.getLastUpdate() + cacheUpdateInterval) <= currentTime && cacheUpdateInterval > 0)
-                                    || (movieFromDb.getLastUpdate() <= 0 && cacheUpdateInterval <= 0)) {
+                            if (((movieFromCache.getLastUpdate() + cacheUpdateInterval) <= currentTime && cacheUpdateInterval > 0)
+                                    || (movieFromCache.getLastUpdate() <= 0 && cacheUpdateInterval <= 0)) {
                                 // 1) cache exist but expired
                                 // 2) cache has never been updated and update interval is "never"
                                 //    - return cache data, and refresh cache from api
                                 Log.i(TAG, "apply: from DB+API");
-                                return movieFromApi.mergeWith(just(movieFromDb));
+                                return movieFromNetwork.mergeWith(just(movieFromCache));
                             }
 
                             Log.i(TAG, "apply: from DB");
-                            return Observable.just(movieFromDb);
+                            return Observable.just(movieFromCache);
                         }
                     });
         }

@@ -34,6 +34,5 @@ public interface MovieInteractor {
     }
 
     Observable<Movie> getMovieObservable();
-
     void sendRequest(MovieRequest request);
 }
