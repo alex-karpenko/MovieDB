@@ -8,6 +8,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 
 /**
  * Created by Leshik on 17.02.2017.
+ * <p>
+ * ViewModel to access movie data
  */
 
 public class MovieViewModel {
@@ -20,20 +22,15 @@ public class MovieViewModel {
     }
 
     public Observable<Movie> getMovie() {
-        refresh();
-        return mMovieInteractor.getMovieObservable()
+        return mMovieInteractor.getMovieObservable(movieId)
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
     public void invertFavorite() {
-        mMovieInteractor.sendRequest(new MovieInteractor.MovieRequest(movieId, false, true));
+        mMovieInteractor.invertFavorite(movieId);
     }
 
     public void forceRefresh() {
-        mMovieInteractor.sendRequest(new MovieInteractor.MovieRequest(movieId, true, false));
-    }
-
-    public void refresh() {
-        mMovieInteractor.sendRequest(new MovieInteractor.MovieRequest(movieId, false, false));
+        mMovieInteractor.forceRefresh(movieId);
     }
 }

@@ -4,16 +4,18 @@ import com.example.leshik.moviedb.data.model.Movie;
 
 import java.util.List;
 
+import io.reactivex.Observable;
+
 /**
  * Created by Leshik on 01.03.2017.
  */
 
 public interface PersistentStorage {
-    Movie readMovie(long movieId);
+    Observable<Movie> getMovieObservable(long movieId);
 
-    long writeMovie(Movie movie);
+    long updateOrInsertMovie(Movie movie);
 
-    void setFavoriteFlag(long movieId, boolean favoriteFlag);
+    void invertFavorite(long movieId);
 
     List<Movie> readPopularList();
 

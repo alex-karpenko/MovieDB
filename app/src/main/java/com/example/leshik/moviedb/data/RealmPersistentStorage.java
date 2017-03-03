@@ -8,34 +8,43 @@ import com.example.leshik.moviedb.data.model.Movie;
 
 import java.util.List;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.disposables.Disposables;
 import io.realm.Realm;
+import io.realm.RealmChangeListener;
 import io.realm.RealmConfiguration;
+import io.realm.RealmResults;
 
 /**
  * Created by Leshik on 01.03.2017.
  */
 
 public class RealmPersistentStorage implements PersistentStorage {
-    private static final String TAG = "RealmPersistentStorage";
     private static final String REALM_DB_FILE_NAME = "movies.realm";
     private static final int REALM_DB_SCHEME_VERSION = 1;
-
-    private Context context;
+    private static boolean isRealmConfigured = false;
 
     RealmPersistentStorage(Context context) {
-        if (!(context instanceof Application)) {
+        if (context instanceof Application) {
+            buildDefaultRealmConfiguration(context);
+        } else {
             throw new IllegalArgumentException("RealmPersistentStorage: context is not Application");
         }
+    }
 
-        this.context = context;
-
-        Realm.init(context);
-        RealmConfiguration realmConfig = new RealmConfiguration.Builder()
-                .name(REALM_DB_FILE_NAME)
-                .schemaVersion(REALM_DB_SCHEME_VERSION)
-                .deleteRealmIfMigrationNeeded()
-                .build();
-        Realm.setDefaultConfiguration(realmConfig);
+    private void buildDefaultRealmConfiguration(Context context) {
+        if (!isRealmConfigured) {
+            Realm.init(context);
+            RealmConfiguration realmConfig = new RealmConfiguration.Builder()
+                    .name(REALM_DB_FILE_NAME)
+                    .schemaVersion(REALM_DB_SCHEME_VERSION)
+                    .deleteRealmIfMigrationNeeded()
+                    .build();
+            Realm.setDefaultConfiguration(realmConfig);
+            isRealmConfigured = true;
+        }
     }
 
     private Realm getRealmInstance() {
@@ -43,30 +52,51 @@ public class RealmPersistentStorage implements PersistentStorage {
     }
 
     @Override
-    public Movie readMovie(long movieId) {
-        Realm realm = getRealmInstance();
-        Movie movie = findMovieFromDb(realm, movieId);
-        realm.close();
+    public Observable<Movie> getMovieObservable(final long movieId) {
+        return Observable.create(new ObservableOnSubscribe<Movie>() {
+            @Override
+            public void subscribe(final ObservableEmitter<Movie> emitter) throws Exception {
+                final Realm realm = getRealmInstance();
+                final RealmResults<Movie> movie = findMovieAsRealmResult(realm, movieId);
 
-        return movie;
+                final RealmChangeListener<RealmResults<Movie>> listener = new RealmChangeListener<RealmResults<Movie>>() {
+                    @Override
+                    public void onChange(RealmResults<Movie> element) {
+                        if (!emitter.isDisposed() && element.size() > 0)
+                            emitter.onNext(element.get(0));
+                    }
+                };
+
+                emitter.setDisposable(Disposables.fromRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        movie.removeChangeListener(listener);
+                        if (!realm.isClosed())
+                            realm.close();
+                    }
+                }));
+
+                movie.addChangeListener(listener);
+                if (movie.size() > 0)
+                    emitter.onNext(movie.get(0));
+            }
+        });
     }
 
-    private Movie findMovieFromDb(Realm realm, long movieId) {
-        Movie movie = realm.where(Movie.class).equalTo("movieId", movieId).findFirst();
-        if (movie != null && movie.isValid())
-            return realm.copyFromRealm(movie);
-        else return null;
+    private RealmResults<Movie> findMovieAsRealmResult(Realm realm, long movieId) {
+        return realm.where(Movie.class)
+                .equalTo("movieId", movieId)
+                .findAll();
     }
-
 
     @Override
-    public long writeMovie(final Movie newMovie) {
+    public long updateOrInsertMovie(final Movie newMovie) {
         Realm realm = getRealmInstance();
 
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm transactionRealm) {
-                Movie movie = findMovieFromDb(transactionRealm, newMovie.getMovieId());
+                Movie movie = findMovie(transactionRealm, newMovie.getMovieId());
                 if (movie != null) newMovie.updateNullFields(movie);
                 transactionRealm.copyToRealmOrUpdate(newMovie);
             }
@@ -77,8 +107,15 @@ public class RealmPersistentStorage implements PersistentStorage {
         return newMovie.getMovieId();
     }
 
+    private Movie findMovie(Realm realm, long movieId) {
+        Movie movie = realm.where(Movie.class).equalTo("movieId", movieId).findFirst();
+        if (movie != null && movie.isValid())
+            return realm.copyFromRealm(movie);
+        else return null;
+    }
+
     @Override
-    public void setFavoriteFlag(final long movieId, final boolean favoriteFlag) {
+    public void invertFavorite(final long movieId) {
         Realm realm = getRealmInstance();
 
         realm.executeTransaction(new Realm.Transaction() {
@@ -86,14 +123,14 @@ public class RealmPersistentStorage implements PersistentStorage {
             public void execute(Realm realm) {
                 Movie movie = realm.where(Movie.class).equalTo("movieId", movieId).findFirst();
                 if (movie != null) {
-                    if (favoriteFlag) {
+                    if (movie.isFavorite()) {
+                        movie.setFavoritePosition(-1);
+                    } else {
                         Integer newFavoriteListPosition;
                         Number maxCurrentFavoritePosition = realm.where(Movie.class).max("favoritePosition");
                         if (maxCurrentFavoritePosition == null) newFavoriteListPosition = 1;
                         else newFavoriteListPosition = maxCurrentFavoritePosition.intValue() + 1;
                         movie.setFavoritePosition(newFavoriteListPosition);
-                    } else {
-                        movie.setFavoritePosition(-1);
                     }
                 }
             }
