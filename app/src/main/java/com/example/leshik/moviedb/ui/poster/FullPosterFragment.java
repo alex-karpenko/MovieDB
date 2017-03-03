@@ -40,7 +40,7 @@ public class FullPosterFragment extends Fragment {
     // state and fragment's arguments markers
     private static final String ARG_MOVIE_ID = "MOVIE_ID";
 
-    private long mMovieId;
+    private long movieId;
 
     private Menu mMenu;
     private ShareActionProvider mShareActionProvider;
@@ -105,20 +105,20 @@ public class FullPosterFragment extends Fragment {
         // set state variables from saved state or argument's bundle
         if (savedInstanceState == null) {
             if (getArguments() != null) {
-                mMovieId = getArguments().getLong(ARG_MOVIE_ID, -1);
+                movieId = getArguments().getLong(ARG_MOVIE_ID, -1);
             }
         } else {
-            mMovieId = savedInstanceState.getLong(ARG_MOVIE_ID);
+            movieId = savedInstanceState.getLong(ARG_MOVIE_ID);
         }
 
         // init view model
-        mViewModel = new MovieViewModel(mMovieId, new MovieRepository(getActivity().getApplicationContext()));
+        mViewModel = new MovieViewModel(movieId, new MovieRepository(getActivity().getApplicationContext()));
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putLong(ARG_MOVIE_ID, mMovieId);
+        outState.putLong(ARG_MOVIE_ID, movieId);
     }
 
     @Override
