@@ -9,7 +9,7 @@ import io.reactivex.Observable;
  */
 
 public interface MovieInteractor {
-    Observable<Movie> getMovieObservable(long movieId);
+    Observable<Movie> getMovie(long movieId);
 
     void invertFavorite(long movieId);
 

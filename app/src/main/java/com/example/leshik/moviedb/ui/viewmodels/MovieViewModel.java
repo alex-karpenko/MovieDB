@@ -22,7 +22,7 @@ public class MovieViewModel {
     }
 
     public Observable<Movie> getMovie() {
-        return mMovieInteractor.getMovieObservable(movieId)
+        return mMovieInteractor.getMovie(movieId)
                 .observeOn(AndroidSchedulers.mainThread());
     }
 

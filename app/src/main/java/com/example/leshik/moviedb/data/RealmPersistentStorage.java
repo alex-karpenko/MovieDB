@@ -77,8 +77,8 @@ public class RealmPersistentStorage implements PersistentStorage {
                 }));
 
                 movie.addChangeListener(listener);
-                if (movie.size() > 0)
-                    emitter.onNext(movie.get(0));
+                if (movie.size() > 0) emitter.onNext(movie.get(0));
+                else emitter.onNext(new Movie());
             }
         });
     }

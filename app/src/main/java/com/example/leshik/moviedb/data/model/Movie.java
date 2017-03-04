@@ -38,6 +38,10 @@ public class Movie extends RealmObject {
     @Index
     private Integer topratedPosition;
 
+    public boolean isEmpty() {
+        return movieId == 0;
+    }
+
     public void updateNullFields(Movie existentMovie) {
         if (existentMovie != null) {
             if (originalTitle == null) originalTitle = existentMovie.getOriginalTitle();
