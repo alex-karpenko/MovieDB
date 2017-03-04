@@ -22,4 +22,12 @@ public interface NetworkStorage {
     Observable<List<Movie>> readPopularListPage(int page);
 
     Observable<List<Movie>> readTopratedListPage(int page);
+
+    int getTotalPopularPages();
+
+    int getTotalPopularItems();
+
+    int getTotalTopratedPages();
+
+    int getTotalTopratedItems();
 }

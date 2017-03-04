@@ -30,6 +30,10 @@ public class TmdbNetworkStorage implements NetworkStorage {
     private static final String TAG = "TmdbNetworkStorage";
 
     private Retrofit retrofit;
+    private static int totalPopularPages;
+    private static int totalPopularItems;
+    private static int totalTopratedPages;
+    private static int totalTopratedItems;
 
     public TmdbNetworkStorage(String apiUrl) {
         retrofit = new Retrofit.Builder()
@@ -142,9 +146,8 @@ public class TmdbNetworkStorage implements NetworkStorage {
     }
 
     private void updatePopularTotals(int totalPages, int totalItems) {
-        // FIXME: 01.03.2017 We must use unified references storage
-        //Utils.setCachePreference(context, R.string.total_popular_pages, totalPages);
-        //Utils.setCachePreference(context, R.string.total_popular_items, totalItems);
+        totalPopularPages=totalPages;
+        totalPopularItems=totalItems;
     }
 
     @Override
@@ -171,8 +174,27 @@ public class TmdbNetworkStorage implements NetworkStorage {
     }
 
     private void updateTopratedTotals(int totalPages, int totalItems) {
-        // FIXME: 01.03.2017 We must use unified references storage
-        //Utils.setCachePreference(context, R.string.total_toprated_pages, totalPages);
-        //Utils.setCachePreference(context, R.string.total_toprated_items, totalItems);
+        totalTopratedPages=totalPages;
+        totalTopratedItems=totalItems;
+    }
+
+    @Override
+    public int getTotalPopularPages() {
+        return totalPopularPages;
+    }
+
+    @Override
+    public int getTotalPopularItems() {
+        return totalPopularItems;
+    }
+
+    @Override
+    public int getTotalTopratedPages() {
+        return totalTopratedPages;
+    }
+
+    @Override
+    public int getTotalTopratedItems() {
+        return totalTopratedItems;
     }
 }

@@ -57,7 +57,7 @@ public class RealmPersistentStorage implements PersistentStorage {
             @Override
             public void subscribe(final ObservableEmitter<Movie> emitter) throws Exception {
                 final Realm realm = getRealmInstance();
-                final RealmResults<Movie> movie = findMovieAsRealmResult(realm, movieId);
+                final RealmResults<Movie> movie = findMovieAsRealmResults(realm, movieId);
 
                 final RealmChangeListener<RealmResults<Movie>> listener = new RealmChangeListener<RealmResults<Movie>>() {
                     @Override
@@ -83,7 +83,7 @@ public class RealmPersistentStorage implements PersistentStorage {
         });
     }
 
-    private RealmResults<Movie> findMovieAsRealmResult(Realm realm, long movieId) {
+    private RealmResults<Movie> findMovieAsRealmResults(Realm realm, long movieId) {
         return realm.where(Movie.class)
                 .equalTo("movieId", movieId)
                 .findAll();
@@ -140,17 +140,49 @@ public class RealmPersistentStorage implements PersistentStorage {
     }
 
     @Override
-    public List<Movie> readPopularList() {
-        throw new UnsupportedOperationException("readPopularList not implemented");
+    public Observable<List<Movie>> getPopularListObservable() {
+        return Observable.create(new ObservableOnSubscribe<List<Movie>>() {
+            @Override
+            public void subscribe(final ObservableEmitter<List<Movie>> emitter) throws Exception {
+                final Realm realm = getRealmInstance();
+                final RealmResults<Movie> movieList = findPopularAsRealmResults(realm);
+
+                final RealmChangeListener<RealmResults<Movie>> listener = new RealmChangeListener<RealmResults<Movie>>() {
+                    @Override
+                    public void onChange(RealmResults<Movie> element) {
+                        if (!emitter.isDisposed())
+                            emitter.onNext(element);
+                    }
+                };
+
+                emitter.setDisposable(Disposables.fromRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        movieList.removeChangeListener(listener);
+                        if (!realm.isClosed())
+                            realm.close();
+                    }
+                }));
+
+                movieList.addChangeListener(listener);
+                emitter.onNext(movieList);
+            }
+        });
+    }
+
+    private RealmResults<Movie> findPopularAsRealmResults(Realm realm) {
+        return realm.where(Movie.class)
+                .greaterThan("popularPosition", 0)
+                .findAllSorted("popularPosition");
     }
 
     @Override
-    public List<Movie> readTopratedList() {
-        throw new UnsupportedOperationException("readTopratedList not implemented");
+    public Observable<List<Movie>> getTopratedListObservable() {
+        throw new UnsupportedOperationException("getTopratedListObservable not implemented");
     }
 
     @Override
-    public List<Movie> readFavoriteList() {
-        throw new UnsupportedOperationException("readFavoriteList not implemented");
+    public Observable<List<Movie>> getFavoriteListObservable() {
+        throw new UnsupportedOperationException("getFavoriteListObservable not implemented");
     }
 }

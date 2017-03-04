@@ -17,9 +17,9 @@ public interface PersistentStorage {
 
     void invertFavorite(long movieId);
 
-    List<Movie> readPopularList();
+    Observable<List<Movie>> getPopularListObservable();
 
-    List<Movie> readTopratedList();
+    Observable<List<Movie>> getTopratedListObservable();
 
-    List<Movie> readFavoriteList();
+    Observable<List<Movie>> getFavoriteListObservable();
 }
