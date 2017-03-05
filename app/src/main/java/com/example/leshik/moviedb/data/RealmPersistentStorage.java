@@ -2,6 +2,7 @@ package com.example.leshik.moviedb.data;
 
 import android.app.Application;
 import android.content.Context;
+import android.support.annotation.Nullable;
 
 import com.example.leshik.moviedb.data.interfaces.PersistentStorage;
 import com.example.leshik.moviedb.data.model.Movie;
@@ -107,6 +108,7 @@ public class RealmPersistentStorage implements PersistentStorage {
         return newMovie.getMovieId();
     }
 
+    @Nullable
     private Movie findMovie(Realm realm, long movieId) {
         Movie movie = realm.where(Movie.class).equalTo("movieId", movieId).findFirst();
         if (movie != null && movie.isValid())
@@ -127,7 +129,8 @@ public class RealmPersistentStorage implements PersistentStorage {
                         movie.setFavoritePosition(-1);
                     } else {
                         Integer newFavoriteListPosition;
-                        Number maxCurrentFavoritePosition = realm.where(Movie.class).max("favoritePosition");
+                        Number maxCurrentFavoritePosition = realm.where(Movie.class)
+                                .max(getListTypeColumnName(MovieListType.Favorite));
                         if (maxCurrentFavoritePosition == null) newFavoriteListPosition = 1;
                         else newFavoriteListPosition = maxCurrentFavoritePosition.intValue() + 1;
                         movie.setFavoritePosition(newFavoriteListPosition);
@@ -139,13 +142,30 @@ public class RealmPersistentStorage implements PersistentStorage {
         realm.close();
     }
 
+    String getListTypeColumnName(MovieListType listType) {
+        String columnName = "";
+        switch (listType) {
+            case Popular:
+                columnName = "popularPosition";
+                break;
+            case Toprated:
+                columnName = "topratedPosition";
+                break;
+            case Favorite:
+                columnName = "favoritePosition";
+                break;
+        }
+
+        return columnName;
+    }
+
     @Override
-    public Observable<List<Movie>> getPopularListObservable() {
+    public Observable<List<Movie>> getMovieListObservable(final MovieListType listType) {
         return Observable.create(new ObservableOnSubscribe<List<Movie>>() {
             @Override
             public void subscribe(final ObservableEmitter<List<Movie>> emitter) throws Exception {
                 final Realm realm = getRealmInstance();
-                final RealmResults<Movie> movieList = findPopularAsRealmResults(realm);
+                final RealmResults<Movie> movieList = findMovieListAsRealmResults(realm, listType);
 
                 final RealmChangeListener<RealmResults<Movie>> listener = new RealmChangeListener<RealmResults<Movie>>() {
                     @Override
@@ -170,19 +190,9 @@ public class RealmPersistentStorage implements PersistentStorage {
         });
     }
 
-    private RealmResults<Movie> findPopularAsRealmResults(Realm realm) {
+    private RealmResults<Movie> findMovieListAsRealmResults(Realm realm, MovieListType listType) {
         return realm.where(Movie.class)
-                .greaterThan("popularPosition", 0)
-                .findAllSorted("popularPosition");
-    }
-
-    @Override
-    public Observable<List<Movie>> getTopratedListObservable() {
-        throw new UnsupportedOperationException("getTopratedListObservable not implemented");
-    }
-
-    @Override
-    public Observable<List<Movie>> getFavoriteListObservable() {
-        throw new UnsupportedOperationException("getFavoriteListObservable not implemented");
+                .greaterThan(getListTypeColumnName(listType), 0)
+                .findAllSorted(getListTypeColumnName(listType));
     }
 }

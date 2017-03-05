@@ -4,6 +4,7 @@ package com.example.leshik.moviedb.data.api;
  * Created by Leshik on 19.12.2016.
  */
 
+import com.example.leshik.moviedb.data.MovieListType;
 import com.example.leshik.moviedb.data.model.Movie;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -66,10 +67,6 @@ class ListResult {
 public class ListPageResponse {
     private static final int PAGE_SIZE = 20;
 
-    private enum ListType {POPULAR, TOPRATED}
-
-    ;
-
     @SerializedName("page")
     @Expose
     public Integer page;
@@ -83,15 +80,7 @@ public class ListPageResponse {
     @Expose
     public Integer totalPages;
 
-    public List<Movie> getPopularListPageInstance() {
-        return getListPageInstance(ListType.POPULAR);
-    }
-
-    public List<Movie> getTopratedListPageInstance() {
-        return getListPageInstance(ListType.TOPRATED);
-    }
-
-    private List<Movie> getListPageInstance(ListType listType) {
+    public List<Movie> getListPageInstance(MovieListType listType) {
         int startPosition = (page - 1) * PAGE_SIZE + 1;
         List<Movie> returnList = new ArrayList<>();
 
@@ -118,12 +107,14 @@ public class ListPageResponse {
                 movie.setTopratedPosition(null);
 
                 switch (listType) {
-                    case POPULAR:
+                    case Popular:
                         movie.setPopularPosition(startPosition);
                         break;
-                    case TOPRATED:
+                    case Toprated:
                         movie.setTopratedPosition(startPosition);
                         break;
+                    default:
+                        throw new IllegalArgumentException("ListPageResponse: instance type does not supported");
                 }
                 startPosition++;
 

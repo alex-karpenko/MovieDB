@@ -10,6 +10,10 @@ import io.reactivex.Observable;
  * Created by Leshik on 17.02.2017.
  */
 
-public interface TopratedInteractor {
-    Observable<List<Movie>> getTopratedList(int lastPage);
+public interface MovieListInteractor {
+    Observable<List<Movie>> getList();
+
+    void forceRefreshList();
+
+    void loadNextPage();
 }

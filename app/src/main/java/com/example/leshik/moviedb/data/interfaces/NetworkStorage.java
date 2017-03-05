@@ -1,5 +1,6 @@
 package com.example.leshik.moviedb.data.interfaces;
 
+import com.example.leshik.moviedb.data.MovieListType;
 import com.example.leshik.moviedb.data.model.Movie;
 import com.example.leshik.moviedb.data.model.Review;
 import com.example.leshik.moviedb.data.model.Video;
@@ -19,15 +20,9 @@ public interface NetworkStorage {
 
     Observable<List<Review>> readReviewList(long movieId);
 
-    Observable<List<Movie>> readPopularListPage(int page);
+    Observable<List<Movie>> readMovieListPage(MovieListType listType, int page);
 
-    Observable<List<Movie>> readTopratedListPage(int page);
+    int getTotalListPages(MovieListType listType);
 
-    int getTotalPopularPages();
-
-    int getTotalPopularItems();
-
-    int getTotalTopratedPages();
-
-    int getTotalTopratedItems();
+    int getTotalListItems(MovieListType listType);
 }

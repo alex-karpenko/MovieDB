@@ -28,12 +28,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class TmdbNetworkStorage implements NetworkStorage {
     private static final String TAG = "TmdbNetworkStorage";
-
     private Retrofit retrofit;
-    private static int totalPopularPages;
-    private static int totalPopularItems;
-    private static int totalTopratedPages;
-    private static int totalTopratedItems;
+    private static int[] totalListPages;
+    private static int[] totalListItems;
 
     public TmdbNetworkStorage(String apiUrl) {
         retrofit = new Retrofit.Builder()
@@ -41,6 +38,10 @@ public class TmdbNetworkStorage implements NetworkStorage {
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build();
+
+        // TODO: 3/5/17 Somewhat does not inspire me this approach ...
+        totalListPages = new int[]{0, 0, 0};
+        totalListItems = new int[]{0, 0, 0};
     }
 
     private ApiService getServiceInstance() {
@@ -123,78 +124,56 @@ public class TmdbNetworkStorage implements NetworkStorage {
     }
 
     @Override
-    public Observable<List<Movie>> readPopularListPage(int page) {
-        ApiService service = getServiceInstance();
-
+    public Observable<List<Movie>> readMovieListPage(final MovieListType listType, int page) {
         Observable<List<Movie>> returnList =
-                service.getPopular(getApiKey(), page)
+                getListResponseObservable(listType, page)
                         .subscribeOn(Schedulers.io())
                         .doOnNext(new Consumer<ListPageResponse>() {
                             @Override
                             public void accept(ListPageResponse listPageResponse) throws Exception {
-                                updatePopularTotals(listPageResponse.totalPages, listPageResponse.totalResults);
+                                updateListTotals(listType, listPageResponse.totalPages, listPageResponse.totalResults);
                             }
                         })
                         .map(new Function<ListPageResponse, List<Movie>>() {
                             @Override
                             public List<Movie> apply(ListPageResponse listPageResponse) throws Exception {
-                                return listPageResponse.getPopularListPageInstance();
+                                return listPageResponse.getListPageInstance(listType);
                             }
                         });
 
         return returnList;
     }
 
-    private void updatePopularTotals(int totalPages, int totalItems) {
-        totalPopularPages=totalPages;
-        totalPopularItems=totalItems;
-    }
-
-    @Override
-    public Observable<List<Movie>> readTopratedListPage(int page) {
+    Observable<ListPageResponse> getListResponseObservable(MovieListType listType, int page) {
         ApiService service = getServiceInstance();
+        Observable<ListPageResponse> returnObservable = null;
 
-        Observable<List<Movie>> returnList =
-                service.getToprated(getApiKey(), page)
-                        .subscribeOn(Schedulers.io())
-                        .doOnNext(new Consumer<ListPageResponse>() {
-                            @Override
-                            public void accept(ListPageResponse listPageResponse) throws Exception {
-                                updateTopratedTotals(listPageResponse.totalPages, listPageResponse.totalResults);
-                            }
-                        })
-                        .map(new Function<ListPageResponse, List<Movie>>() {
-                            @Override
-                            public List<Movie> apply(ListPageResponse listPageResponse) throws Exception {
-                                return listPageResponse.getTopratedListPageInstance();
-                            }
-                        });
+        switch (listType) {
+            case Popular:
+                returnObservable = service.getPopular(getApiKey(), page);
+                break;
+            case Toprated:
+                returnObservable = service.getToprated(getApiKey(), page);
+                break;
+            default:
+                throw new IllegalArgumentException("NetworkStorage: list type does not supported");
+        }
 
-        return returnList;
+        return returnObservable;
     }
 
-    private void updateTopratedTotals(int totalPages, int totalItems) {
-        totalTopratedPages=totalPages;
-        totalTopratedItems=totalItems;
+    private void updateListTotals(MovieListType listType, int totalPages, int totalItems) {
+        totalListPages[listType.getIndex()] = totalPages;
+        totalListItems[listType.getIndex()] = totalItems;
     }
 
     @Override
-    public int getTotalPopularPages() {
-        return totalPopularPages;
+    public int getTotalListPages(MovieListType listType) {
+        return totalListPages[listType.getIndex()];
     }
 
     @Override
-    public int getTotalPopularItems() {
-        return totalPopularItems;
-    }
-
-    @Override
-    public int getTotalTopratedPages() {
-        return totalTopratedPages;
-    }
-
-    @Override
-    public int getTotalTopratedItems() {
-        return totalTopratedItems;
+    public int getTotalListItems(MovieListType listType) {
+        return totalListItems[listType.getIndex()];
     }
 }

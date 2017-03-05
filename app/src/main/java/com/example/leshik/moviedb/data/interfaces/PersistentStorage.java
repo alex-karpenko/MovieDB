@@ -1,5 +1,6 @@
 package com.example.leshik.moviedb.data.interfaces;
 
+import com.example.leshik.moviedb.data.MovieListType;
 import com.example.leshik.moviedb.data.model.Movie;
 
 import java.util.List;
@@ -17,9 +18,5 @@ public interface PersistentStorage {
 
     void invertFavorite(long movieId);
 
-    Observable<List<Movie>> getPopularListObservable();
-
-    Observable<List<Movie>> getTopratedListObservable();
-
-    Observable<List<Movie>> getFavoriteListObservable();
+    Observable<List<Movie>> getMovieListObservable(MovieListType listType);
 }
