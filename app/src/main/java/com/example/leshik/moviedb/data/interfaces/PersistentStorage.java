@@ -19,4 +19,10 @@ public interface PersistentStorage {
     void invertFavorite(long movieId);
 
     Observable<List<Movie>> getMovieListObservable(MovieListType listType);
+
+    void clearMovieListPositionsAndInsertOrUpdateData(MovieListType listType, Observable<List<Movie>> movieList);
+
+    void insertOrUpdateMovieList(MovieListType listType, Observable<List<Movie>> movieList);
+
+    int getMovieListLastPageNumber(MovieListType listType);
 }

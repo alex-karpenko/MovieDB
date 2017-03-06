@@ -146,7 +146,7 @@ public class TmdbNetworkStorage implements NetworkStorage {
 
     Observable<ListPageResponse> getListResponseObservable(MovieListType listType, int page) {
         ApiService service = getServiceInstance();
-        Observable<ListPageResponse> returnObservable = null;
+        Observable<ListPageResponse> returnObservable;
 
         switch (listType) {
             case Popular:

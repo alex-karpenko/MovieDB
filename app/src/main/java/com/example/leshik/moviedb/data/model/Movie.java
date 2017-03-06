@@ -54,11 +54,16 @@ public class Movie extends RealmObject {
             if (adult == null) adult = existentMovie.getAdult();
             if (video == null) video = existentMovie.getVideo();
             if (runTime == null) runTime = existentMovie.getRunTime();
-            if (favoritePosition == null) favoritePosition = existentMovie.getFavoritePosition();
-            if (popularPosition == null) popularPosition = existentMovie.getPopularPosition();
-            if (topratedPosition == null) topratedPosition = existentMovie.getTopratedPosition();
             if (videos == null || videos.size() == 0) videos = existentMovie.getVideos();
             if (reviews == null || reviews.size() == 0) reviews = existentMovie.getReviews();
+
+            if (favoritePosition == null || favoritePosition <= 0)
+                favoritePosition = existentMovie.getFavoritePosition();
+            if (popularPosition == null || popularPosition <= 0)
+                popularPosition = existentMovie.getPopularPosition();
+            if (topratedPosition == null || topratedPosition <= 0)
+                topratedPosition = existentMovie.getTopratedPosition();
+
             if (lastUpdate == null) lastUpdate = existentMovie.getLastUpdate();
         }
     }

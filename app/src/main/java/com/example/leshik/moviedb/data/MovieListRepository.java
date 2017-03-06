@@ -23,21 +23,20 @@ public class MovieListRepository implements MovieListInteractor {
     private final RealmPersistentStorage persistentStorage;
     private MovieListType listType;
 
-    public MovieListRepository(Context context, MovieListType listType) {
+    public MovieListRepository(Context context) {
         networkStorage = new TmdbNetworkStorage(Utils.getBaseApiUrl());
         persistentStorage = new RealmPersistentStorage(context);
-        this.listType = listType;
     }
 
     @Override
-    public Observable<List<Movie>> getList() {
+    public Observable<List<Movie>> getList(final MovieListType listType) {
         Observable<List<Movie>> listFromCache = persistentStorage.getMovieListObservable(listType);
 
         return listFromCache.doOnNext(new Consumer<List<Movie>>() {
             @Override
             public void accept(List<Movie> movies) throws Exception {
                 if (isExpiredOrEmptyList(movies))
-                    forceRefreshList();
+                    forceRefreshList(listType);
             }
         })
                 .filter(new Predicate<List<Movie>>() {
@@ -65,13 +64,22 @@ public class MovieListRepository implements MovieListInteractor {
     }
 
     @Override
-    public void forceRefreshList() {
-        // TODO: 3/5/17  Implement this
+    public void forceRefreshList(MovieListType listType) {
+        if (listType == MovieListType.Favorite) return;
 
+        persistentStorage.clearMovieListPositionsAndInsertOrUpdateData(listType,
+                networkStorage.readMovieListPage(listType, 1));
     }
 
     @Override
-    public void loadNextPage() {
+    public void loadNextPage(MovieListType listType) {
+        if (listType == MovieListType.Favorite) return;
+
+        int lastPageInStorage = persistentStorage.getMovieListLastPageNumber(listType);
+        int lastPageInNetwork = networkStorage.getTotalListPages(listType);
+        if (lastPageInStorage < lastPageInNetwork)
+            persistentStorage.insertOrUpdateMovieList(listType,
+                    networkStorage.readMovieListPage(listType, lastPageInStorage + 1));
 
     }
 }
