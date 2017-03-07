@@ -1,6 +1,5 @@
 package com.example.leshik.moviedb;
 
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -18,10 +17,8 @@ class MainPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        Fragment fragment = new MovieListFragment();
-        Bundle args = new Bundle();
-        args.putInt(MovieListFragment.ARG_FRAGMENT_TYPE, position);
-        fragment.setArguments(args);
+        // TODO: 3/7/17 Change this to use MovieListType enum
+        Fragment fragment = MovieListFragment.newInstance(position);
 
         return fragment;
     }

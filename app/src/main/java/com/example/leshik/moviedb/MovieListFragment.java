@@ -64,6 +64,19 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
     // start auto loading after this threshold (multiplied by number of the items in list row)
     private int scrollingThreshold = 5;
 
+    // TODO: 3/7/17 Change arguments to MovieListType enum
+    public static MovieListFragment newInstance(int listType) {
+        MovieListFragment fragment = new MovieListFragment();
+
+        Bundle args = new Bundle();
+        args.putInt(ARG_FRAGMENT_TYPE, listType);
+        fragment.setArguments(args);
+
+        return fragment;
+    }
+
+
+
     // swipe refresh callback
     @Override
     public void onRefresh() {
