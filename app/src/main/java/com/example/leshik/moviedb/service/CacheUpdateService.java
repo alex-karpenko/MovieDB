@@ -7,8 +7,8 @@ import android.content.Intent;
 
 import com.example.leshik.moviedb.BuildConfig;
 import com.example.leshik.moviedb.R;
-import com.example.leshik.moviedb.Utils;
 import com.example.leshik.moviedb.data.MoviesContract;
+import com.example.leshik.moviedb.utils.Utils;
 
 import java.io.IOException;
 import java.util.Calendar;

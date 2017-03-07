@@ -1,4 +1,4 @@
-package com.example.leshik.moviedb;
+package com.example.leshik.moviedb.utils;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
@@ -11,6 +11,9 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.example.leshik.moviedb.BuildConfig;
+import com.example.leshik.moviedb.R;
 
 import static com.example.leshik.moviedb.service.CacheUpdateService.CACHE_PREFS_NAME;
 

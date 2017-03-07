@@ -2,9 +2,9 @@ package com.example.leshik.moviedb.data;
 
 import android.content.Context;
 
-import com.example.leshik.moviedb.Utils;
 import com.example.leshik.moviedb.data.interfaces.MovieListInteractor;
 import com.example.leshik.moviedb.data.model.Movie;
+import com.example.leshik.moviedb.utils.Utils;
 
 import java.util.Calendar;
 import java.util.List;

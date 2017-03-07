@@ -9,8 +9,8 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 
 import com.example.leshik.moviedb.R;
-import com.example.leshik.moviedb.Utils;
 import com.example.leshik.moviedb.data.model.Movie;
+import com.example.leshik.moviedb.utils.Utils;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;

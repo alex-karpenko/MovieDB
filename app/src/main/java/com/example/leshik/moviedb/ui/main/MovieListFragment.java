@@ -15,11 +15,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.example.leshik.moviedb.R;
-import com.example.leshik.moviedb.Utils;
 import com.example.leshik.moviedb.data.MovieListRepository;
 import com.example.leshik.moviedb.data.MovieListType;
 import com.example.leshik.moviedb.data.model.Movie;
 import com.example.leshik.moviedb.ui.viewmodels.MovieListViewModel;
+import com.example.leshik.moviedb.utils.Utils;
 
 import java.util.List;
 

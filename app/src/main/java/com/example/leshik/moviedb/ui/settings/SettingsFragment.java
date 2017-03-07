@@ -8,7 +8,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 
 import com.example.leshik.moviedb.R;
-import com.example.leshik.moviedb.Utils;
+import com.example.leshik.moviedb.utils.Utils;
 
 
 /**

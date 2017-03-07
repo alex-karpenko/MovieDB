@@ -3,11 +3,11 @@ package com.example.leshik.moviedb.data;
 import android.content.Context;
 import android.util.Log;
 
-import com.example.leshik.moviedb.Utils;
 import com.example.leshik.moviedb.data.interfaces.MovieInteractor;
 import com.example.leshik.moviedb.data.model.Movie;
 import com.example.leshik.moviedb.data.model.Review;
 import com.example.leshik.moviedb.data.model.Video;
+import com.example.leshik.moviedb.utils.Utils;
 
 import java.util.Calendar;
 import java.util.List;
