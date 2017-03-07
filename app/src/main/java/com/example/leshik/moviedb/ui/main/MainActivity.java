@@ -1,4 +1,4 @@
-package com.example.leshik.moviedb;
+package com.example.leshik.moviedb.ui.main;
 
 import android.app.ActivityOptions;
 import android.content.Intent;
@@ -11,6 +11,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 
+import com.example.leshik.moviedb.R;
+import com.example.leshik.moviedb.Utils;
 import com.example.leshik.moviedb.service.CacheUpdateService;
 import com.example.leshik.moviedb.ui.details.DetailActivity;
 import com.example.leshik.moviedb.ui.details.DetailFragment;

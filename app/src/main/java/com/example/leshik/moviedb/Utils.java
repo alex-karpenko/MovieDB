@@ -66,7 +66,7 @@ public final class Utils {
     }
 
     // retrieve stored preference variable (String)
-    static String getStringCachePreference(Context context, int key) {
+    public static String getStringCachePreference(Context context, int key) {
         SharedPreferences prefs = context.getSharedPreferences(CACHE_PREFS_NAME, 0);
         return prefs.getString(context.getString(key), null);
     }

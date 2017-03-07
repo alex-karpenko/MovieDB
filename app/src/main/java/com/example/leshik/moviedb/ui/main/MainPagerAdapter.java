@@ -1,4 +1,4 @@
-package com.example.leshik.moviedb;
+package com.example.leshik.moviedb.ui.main;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
