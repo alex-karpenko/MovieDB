@@ -38,7 +38,7 @@ import uk.co.senab.photoview.PhotoViewAttacher;
 public class FullPosterFragment extends Fragment {
     private static final String TAG = "FullPosterFragment";
     // state and fragment's arguments markers
-    private static final String ARG_MOVIE_ID = "MOVIE_ID";
+    private static final String ARG_MOVIE_ID = "ARG_MOVIE_ID";
 
     private long movieId;
 

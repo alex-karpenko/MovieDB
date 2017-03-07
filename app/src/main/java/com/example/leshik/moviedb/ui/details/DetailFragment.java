@@ -1,8 +1,6 @@
 package com.example.leshik.moviedb.ui.details;
 
-import android.content.ContentUris;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -44,9 +42,8 @@ import io.reactivex.functions.Consumer;
 public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     private static final String TAG = "DetailFragment";
     // fragment args
-    public static final String FRAGMENT_MOVIE_URI = "FRAGMENT_MOVIE_URI";
+    public static final String ARG_MOVIE_ID = "ARG_MOVIE_ID";
     // state variables
-    private Uri mUri;
     private long movieId;
 
     // references for all views
@@ -97,11 +94,11 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
         // Required empty public constructor
     }
 
-    public static DetailFragment newInstance(Uri uri) {
+    public static DetailFragment newInstance(long movieId) {
         DetailFragment fragment = new DetailFragment();
         Bundle args = new Bundle();
 
-        args.putParcelable(FRAGMENT_MOVIE_URI, uri);
+        args.putLong(ARG_MOVIE_ID, movieId);
         fragment.setArguments(args);
 
         return fragment;
@@ -114,7 +111,7 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
         // restore movie uri
         if (savedInstanceState != null) {
-            mUri = savedInstanceState.getParcelable(FRAGMENT_MOVIE_URI);
+            movieId = savedInstanceState.getLong(ARG_MOVIE_ID);
         }
     }
 
@@ -122,7 +119,7 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         // put movie uri into state bundle
-        outState.putParcelable(FRAGMENT_MOVIE_URI, mUri);
+        outState.putLong(ARG_MOVIE_ID, movieId);
     }
 
     @Override
@@ -130,8 +127,7 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
                              Bundle savedInstanceState) {
         // Get bundle with args (URI)
         Bundle args = getArguments();
-        if (args != null) mUri = args.getParcelable(FRAGMENT_MOVIE_URI);
-        if (mUri != null) movieId = ContentUris.parseId(mUri);
+        if (args != null) movieId = args.getLong(ARG_MOVIE_ID);
 
         // init vew model
         mViewModel = new MovieViewModel(movieId, new MovieRepository(getActivity().getApplicationContext()));

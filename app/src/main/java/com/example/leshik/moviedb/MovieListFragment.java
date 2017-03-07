@@ -79,7 +79,7 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
         /**
          * DetailFragmentCallback for when an item has been selected.
          */
-        void onItemSelected(Uri movieUri, ImageView posterView);
+        void onItemSelected(long movieId, ImageView posterView);
     }
 
     @Override

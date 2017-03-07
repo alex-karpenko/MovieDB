@@ -32,7 +32,7 @@ import io.reactivex.functions.Consumer;
 public class FullPosterActivity extends AppCompatActivity implements FullPosterFragment.OnImageClickCallback {
     private static final String TAG = "FullPosterActivity";
 
-    public static final String ARG_MOVIE_ID = "MOVIE_ID";
+    public static final String ARG_MOVIE_ID = "ARG_MOVIE_ID";
 
     private boolean mVisible;
     private long movieId;

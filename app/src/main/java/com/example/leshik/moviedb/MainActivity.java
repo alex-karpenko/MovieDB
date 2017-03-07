@@ -2,7 +2,6 @@ package com.example.leshik.moviedb;
 
 import android.app.ActivityOptions;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -13,6 +12,7 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 
 import com.example.leshik.moviedb.service.CacheUpdateService;
+import com.example.leshik.moviedb.ui.details.DetailActivity;
 import com.example.leshik.moviedb.ui.details.DetailFragment;
 import com.example.leshik.moviedb.ui.poster.FullPosterActivity;
 import com.example.leshik.moviedb.ui.settings.SettingsActivity;
@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
     private static final String TAG = "MainActivity";
     // tags to saved state bundle
     private static final String STATE_CURRENT_PAGE = "STATE_CURRENT_PAGE";
-    private static final String STATE_SELECTED_URI = "STATE_SELECTED_URI";
+    private static final String STATE_SELECTED_MOVIE_ID = "STATE_SELECTED_MOVIE_ID";
 
     // to store titles of the tabs (popular, top rated, favorites)
     public static String[] tabFragmentNames;
@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
     protected Toolbar mToolbar;
 
     // current selected movie (for two pane view)
-    private Uri selectedMovieUri = null;
+    private long selectedMovieId = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,18 +76,13 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
         // restore state, if it was save
         if (savedInstanceState != null) {
             int selectedTab = savedInstanceState.getInt(STATE_CURRENT_PAGE);
-            selectedMovieUri = savedInstanceState.getParcelable(STATE_SELECTED_URI);
+            selectedMovieId = savedInstanceState.getLong(STATE_SELECTED_MOVIE_ID, 0);
             mViewPager.setCurrentItem(selectedTab);
 
             // restore content of the details fragment if it present
-            if (selectedMovieUri != null && Utils.isTwoPane()) {
+            if (selectedMovieId != 0 && Utils.isTwoPane()) {
                 // replace fragment into details frame
-                Bundle args = new Bundle();
-                args.putParcelable(DetailFragment.FRAGMENT_MOVIE_URI, selectedMovieUri);
-
-                DetailFragment fragment = new DetailFragment();
-                fragment.setArguments(args);
-
+                DetailFragment fragment = DetailFragment.newInstance(selectedMovieId);
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.detail_container, fragment)
                         .commit();
@@ -99,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(STATE_CURRENT_PAGE, mViewPager.getCurrentItem());
-        if (selectedMovieUri != null) outState.putParcelable(STATE_SELECTED_URI, selectedMovieUri);
+        if (selectedMovieId != 0) outState.putLong(STATE_SELECTED_MOVIE_ID, selectedMovieId);
     }
 
     @Override
@@ -132,12 +127,10 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
 
     // listener action - if image from the list pressed - start details activity or update detail frame (if two panes)
     @Override
-    public void onItemSelected(Uri movieUri, ImageView posterView) {
-        selectedMovieUri = movieUri;
+    public void onItemSelected(long movieId, ImageView posterView) {
 
         if (!Utils.isTwoPane()) {
-            Intent intent = new Intent(this, com.example.leshik.moviedb.ui.details.DetailActivity.class)
-                    .setData(movieUri);
+            Intent intent = DetailActivity.getIntentInstance(this, movieId);
 
             // If one pane - start details activity
             // If Lollipop or higher - start activity with image animation
@@ -152,12 +145,7 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
         } else {
             // if two panes
             // replace fragment into details frame
-            Bundle args = new Bundle();
-            args.putParcelable(DetailFragment.FRAGMENT_MOVIE_URI, movieUri);
-
-            DetailFragment fragment = new DetailFragment();
-            fragment.setArguments(args);
-
+            DetailFragment fragment = DetailFragment.newInstance(movieId);
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.detail_container, fragment)
                     .commit();

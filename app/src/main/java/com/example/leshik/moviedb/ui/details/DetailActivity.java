@@ -1,7 +1,7 @@
 package com.example.leshik.moviedb.ui.details;
 
+import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -10,9 +10,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.leshik.moviedb.R;
-import com.example.leshik.moviedb.ui.settings.SettingsActivity;
 import com.example.leshik.moviedb.Utils;
 import com.example.leshik.moviedb.ui.poster.FullPosterActivity;
+import com.example.leshik.moviedb.ui.settings.SettingsActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -24,11 +24,18 @@ import butterknife.ButterKnife;
 public class DetailActivity extends AppCompatActivity implements DetailFragment.Callback {
     private static final String TAG = "DetailActivity";
     // marker string and variable to state saving
-    private static final String MOVIE_URI = "MOVIE_URI";
-    Uri mUri;
+    private static final String ARG_MOVIE_ID = "ARG_MOVIE_ID";
+    long movieId;
 
     @BindView(R.id.detail_toolbar)
     protected Toolbar mToolbar;
+
+    // helper method to create proper intent to start DetailActivity
+    static public Intent getIntentInstance(Context context, long movieId) {
+        Intent intent = new Intent(context, DetailActivity.class);
+        intent.putExtra(DetailActivity.ARG_MOVIE_ID, movieId);
+        return intent;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,15 +56,15 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
 
 
         if (savedInstanceState == null) {
-            // get URI from intent
-            mUri = getIntent().getData();
+            // get movieId from intent
+            movieId = getIntent().getLongExtra(ARG_MOVIE_ID, 0);
         } else {
             // or restore it from saved state
-            mUri = savedInstanceState.getParcelable(MOVIE_URI);
+            movieId = savedInstanceState.getLong(ARG_MOVIE_ID);
         }
 
         // create fragment with all details info and add (or replace) it
-        DetailFragment fragment = DetailFragment.newInstance(mUri);
+        DetailFragment fragment = DetailFragment.newInstance(movieId);
 
         if (savedInstanceState != null) {
             // replace fragment if it is not a new activity
@@ -76,7 +83,7 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable(MOVIE_URI, mUri);
+        outState.putLong(ARG_MOVIE_ID, movieId);
     }
 
     @Override
