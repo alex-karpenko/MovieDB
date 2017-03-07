@@ -19,23 +19,22 @@ import io.reactivex.functions.Predicate;
 
 public class MovieListRepository implements MovieListInteractor {
     private static final String TAG = "MovieListRepository";
-    private final TmdbNetworkStorage networkStorage;
-    private final RealmPersistentStorage persistentStorage;
-    private MovieListType listType;
+    private final TmdbNetworkDataSource networkDataSource;
+    private final RealmCacheStorage cacheStorage;
 
     public MovieListRepository(Context context) {
-        networkStorage = new TmdbNetworkStorage(Utils.getBaseApiUrl());
-        persistentStorage = new RealmPersistentStorage(context);
+        networkDataSource = new TmdbNetworkDataSource(Utils.getBaseApiUrl());
+        cacheStorage = new RealmCacheStorage(context);
     }
 
     @Override
     public Observable<List<Movie>> getList(final MovieListType listType) {
-        Observable<List<Movie>> listFromCache = persistentStorage.getMovieListObservable(listType);
+        Observable<List<Movie>> listFromCache = cacheStorage.getMovieListObservable(listType);
 
         return listFromCache.doOnNext(new Consumer<List<Movie>>() {
             @Override
             public void accept(List<Movie> movies) throws Exception {
-                if (isExpiredOrEmptyList(movies))
+                if (isExpiredOrEmptyList(movies, listType))
                     forceRefreshList(listType);
             }
         })
@@ -47,7 +46,7 @@ public class MovieListRepository implements MovieListInteractor {
                 });
     }
 
-    private boolean isExpiredOrEmptyList(List<Movie> movies) {
+    private boolean isExpiredOrEmptyList(List<Movie> movies, MovieListType listType) {
         if (listType == MovieListType.Favorite) return false;
 
         long currentTime = Calendar.getInstance().getTimeInMillis();
@@ -67,19 +66,19 @@ public class MovieListRepository implements MovieListInteractor {
     public void forceRefreshList(MovieListType listType) {
         if (listType == MovieListType.Favorite) return;
 
-        persistentStorage.clearMovieListPositionsAndInsertOrUpdateData(listType,
-                networkStorage.readMovieListPage(listType, 1));
+        cacheStorage.clearMovieListPositionsAndInsertOrUpdateData(listType,
+                networkDataSource.readMovieListPage(listType, 1));
     }
 
     @Override
     public void loadNextPage(MovieListType listType) {
         if (listType == MovieListType.Favorite) return;
 
-        int lastPageInStorage = persistentStorage.getMovieListLastPageNumber(listType);
-        int lastPageInNetwork = networkStorage.getTotalListPages(listType);
+        int lastPageInStorage = cacheStorage.getMovieListLastPageNumber(listType);
+        int lastPageInNetwork = networkDataSource.getTotalListPages(listType);
         if (lastPageInStorage < lastPageInNetwork)
-            persistentStorage.insertOrUpdateMovieList(listType,
-                    networkStorage.readMovieListPage(listType, lastPageInStorage + 1));
+            cacheStorage.insertOrUpdateMovieList(listType,
+                    networkDataSource.readMovieListPage(listType, lastPageInStorage + 1));
 
     }
 }

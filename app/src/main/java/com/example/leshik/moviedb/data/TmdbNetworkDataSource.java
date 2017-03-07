@@ -6,7 +6,7 @@ import com.example.leshik.moviedb.data.api.MovieResponse;
 import com.example.leshik.moviedb.data.api.ReviewsResponse;
 import com.example.leshik.moviedb.data.api.VideosResponse;
 import com.example.leshik.moviedb.data.interfaces.ApiService;
-import com.example.leshik.moviedb.data.interfaces.NetworkStorage;
+import com.example.leshik.moviedb.data.interfaces.NetworkDataSource;
 import com.example.leshik.moviedb.data.model.Movie;
 import com.example.leshik.moviedb.data.model.Review;
 import com.example.leshik.moviedb.data.model.Video;
@@ -26,13 +26,13 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * Created by Leshik on 01.03.2017.
  */
 
-public class TmdbNetworkStorage implements NetworkStorage {
-    private static final String TAG = "TmdbNetworkStorage";
+public class TmdbNetworkDataSource implements NetworkDataSource {
+    private static final String TAG = "TmdbNetworkDataSource";
     private Retrofit retrofit;
     private static int[] totalListPages;
     private static int[] totalListItems;
 
-    public TmdbNetworkStorage(String apiUrl) {
+    public TmdbNetworkDataSource(String apiUrl) {
         retrofit = new Retrofit.Builder()
                 .baseUrl(apiUrl)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -156,7 +156,7 @@ public class TmdbNetworkStorage implements NetworkStorage {
                 returnObservable = service.getToprated(getApiKey(), page);
                 break;
             default:
-                throw new IllegalArgumentException("NetworkStorage: list type does not supported");
+                throw new IllegalArgumentException("NetworkDataSource: list type does not supported");
         }
 
         return returnObservable;

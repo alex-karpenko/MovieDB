@@ -13,7 +13,7 @@ import io.reactivex.Observable;
  * Created by Leshik on 01.03.2017.
  */
 
-public interface NetworkStorage {
+public interface NetworkDataSource {
     Observable<Movie> readMovie(long movieId);
 
     Observable<List<Video>> readVideoList(long movieId);

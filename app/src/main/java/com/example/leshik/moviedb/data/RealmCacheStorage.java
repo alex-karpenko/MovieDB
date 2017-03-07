@@ -4,7 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.support.annotation.Nullable;
 
-import com.example.leshik.moviedb.data.interfaces.PersistentStorage;
+import com.example.leshik.moviedb.data.interfaces.CacheStorage;
 import com.example.leshik.moviedb.data.model.Movie;
 
 import java.util.List;
@@ -25,16 +25,16 @@ import io.realm.RealmResults;
  * Created by Leshik on 01.03.2017.
  */
 
-public class RealmPersistentStorage implements PersistentStorage {
+public class RealmCacheStorage implements CacheStorage {
     private static final String REALM_DB_FILE_NAME = "movies.realm";
     private static final int REALM_DB_SCHEME_VERSION = 1;
     private static boolean isRealmConfigured = false;
 
-    RealmPersistentStorage(Context context) {
+    RealmCacheStorage(Context context) {
         if (context instanceof Application) {
             buildDefaultRealmConfiguration(context);
         } else {
-            throw new IllegalArgumentException("RealmPersistentStorage: context is not Application");
+            throw new IllegalArgumentException("RealmCacheStorage: context is not Application");
         }
     }
 

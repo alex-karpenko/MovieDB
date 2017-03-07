@@ -24,17 +24,17 @@ import io.reactivex.schedulers.Schedulers;
 
 public class MovieRepository implements MovieInteractor {
     private static final String TAG = "MovieRepository";
-    private final TmdbNetworkStorage networkStorage;
-    private final RealmPersistentStorage persistentStorage;
+    private final TmdbNetworkDataSource networkDataSource;
+    private final RealmCacheStorage cacheStorage;
 
     public MovieRepository(Context context) {
-        networkStorage = new TmdbNetworkStorage(Utils.getBaseApiUrl());
-        persistentStorage = new RealmPersistentStorage(context);
+        networkDataSource = new TmdbNetworkDataSource(Utils.getBaseApiUrl());
+        cacheStorage = new RealmCacheStorage(context);
     }
 
     @Override
     public Observable<Movie> getMovie(final long movieId) {
-        Observable<Movie> movieFromCache = persistentStorage.getMovieObservable(movieId);
+        Observable<Movie> movieFromCache = cacheStorage.getMovieObservable(movieId);
 
         return movieFromCache.doOnNext(new Consumer<Movie>() {
             @Override
@@ -69,7 +69,7 @@ public class MovieRepository implements MovieInteractor {
 
     @Override
     public void invertFavorite(long movieId) {
-        persistentStorage.invertFavorite(movieId);
+        cacheStorage.invertFavorite(movieId);
     }
 
     @Override
@@ -82,14 +82,14 @@ public class MovieRepository implements MovieInteractor {
                     @Override
                     public void accept(Movie movie) throws Exception {
                         Log.i(TAG, "forceRefresh: +");
-                        persistentStorage.updateOrInsertMovie(movie);
+                        cacheStorage.updateOrInsertMovie(movie);
                     }
                 });
     }
 
     private Observable<Movie> buildMovieFromNetworkObservable(long movieId) {
-        return networkStorage.readMovie(movieId)
-                .zipWith(networkStorage.readVideoList(movieId),
+        return networkDataSource.readMovie(movieId)
+                .zipWith(networkDataSource.readVideoList(movieId),
                         new BiFunction<Movie, List<Video>, Movie>() {
                             @Override
                             public Movie apply(Movie movie, List<Video> videos) throws Exception {
@@ -97,7 +97,7 @@ public class MovieRepository implements MovieInteractor {
                                 return movie;
                             }
                         })
-                .zipWith(networkStorage.readReviewList(movieId),
+                .zipWith(networkDataSource.readReviewList(movieId),
                         new BiFunction<Movie, List<Review>, Movie>() {
                             @Override
                             public Movie apply(Movie movie, List<Review> reviews) throws Exception {

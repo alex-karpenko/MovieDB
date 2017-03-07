@@ -11,7 +11,7 @@ import io.reactivex.Observable;
  * Created by Leshik on 01.03.2017.
  */
 
-public interface PersistentStorage {
+public interface CacheStorage {
     Observable<Movie> getMovieObservable(long movieId);
 
     long updateOrInsertMovie(Movie movie);
