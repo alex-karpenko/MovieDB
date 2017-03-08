@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.example.leshik.moviedb.data.interfaces.CacheStorage;
 import com.example.leshik.moviedb.data.model.Movie;
+import com.example.leshik.moviedb.utils.Utils;
 
 import java.util.List;
 
@@ -327,14 +328,14 @@ public class RealmCacheStorage implements CacheStorage {
     @Override
     public int getMovieListLastPageNumber(MovieListType listType) {
         Realm realm = getRealmInstance();
-        int lastPageNumber;
+        int lastPosition;
 
-        lastPageNumber = realm.where(Movie.class)
+        lastPosition = realm.where(Movie.class)
                 .greaterThan(getListTypeColumnName(listType), 0)
                 .findAll()
                 .size();
 
         realm.close();
-        return lastPageNumber;
+        return lastPosition / Utils.getCachePageSize();
     }
 }

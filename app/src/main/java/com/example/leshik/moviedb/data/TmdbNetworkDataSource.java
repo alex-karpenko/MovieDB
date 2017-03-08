@@ -1,6 +1,7 @@
 package com.example.leshik.moviedb.data;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.example.leshik.moviedb.BuildConfig;
 import com.example.leshik.moviedb.data.api.ListPageResponse;
@@ -125,6 +126,7 @@ public class TmdbNetworkDataSource implements NetworkDataSource {
 
     @Override
     public Observable<List<Movie>> readMovieListPage(final MovieListType listType, int page) {
+        Log.i(TAG, "readMovieListPage: listType = " + listType.toString() + ", page=" + page);
         Observable<List<Movie>> returnList =
                 getListResponseObservable(listType, page)
                         .subscribeOn(Schedulers.io())

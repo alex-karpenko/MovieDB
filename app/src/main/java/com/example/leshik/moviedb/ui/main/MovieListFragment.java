@@ -83,7 +83,7 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        fragmentType = getFragmentType();
+        fragmentType = getFragmentTypeFromArgs();
         viewModel = new MovieListViewModel(fragmentType,
                 new MovieListRepository(getActivity().getApplicationContext()));
 
@@ -114,7 +114,7 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
         return rootView;
     }
 
-    private MovieListType getFragmentType() {
+    private MovieListType getFragmentTypeFromArgs() {
         Bundle args = getArguments();
         if (args != null) {
             int typeFromIntent = args.getInt(ARG_FRAGMENT_TYPE);
@@ -138,9 +138,9 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
     }
 
     void updateUi(List<Movie> newList) {
+        loadingCache = false;
         mAdapter.setMovieList(newList);
         mSwipeRefreshLayout.setRefreshing(false);
-        loadingCache = false;
     }
 
     @Override
@@ -177,6 +177,8 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
     // update cache for current page type
     private void updateCurrentPageCache() {
         viewModel.forceRefresh();
+        // FIXME: 3/8/17 Somewhat must be dealt with this favorites type
+        if (fragmentType == MovieListType.Favorite) mSwipeRefreshLayout.setRefreshing(false);
     }
 
     // listener for check every scroll event on list view and start loading cache content

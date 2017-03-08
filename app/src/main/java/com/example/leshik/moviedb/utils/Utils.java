@@ -68,6 +68,12 @@ public final class Utils {
     }
 
     // retrieve stored preference variable (Long)
+    public static long getLongCachePreference(Context context, String key) {
+        SharedPreferences prefs = context.getSharedPreferences(CACHE_PREFS_NAME, 0);
+        return prefs.getLong(key, -1);
+    }
+
+    // retrieve stored preference variable (Long)
     public static int getIntCachePreference(Context context, String key) {
         SharedPreferences prefs = context.getSharedPreferences(CACHE_PREFS_NAME, 0);
         return prefs.getInt(key, -1);
