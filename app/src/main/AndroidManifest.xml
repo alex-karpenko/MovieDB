@@ -42,11 +42,6 @@
                 android:value="com.example.leshik.moviedb.ui.details.DetailActivity" />
         </activity>
 
-        <provider
-            android:name=".data.MoviesProvider"
-            android:authorities="@string/content_authority"
-            android:exported="false" />
-
         <service
             android:name=".service.CacheUpdateService"
             android:exported="false" />

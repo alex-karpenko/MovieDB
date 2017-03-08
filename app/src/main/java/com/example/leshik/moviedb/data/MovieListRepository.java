@@ -1,6 +1,7 @@
 package com.example.leshik.moviedb.data;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.example.leshik.moviedb.data.interfaces.MovieListInteractor;
 import com.example.leshik.moviedb.data.model.Movie;
@@ -23,7 +24,7 @@ public class MovieListRepository implements MovieListInteractor {
     private final RealmCacheStorage cacheStorage;
 
     public MovieListRepository(Context context) {
-        networkDataSource = new TmdbNetworkDataSource(Utils.getBaseApiUrl());
+        networkDataSource = new TmdbNetworkDataSource(context, Utils.getBaseApiUrl());
         cacheStorage = new RealmCacheStorage(context);
     }
 
@@ -59,11 +60,12 @@ public class MovieListRepository implements MovieListInteractor {
 
     private long getLastUpdateTime() {
         // FIXME: 3/5/17 Have to implement saving and reading update time
-        return 0;
+        return Long.MAX_VALUE;
     }
 
     @Override
     public void forceRefreshList(MovieListType listType) {
+        Log.i(TAG, "forceRefreshList: " + listType);
         if (listType == MovieListType.Favorite) return;
 
         cacheStorage.clearMovieListPositionsAndInsertOrUpdateData(listType,

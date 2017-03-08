@@ -50,8 +50,8 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
         super.onCreate(savedInstanceState);
 
         // restore base URLs from shared config
-        Utils.basePosterUrl = Utils.getStringCachePreference(this, R.string.base_potser_url);
-        Utils.basePosterSecureUrl = Utils.getStringCachePreference(this, R.string.base_potser_secure_url);
+        Utils.basePosterUrl = Utils.getStringCachePreference(this, R.string.base_poster_url);
+        Utils.basePosterSecureUrl = Utils.getStringCachePreference(this, R.string.base_poster_secure_url);
         // Every time when activity created - update configuration from the TMDB
         CacheUpdateService.startActionUpdateConfiguration(this);
 

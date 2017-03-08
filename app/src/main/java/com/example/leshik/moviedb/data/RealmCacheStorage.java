@@ -3,6 +3,7 @@ package com.example.leshik.moviedb.data;
 import android.app.Application;
 import android.content.Context;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.example.leshik.moviedb.data.interfaces.CacheStorage;
 import com.example.leshik.moviedb.data.model.Movie;
@@ -13,6 +14,7 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.ObservableSource;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposables;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
@@ -26,6 +28,7 @@ import io.realm.RealmResults;
  */
 
 public class RealmCacheStorage implements CacheStorage {
+    private static final String TAG = "RealmCacheStorage";
     private static final String REALM_DB_FILE_NAME = "movies.realm";
     private static final int REALM_DB_SCHEME_VERSION = 1;
     private static boolean isRealmConfigured = false;
@@ -38,7 +41,7 @@ public class RealmCacheStorage implements CacheStorage {
         }
     }
 
-    private void buildDefaultRealmConfiguration(Context context) {
+    private synchronized void buildDefaultRealmConfiguration(Context context) {
         if (!isRealmConfigured) {
             Realm.init(context);
             RealmConfiguration realmConfig = new RealmConfiguration.Builder()
@@ -53,6 +56,33 @@ public class RealmCacheStorage implements CacheStorage {
 
     private Realm getRealmInstance() {
         return Realm.getDefaultInstance();
+    }
+
+    private Observable<Realm> getRealmObservable() {
+        return Observable.create(new ObservableOnSubscribe<Realm>() {
+            @Override
+            public void subscribe(final ObservableEmitter<Realm> emitter)
+                    throws Exception {
+                final Realm observableRealm = getRealmInstance();
+
+                final RealmChangeListener<Realm> listener = new RealmChangeListener<Realm>() {
+                    @Override
+                    public void onChange(Realm element) {
+                        emitter.onNext(element);
+                    }
+                };
+
+                emitter.setDisposable(Disposables.fromRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        observableRealm.removeChangeListener(listener);
+                        observableRealm.close();
+                    }
+                }));
+                observableRealm.addChangeListener(listener);
+                emitter.onNext(observableRealm);
+            }
+        });
     }
 
     @Override
@@ -100,7 +130,9 @@ public class RealmCacheStorage implements CacheStorage {
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm transactionRealm) {
+                Log.i(TAG, "updateOrInsertMovie: +");
                 updateOrInsertMovie(transactionRealm, newMovie);
+                Log.i(TAG, "updateOrInsertMovie: -");
             }
         });
 
@@ -108,11 +140,24 @@ public class RealmCacheStorage implements CacheStorage {
         return newMovie.getMovieId();
     }
 
-    private void updateOrInsertMovie(Realm realm, Movie newMovie) {
+    private void updateOrInsertMovie(final Realm realm, final Movie newMovie) {
         Movie oldMovie = findMovie(realm, newMovie.getMovieId());
         if (oldMovie != null)
             newMovie.updateNullFields(oldMovie);
-        realm.copyToRealmOrUpdate(newMovie);
+
+        if (realm.isInTransaction()) {
+            realm.copyToRealmOrUpdate(newMovie);
+        } else {
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm transactionRealm) {
+                    Log.i(TAG, "updateOrInsertMovie: +");
+                    transactionRealm.copyToRealmOrUpdate(newMovie);
+                    Log.i(TAG, "updateOrInsertMovie: -");
+                }
+            });
+        }
+
     }
 
     @Nullable
@@ -130,6 +175,7 @@ public class RealmCacheStorage implements CacheStorage {
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
+                Log.i(TAG, "invertFavorite: +");
                 Movie movie = realm.where(Movie.class).equalTo("movieId", movieId).findFirst();
                 if (movie != null) {
                     if (movie.isFavorite()) {
@@ -143,6 +189,7 @@ public class RealmCacheStorage implements CacheStorage {
                         movie.setFavoritePosition(newFavoriteListPosition);
                     }
                 }
+                Log.i(TAG, "invertFavorite: -");
             }
         });
 
@@ -209,7 +256,9 @@ public class RealmCacheStorage implements CacheStorage {
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm transactionRealm) {
+                Log.i(TAG, "insertOrUpdateMovieList: +");
                 updateOrInsertMovieList(transactionRealm, movieList);
+                Log.i(TAG, "insertOrUpdateMovieList: -");
             }
         });
 
@@ -220,18 +269,26 @@ public class RealmCacheStorage implements CacheStorage {
     public void clearMovieListPositionsAndInsertOrUpdateData(final MovieListType listType, final Observable<List<Movie>> movieList) {
         Realm realm = getRealmInstance();
 
-        realm.executeTransaction(new Realm.Transaction() {
+        if (realm.isInTransaction())
+            clearMovieListPositionsAndInsertOrUpdateData(realm, listType, movieList);
+        else realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm transactionRealm) {
-                RealmResults<Movie> result = transactionRealm.where(Movie.class)
-                        .greaterThan(getListTypeColumnName(listType), 0)
-                        .findAll();
-                clearMovieListPosition(listType, result);
-                updateOrInsertMovieList(transactionRealm, movieList);
+                clearMovieListPositionsAndInsertOrUpdateData(transactionRealm, listType, movieList);
             }
         });
 
         realm.close();
+    }
+
+    private void clearMovieListPositionsAndInsertOrUpdateData(Realm transactionRealm, final MovieListType listType, final Observable<List<Movie>> movieList) {
+        Log.i(TAG, "clearMovieListPositionsAndInsertOrUpdateData: +, " + listType);
+        final RealmResults<Movie> result = transactionRealm.where(Movie.class)
+                .greaterThan(getListTypeColumnName(listType), 0)
+                .findAll();
+        clearMovieListPosition(listType, result);
+        updateOrInsertMovieList(transactionRealm, movieList);
+        Log.i(TAG, "clearMovieListPositionsAndInsertOrUpdateData: -");
     }
 
     private void clearMovieListPosition(MovieListType listType, RealmResults<Movie> movieList) {
@@ -258,6 +315,7 @@ public class RealmCacheStorage implements CacheStorage {
                         return Observable.fromIterable(movieList);
                     }
                 })
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<Movie>() {
                     @Override
                     public void accept(Movie newMovie) throws Exception {

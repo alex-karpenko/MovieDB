@@ -38,7 +38,6 @@ import io.reactivex.functions.Consumer;
  */
 public class MovieListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     private static final String TAG = "MovieListFragment";
-    // Fragment types, for PageAdapter
     public static final String ARG_FRAGMENT_TYPE = "FRAGMENT_TYPE";
 
     // Current fragment type
@@ -62,7 +61,7 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
     private int scrollingThreshold = 5;
 
     private MovieListViewModel viewModel;
-    Disposable subscription;
+    private Disposable subscription;
 
     // TODO: 3/7/17 Change arguments to MovieListType enum
     public static MovieListFragment newInstance(int listType) {
@@ -128,13 +127,6 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
         } else return DEFAULT_FRAGMENT_TYPE;
     }
 
-    @Override
-    public void onDestroyView() {
-        unsubscribeFromMovieList();
-        super.onDestroyView();
-        unbinder.unbind();
-    }
-
     private void subscribeToMovieList() {
         subscription = viewModel.getMovieList()
                 .subscribe(new Consumer<List<Movie>>() {
@@ -145,14 +137,21 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
                 });
     }
 
-    private void unsubscribeFromMovieList() {
-        if (subscription != null && !subscription.isDisposed()) subscription.dispose();
-    }
-
     void updateUi(List<Movie> newList) {
         mAdapter.setMovieList(newList);
         mSwipeRefreshLayout.setRefreshing(false);
         loadingCache = false;
+    }
+
+    @Override
+    public void onDestroyView() {
+        unsubscribeFromMovieList();
+        super.onDestroyView();
+        unbinder.unbind();
+    }
+
+    private void unsubscribeFromMovieList() {
+        if (subscription != null && !subscription.isDisposed()) subscription.dispose();
     }
 
     @Override

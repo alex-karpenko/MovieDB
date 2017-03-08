@@ -12,7 +12,6 @@ import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.example.leshik.moviedb.BuildConfig;
 import com.example.leshik.moviedb.R;
 
 import static com.example.leshik.moviedb.service.CacheUpdateService.CACHE_PREFS_NAME;
@@ -24,7 +23,7 @@ import static com.example.leshik.moviedb.service.CacheUpdateService.CACHE_PREFS_
 public final class Utils {
     private static final String TAG = "Utils";
 
-    // Base URLs to deal with TMBD API
+    // Base URLs to deal with TMDB API
     public static final String baseApiUrl = "http://api.themoviedb.org/3/";
     public static final String baseApiSecureUrl = "https://api.themoviedb.org/3/";
 
@@ -68,6 +67,12 @@ public final class Utils {
         return prefs.getLong(context.getString(key), -1);
     }
 
+    // retrieve stored preference variable (Long)
+    public static int getIntCachePreference(Context context, String key) {
+        SharedPreferences prefs = context.getSharedPreferences(CACHE_PREFS_NAME, 0);
+        return prefs.getInt(key, -1);
+    }
+
     // retrieve stored preference variable (String)
     public static String getStringCachePreference(Context context, int key) {
         SharedPreferences prefs = context.getSharedPreferences(CACHE_PREFS_NAME, 0);
@@ -83,10 +88,18 @@ public final class Utils {
     }
 
     // Helper method to update shared preferences by long value
-    public static void setCachePreference(Context context, int key, long value) {
+    public static void setCachePreference(Context context, String key, long value) {
         SharedPreferences prefs = context.getSharedPreferences(CACHE_PREFS_NAME, 0);
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putLong(context.getString(key), value);
+        editor.putLong(key, value);
+        editor.commit();
+    }
+
+    // Helper method to update shared preferences by int value
+    public static void setCachePreference(Context context, String key, int value) {
+        SharedPreferences prefs = context.getSharedPreferences(CACHE_PREFS_NAME, 0);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putInt(key, value);
         editor.commit();
     }
 
@@ -171,7 +184,7 @@ public final class Utils {
         currentTheme = themeId;
     }
 
-    // return curent theme resource ID
+    // return current theme resource ID
     public static int getCurrentTheme() {
         return currentTheme;
     }
@@ -259,12 +272,7 @@ public final class Utils {
         return i;
     }
 
-    public static String getApiKey() {
-        return BuildConfig.THE_MOVIE_DB_API_KEY;
-    }
-
     public static String getBaseApiUrl() {
         return baseApiUrl;
     }
-
 }

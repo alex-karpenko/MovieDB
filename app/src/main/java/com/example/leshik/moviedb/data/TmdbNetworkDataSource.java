@@ -1,5 +1,7 @@
 package com.example.leshik.moviedb.data;
 
+import android.content.Context;
+
 import com.example.leshik.moviedb.BuildConfig;
 import com.example.leshik.moviedb.data.api.ListPageResponse;
 import com.example.leshik.moviedb.data.api.MovieResponse;
@@ -10,6 +12,7 @@ import com.example.leshik.moviedb.data.interfaces.NetworkDataSource;
 import com.example.leshik.moviedb.data.model.Movie;
 import com.example.leshik.moviedb.data.model.Review;
 import com.example.leshik.moviedb.data.model.Video;
+import com.example.leshik.moviedb.utils.Utils;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 import java.util.ArrayList;
@@ -29,19 +32,16 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class TmdbNetworkDataSource implements NetworkDataSource {
     private static final String TAG = "TmdbNetworkDataSource";
     private Retrofit retrofit;
-    private static int[] totalListPages;
-    private static int[] totalListItems;
+    private Context context;
 
-    public TmdbNetworkDataSource(String apiUrl) {
+    public TmdbNetworkDataSource(Context context, String apiUrl) {
         retrofit = new Retrofit.Builder()
                 .baseUrl(apiUrl)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build();
 
-        // TODO: 3/5/17 Somewhat does not inspire me this approach ...
-        totalListPages = new int[]{0, 0, 0};
-        totalListItems = new int[]{0, 0, 0};
+        this.context = context;
     }
 
     private ApiService getServiceInstance() {
@@ -163,17 +163,25 @@ public class TmdbNetworkDataSource implements NetworkDataSource {
     }
 
     private void updateListTotals(MovieListType listType, int totalPages, int totalItems) {
-        totalListPages[listType.getIndex()] = totalPages;
-        totalListItems[listType.getIndex()] = totalItems;
+        Utils.setCachePreference(context, getPagesPrefKey(listType), totalPages);
+        Utils.setCachePreference(context, getItemsPrefKey(listType), totalItems);
+    }
+
+    private String getPagesPrefKey(MovieListType listType) {
+        return listType.toString() + "_total_pages";
+    }
+
+    private String getItemsPrefKey(MovieListType listType) {
+        return listType.toString() + "_total_items";
     }
 
     @Override
     public int getTotalListPages(MovieListType listType) {
-        return totalListPages[listType.getIndex()];
+        return Utils.getIntCachePreference(context, getPagesPrefKey(listType));
     }
 
     @Override
     public int getTotalListItems(MovieListType listType) {
-        return totalListItems[listType.getIndex()];
+        return Utils.getIntCachePreference(context, getItemsPrefKey(listType));
     }
 }

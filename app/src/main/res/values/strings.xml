@@ -42,8 +42,8 @@
     <string name="total_toprated_pages">total_toprated_pages</string>
     <string name="total_toprated_items">total_toprated_items</string>
 
-    <string name="base_potser_url" translatable="false">base_poster_url</string>
-    <string name="base_potser_secure_url" translatable="false">base_poster_secure_url</string>
+    <string name="base_poster_url" translatable="false">base_poster_url</string>
+    <string name="base_poster_secure_url" translatable="false">base_poster_secure_url</string>
 
     <!-- Strings for identify transforms -->
     <string name="poster_image" translatable="false">poster_image</string>

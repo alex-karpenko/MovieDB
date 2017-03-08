@@ -149,7 +149,7 @@ public class Movie extends RealmObject {
     }
 
     public Integer getRunTime() {
-        return runTime;
+        return runTime == null ? 0 : runTime;
     }
 
     public void setRunTime(Integer runTime) {

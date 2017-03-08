@@ -28,7 +28,7 @@ public class MovieRepository implements MovieInteractor {
     private final RealmCacheStorage cacheStorage;
 
     public MovieRepository(Context context) {
-        networkDataSource = new TmdbNetworkDataSource(Utils.getBaseApiUrl());
+        networkDataSource = new TmdbNetworkDataSource(context, Utils.getBaseApiUrl());
         cacheStorage = new RealmCacheStorage(context);
     }
 
