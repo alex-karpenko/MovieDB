@@ -26,9 +26,13 @@ import io.realm.RealmResults;
 
 /**
  * Created by Leshik on 01.03.2017.
+ *
+ * Implementation of CacheStorage interface
+ * with Realm DB
+ *
  */
 
-public class RealmCacheStorage implements CacheStorage {
+class RealmCacheStorage implements CacheStorage {
     private static final String TAG = "RealmCacheStorage";
     private static final String REALM_DB_FILE_NAME = "movies.realm";
     private static final int REALM_DB_SCHEME_VERSION = 1;

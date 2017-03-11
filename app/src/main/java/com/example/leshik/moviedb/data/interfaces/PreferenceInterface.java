@@ -13,7 +13,7 @@ public interface PreferenceInterface {
 
     void setMovieListUpdateTimestamp(MovieListType listType, long updateTime);
 
-    long updateMovieListUpdateTimestampToCurrent(MovieListType listType);
+    long setMovieListUpdateTimestampToCurrent(MovieListType listType);
 
     int getMovieListTotalPages(MovieListType listType);
 

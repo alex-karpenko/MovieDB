@@ -15,9 +15,14 @@ import java.util.Calendar;
 
 /**
  * Created by alex on 3/9/17.
+ *
+ * Implementation of the PreferenceInterface
+ * using SharedPreferences
+ *
  */
 
 public class PreferenceStorage implements PreferenceInterface {
+    private static final long ONE_HOUR_MILLIS = 60 * 60 * 1000;
     private static final String BASE_POSTER_URL_KEY = "base_poster_url";
     private static final String BASE_POSTER_SECURE_URL_KEY = "base_poster_secure_url";
 
@@ -31,7 +36,6 @@ public class PreferenceStorage implements PreferenceInterface {
     // default page size of popular and toprated list
     private int cachePageSize = 20;
     // cache update interval in milliseconds
-    private static final long ONE_HOUR_MILLIS = 60 * 60 * 1000;
     private static long cacheUpdateInterval = ONE_HOUR_MILLIS * 24; // 24 hours
     // Default image width
     private String posterSmallWidthStr = "w185";
@@ -135,28 +139,30 @@ public class PreferenceStorage implements PreferenceInterface {
     }
 
     private void setPreference(String key, long value) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = prefs.edit();
+        SharedPreferences.Editor editor = getPreferenceEditor();
         editor.putLong(key, value);
         editor.commit();
     }
 
+    private static SharedPreferences.Editor getPreferenceEditor() {
+        SharedPreferences prefs = getCurrentPreferences();
+        return prefs.edit();
+    }
+
     private void setPreference(String key, int value) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = prefs.edit();
+        SharedPreferences.Editor editor = getPreferenceEditor();
         editor.putInt(key, value);
         editor.commit();
     }
 
     private static void setPreference(String key, String value) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = prefs.edit();
+        SharedPreferences.Editor editor = getPreferenceEditor();
         editor.putString(key, value);
         editor.commit();
     }
 
     @Override
-    public long updateMovieListUpdateTimestampToCurrent(MovieListType listType) {
+    public long setMovieListUpdateTimestampToCurrent(MovieListType listType) {
         long currentTime = Calendar.getInstance().getTimeInMillis();
         setMovieListUpdateTimestamp(listType, currentTime);
 
@@ -214,7 +220,7 @@ public class PreferenceStorage implements PreferenceInterface {
 
     @Override
     public void setCacheUpdateIntervalMillis(long cacheUpdateInterval) {
-        this.cacheUpdateInterval = cacheUpdateInterval;
+        PreferenceStorage.cacheUpdateInterval = cacheUpdateInterval;
     }
 
     @Override

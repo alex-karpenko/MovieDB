@@ -33,10 +33,12 @@ import retrofit2.converter.gson.GsonConverterFactory;
  *
  * Implementation of the NetworkDataSource interface
  * with TheMovieDataBase API via Retrofit2
+ *
  */
 
 class TmdbNetworkDataSource implements NetworkDataSource {
     private static final String TAG = "TmdbNetworkDataSource";
+
     private Retrofit retrofit;
     private Map<MovieListType, Integer> totalPages;
     private Map<MovieListType, Integer> totalItems;

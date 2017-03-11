@@ -18,6 +18,9 @@ import io.reactivex.functions.Predicate;
 
 /**
  * Created by alex on 3/5/17.
+ * <p>
+ * Implementation of the MovieListInteractor
+ * with cache in Realm DB and network source from TheMovieDataBase
  */
 
 public class MovieListRepository implements MovieListInteractor {
@@ -74,7 +77,7 @@ public class MovieListRepository implements MovieListInteractor {
         if (listType.isFromNetwork()) {
             cacheStorage.clearMovieListPositionsAndInsertOrUpdateData(listType,
                     networkDataSource.readMovieListPage(listType, 1));
-            prefStorage.updateMovieListUpdateTimestampToCurrent(listType);
+            prefStorage.setMovieListUpdateTimestampToCurrent(listType);
             prefStorage.setMovieListTotalPages(listType, networkDataSource.getTotalListPages(listType));
             prefStorage.setMovieListTotalItems(listType, networkDataSource.getTotalListItems(listType));
         }
@@ -85,11 +88,15 @@ public class MovieListRepository implements MovieListInteractor {
         if (listType.isFromNetwork()) {
             int lastPageInStorage = cacheStorage.getMovieListLastPageNumber(listType);
             int lastPageInNetwork = networkDataSource.getTotalListPages(listType);
+            Log.i(TAG, "loadNextPage: last_cache_page=" + lastPageInStorage);
+            Log.i(TAG, "loadNextPage: last_network_page=" + lastPageInNetwork);
 
-            if (lastPageInNetwork <= 0)
+            if (lastPageInNetwork <= 0) {
                 lastPageInNetwork = prefStorage.getMovieListTotalPages(listType);
+                Log.i(TAG, "loadNextPage: last_network_page from prefs=" + lastPageInNetwork);
+            }
 
-            if (lastPageInStorage < lastPageInNetwork) {
+            if (lastPageInStorage < lastPageInNetwork || lastPageInNetwork <= 0) {
                 cacheStorage.insertOrUpdateMovieList(listType,
                         networkDataSource.readMovieListPage(listType, lastPageInStorage + 1));
                 prefStorage.setMovieListTotalPages(listType, networkDataSource.getTotalListPages(listType));
