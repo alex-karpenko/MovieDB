@@ -25,13 +25,11 @@ public class MovieListRepository implements MovieListInteractor {
     private final NetworkDataSource networkDataSource;
     private final CacheStorage cacheStorage;
     private final PreferenceInterface prefStorage;
-    private Context context;
 
     public MovieListRepository(Context context) {
         prefStorage = PreferenceStorage.getInstance(context);
         networkDataSource = new TmdbNetworkDataSource(prefStorage.getBaseApiUrl());
         cacheStorage = new RealmCacheStorage(context);
-        this.context = context;
     }
 
     @Override
