@@ -32,7 +32,7 @@ public class RealmCacheStorage implements CacheStorage {
     private static final String TAG = "RealmCacheStorage";
     private static final String REALM_DB_FILE_NAME = "movies.realm";
     private static final int REALM_DB_SCHEME_VERSION = 1;
-    private static boolean isRealmConfigured = false;
+    private static volatile Boolean isRealmConfigured = false;
     private PreferenceInterface prefStorage;
 
     RealmCacheStorage(Context context) {
@@ -44,16 +44,20 @@ public class RealmCacheStorage implements CacheStorage {
         prefStorage = PreferenceStorage.getInstance(context);
     }
 
-    private synchronized void buildDefaultRealmConfiguration(Context context) {
+    private void buildDefaultRealmConfiguration(Context context) {
         if (!isRealmConfigured) {
-            Realm.init(context);
-            RealmConfiguration realmConfig = new RealmConfiguration.Builder()
-                    .name(REALM_DB_FILE_NAME)
-                    .schemaVersion(REALM_DB_SCHEME_VERSION)
-                    .deleteRealmIfMigrationNeeded()
-                    .build();
-            Realm.setDefaultConfiguration(realmConfig);
-            isRealmConfigured = true;
+            synchronized (isRealmConfigured) {
+                if (!isRealmConfigured) {
+                    Realm.init(context);
+                    RealmConfiguration realmConfig = new RealmConfiguration.Builder()
+                            .name(REALM_DB_FILE_NAME)
+                            .schemaVersion(REALM_DB_SCHEME_VERSION)
+                            .deleteRealmIfMigrationNeeded()
+                            .build();
+                    Realm.setDefaultConfiguration(realmConfig);
+                    isRealmConfigured = true;
+                }
+            }
         }
     }
 

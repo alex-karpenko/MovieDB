@@ -23,7 +23,7 @@ public class PreferenceStorage implements PreferenceInterface {
 
     private static final PreferenceStorage ourInstance = new PreferenceStorage();
     private static Context context;
-    private static Boolean isInitialized = false;
+    private static volatile Boolean isInitialized = false;
     // Base URLs to deal with TMDB API
     private static final String baseApiSecureUrl = "https://api.themoviedb.org/3/";
     // Common variables, we fill its by fetching configuration from TMDB
