@@ -6,6 +6,9 @@ import io.reactivex.Observable;
 
 /**
  * Created by alex on 2/14/17.
+ *
+ * MovieInteractor interface definition
+ *
  */
 
 public interface MovieInteractor {

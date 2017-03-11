@@ -12,6 +12,9 @@ import io.reactivex.Observable;
 
 /**
  * Created by Leshik on 01.03.2017.
+ *
+ * NetworkDataSource interface definition
+ *
  */
 
 public interface NetworkDataSource {

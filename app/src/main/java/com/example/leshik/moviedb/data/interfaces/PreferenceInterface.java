@@ -6,6 +6,9 @@ import com.example.leshik.moviedb.data.MovieListType;
 
 /**
  * Created by alex on 3/9/17.
+ *
+ * PreferenceInterface definition
+ *
  */
 
 public interface PreferenceInterface {

@@ -9,6 +9,9 @@ import io.reactivex.Observable;
 
 /**
  * Created by Leshik on 01.03.2017.
+ *
+ * CacheStorage interface definition
+ *
  */
 
 public interface CacheStorage {
