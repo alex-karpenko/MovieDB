@@ -30,15 +30,18 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Created by Leshik on 01.03.2017.
+ *
+ * Implementation of the NetworkDataSource interface
+ * with TheMovieDataBase API via Retrofit2
  */
 
-public class TmdbNetworkDataSource implements NetworkDataSource {
+class TmdbNetworkDataSource implements NetworkDataSource {
     private static final String TAG = "TmdbNetworkDataSource";
     private Retrofit retrofit;
     private Map<MovieListType, Integer> totalPages;
     private Map<MovieListType, Integer> totalItems;
 
-    public TmdbNetworkDataSource(String apiUrl) {
+    TmdbNetworkDataSource(String apiUrl) {
         retrofit = new Retrofit.Builder()
                 .baseUrl(apiUrl)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -87,34 +90,28 @@ public class TmdbNetworkDataSource implements NetworkDataSource {
     public Observable<Movie> readMovie(long movieId) {
         ApiService service = getServiceInstance();
 
-        Observable<Movie> movie =
-                service.getMovie(movieId, getApiKey())
-                        .subscribeOn(Schedulers.io())
-                        .map(new Function<MovieResponse, Movie>() {
-                            @Override
-                            public Movie apply(MovieResponse movieResponse) throws Exception {
-                                return movieResponse.getMovieInstance();
-                            }
-                        });
-
-        return movie;
+        return service.getMovie(movieId, getApiKey())
+                .subscribeOn(Schedulers.io())
+                .map(new Function<MovieResponse, Movie>() {
+                    @Override
+                    public Movie apply(MovieResponse movieResponse) throws Exception {
+                        return movieResponse.getMovieInstance();
+                    }
+                });
     }
 
     @Override
     public Observable<List<Video>> readVideoList(long movieId) {
         ApiService service = getServiceInstance();
 
-        Observable<List<Video>> videoList =
-                service.getVideos(movieId, getApiKey())
-                        .subscribeOn(Schedulers.io())
-                        .map(new Function<VideosResponse, List<Video>>() {
-                            @Override
-                            public List<Video> apply(VideosResponse videosResponse) throws Exception {
-                                return videosResponse.getVideoListInstance();
-                            }
-                        });
-
-        return videoList;
+        return service.getVideos(movieId, getApiKey())
+                .subscribeOn(Schedulers.io())
+                .map(new Function<VideosResponse, List<Video>>() {
+                    @Override
+                    public List<Video> apply(VideosResponse videosResponse) throws Exception {
+                        return videosResponse.getVideoListInstance();
+                    }
+                });
     }
 
     @Override
@@ -125,58 +122,53 @@ public class TmdbNetworkDataSource implements NetworkDataSource {
     private Observable<List<Review>> readReviewListPagesRecursively(final long movieId, final int startPage) {
         final ApiService service = getServiceInstance();
 
-        Observable<List<Review>> reviewList =
-                service.getReviews(movieId, getApiKey(), startPage)
-                        .subscribeOn(Schedulers.io())
-                        .map(new Function<ReviewsResponse, List<Review>>() {
-                            @Override
-                            public List<Review> apply(ReviewsResponse reviewsResponse) throws Exception {
-                                int totalPages = reviewsResponse.totalPages;
-                                final List<Review> newList = new ArrayList<>();
+        return service.getReviews(movieId, getApiKey(), startPage)
+                .subscribeOn(Schedulers.io())
+                .map(new Function<ReviewsResponse, List<Review>>() {
+                    @Override
+                    public List<Review> apply(ReviewsResponse reviewsResponse) throws Exception {
+                        int totalPages1 = reviewsResponse.totalPages;
+                        final List<Review> newList = new ArrayList<>();
 
-                                newList.addAll(reviewsResponse.getReviewListInstance());
+                        newList.addAll(reviewsResponse.getReviewListInstance());
 
-                                if (totalPages > startPage) {
-                                    readReviewListPagesRecursively(movieId, startPage + 1)
-                                            .subscribeOn(Schedulers.io())
-                                            .subscribe(new Consumer<List<Review>>() {
-                                                @Override
-                                                public void accept(List<Review> reviews) throws Exception {
-                                                    newList.addAll(reviews);
-                                                }
-                                            });
-                                }
+                        if (totalPages1 > startPage) {
+                            readReviewListPagesRecursively(movieId, startPage + 1)
+                                    .subscribeOn(Schedulers.io())
+                                    .subscribe(new Consumer<List<Review>>() {
+                                        @Override
+                                        public void accept(List<Review> reviews) throws Exception {
+                                            newList.addAll(reviews);
+                                        }
+                                    });
+                        }
 
-                                return newList;
-                            }
-                        });
-
-        return reviewList;
+                        return newList;
+                    }
+                });
     }
 
     @Override
     public Observable<List<Movie>> readMovieListPage(final MovieListType listType, int page) {
         Log.i(TAG, "readMovieListPage: listType = " + listType.toString() + ", page=" + page);
-        Observable<List<Movie>> returnList =
-                getListResponseObservable(listType, page)
-                        .subscribeOn(Schedulers.io())
-                        .doOnNext(new Consumer<ListPageResponse>() {
-                            @Override
-                            public void accept(ListPageResponse listPageResponse) throws Exception {
-                                updateListTotals(listType, listPageResponse.totalPages, listPageResponse.totalResults);
-                            }
-                        })
-                        .map(new Function<ListPageResponse, List<Movie>>() {
-                            @Override
-                            public List<Movie> apply(ListPageResponse listPageResponse) throws Exception {
-                                return listPageResponse.getListPageInstance(listType);
-                            }
-                        });
 
-        return returnList;
+        return getListResponseObservable(listType, page)
+                .subscribeOn(Schedulers.io())
+                .doOnNext(new Consumer<ListPageResponse>() {
+                    @Override
+                    public void accept(ListPageResponse listPageResponse) throws Exception {
+                        updateListTotals(listType, listPageResponse.totalPages, listPageResponse.totalResults);
+                    }
+                })
+                .map(new Function<ListPageResponse, List<Movie>>() {
+                    @Override
+                    public List<Movie> apply(ListPageResponse listPageResponse) throws Exception {
+                        return listPageResponse.getListPageInstance(listType);
+                    }
+                });
     }
 
-    Observable<ListPageResponse> getListResponseObservable(MovieListType listType, int page) {
+    private Observable<ListPageResponse> getListResponseObservable(MovieListType listType, int page) {
         ApiService service = getServiceInstance();
         Observable<ListPageResponse> returnObservable;
 
