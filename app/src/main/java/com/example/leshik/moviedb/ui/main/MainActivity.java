@@ -12,7 +12,8 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 
 import com.example.leshik.moviedb.R;
-import com.example.leshik.moviedb.service.CacheUpdateService;
+import com.example.leshik.moviedb.data.PreferenceStorage;
+import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
 import com.example.leshik.moviedb.ui.details.DetailActivity;
 import com.example.leshik.moviedb.ui.details.DetailFragment;
 import com.example.leshik.moviedb.ui.poster.FullPosterActivity;
@@ -44,16 +45,13 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
     // current selected movie (for two pane view)
     private long selectedMovieId = 0;
 
+    private PreferenceInterface prefStorage;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Utils.loadDefaultPreferences(this);
+        prefStorage = PreferenceStorage.getInstance(this.getApplicationContext());
+        Utils.applyTheme(this, prefStorage.getTheme());
         super.onCreate(savedInstanceState);
-
-        // restore base URLs from shared config
-        Utils.basePosterUrl = Utils.getStringCachePreference(this, R.string.base_poster_url);
-        Utils.basePosterSecureUrl = Utils.getStringCachePreference(this, R.string.base_poster_secure_url);
-        // Every time when activity created - update configuration from the TMDB
-        CacheUpdateService.startActionUpdateConfiguration(this);
 
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);

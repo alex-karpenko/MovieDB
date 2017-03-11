@@ -6,8 +6,8 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.example.leshik.moviedb.data.interfaces.CacheStorage;
+import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
 import com.example.leshik.moviedb.data.model.Movie;
-import com.example.leshik.moviedb.utils.Utils;
 
 import java.util.List;
 
@@ -33,6 +33,7 @@ public class RealmCacheStorage implements CacheStorage {
     private static final String REALM_DB_FILE_NAME = "movies.realm";
     private static final int REALM_DB_SCHEME_VERSION = 1;
     private static boolean isRealmConfigured = false;
+    private PreferenceInterface prefStorage;
 
     RealmCacheStorage(Context context) {
         if (context instanceof Application) {
@@ -40,6 +41,7 @@ public class RealmCacheStorage implements CacheStorage {
         } else {
             throw new IllegalArgumentException("RealmCacheStorage: context is not Application");
         }
+        prefStorage = PreferenceStorage.getInstance(context);
     }
 
     private synchronized void buildDefaultRealmConfiguration(Context context) {
@@ -184,7 +186,7 @@ public class RealmCacheStorage implements CacheStorage {
                     } else {
                         Integer newFavoriteListPosition;
                         Number maxCurrentFavoritePosition = realm.where(Movie.class)
-                                .max(getListTypeColumnName(MovieListType.Favorite));
+                                .max(MovieListType.Favorite.getModelColumnName());
                         if (maxCurrentFavoritePosition == null) newFavoriteListPosition = 1;
                         else newFavoriteListPosition = maxCurrentFavoritePosition.intValue() + 1;
                         movie.setFavoritePosition(newFavoriteListPosition);
@@ -195,23 +197,6 @@ public class RealmCacheStorage implements CacheStorage {
         });
 
         realm.close();
-    }
-
-    String getListTypeColumnName(MovieListType listType) {
-        String columnName = "";
-        switch (listType) {
-            case Popular:
-                columnName = "popularPosition";
-                break;
-            case Toprated:
-                columnName = "topratedPosition";
-                break;
-            case Favorite:
-                columnName = "favoritePosition";
-                break;
-        }
-
-        return columnName;
     }
 
     @Override
@@ -247,8 +232,8 @@ public class RealmCacheStorage implements CacheStorage {
 
     private RealmResults<Movie> findMovieListAsRealmResults(Realm realm, MovieListType listType) {
         return realm.where(Movie.class)
-                .greaterThan(getListTypeColumnName(listType), 0)
-                .findAllSorted(getListTypeColumnName(listType));
+                .greaterThan(listType.getModelColumnName(), 0)
+                .findAllSorted(listType.getModelColumnName());
     }
 
     @Override
@@ -285,7 +270,7 @@ public class RealmCacheStorage implements CacheStorage {
     private void clearMovieListPositionsAndInsertOrUpdateData(Realm transactionRealm, final MovieListType listType, final Observable<List<Movie>> movieList) {
         Log.i(TAG, "clearMovieListPositionsAndInsertOrUpdateData: +, " + listType);
         final RealmResults<Movie> result = transactionRealm.where(Movie.class)
-                .greaterThan(getListTypeColumnName(listType), 0)
+                .greaterThan(listType.getModelColumnName(), 0)
                 .findAll();
         clearMovieListPosition(listType, result);
         updateOrInsertMovieList(transactionRealm, movieList);
@@ -331,11 +316,11 @@ public class RealmCacheStorage implements CacheStorage {
         int lastPosition;
 
         lastPosition = realm.where(Movie.class)
-                .greaterThan(getListTypeColumnName(listType), 0)
+                .greaterThan(listType.getModelColumnName(), 0)
                 .findAll()
                 .size();
 
         realm.close();
-        return lastPosition / Utils.getCachePageSize();
+        return lastPosition / prefStorage.getCachePageSize();
     }
 }

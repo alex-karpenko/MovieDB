@@ -15,6 +15,8 @@ import android.widget.TextView;
 
 import com.example.leshik.moviedb.R;
 import com.example.leshik.moviedb.data.MovieRepository;
+import com.example.leshik.moviedb.data.PreferenceStorage;
+import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
 import com.example.leshik.moviedb.data.model.Movie;
 import com.example.leshik.moviedb.ui.viewmodels.MovieViewModel;
 import com.example.leshik.moviedb.utils.Utils;
@@ -68,6 +70,8 @@ public class FullPosterActivity extends AppCompatActivity implements FullPosterF
     MovieViewModel mViewModel;
     CompositeDisposable subscription = new CompositeDisposable();
 
+    private PreferenceInterface prefStorage;
+
     // helper method to create proper intent to start FullPosterActivity
     static public Intent getIntentInstance(Context context, long movieId) {
         Intent intent = new Intent(context, FullPosterActivity.class);
@@ -112,7 +116,8 @@ public class FullPosterActivity extends AppCompatActivity implements FullPosterF
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Utils.applyCurrentTheme(this);
+        prefStorage = PreferenceStorage.getInstance(this.getApplicationContext());
+        Utils.applyTheme(this, prefStorage.getTheme());
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState == null) {

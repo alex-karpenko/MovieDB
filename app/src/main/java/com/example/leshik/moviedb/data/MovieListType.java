@@ -5,9 +5,56 @@ package com.example.leshik.moviedb.data;
  */
 
 public enum MovieListType {
-    Popular(0),
-    Toprated(1),
-    Favorite(2);
+
+    Popular(0) {
+        @Override
+        boolean isFromNetwork() {
+            return true;
+        }
+
+        @Override
+        boolean isLocalOnly() {
+            return false;
+        }
+
+        @Override
+        String getModelColumnName() {
+            return "popularPosition";
+        }
+
+    },
+    Toprated(1) {
+        @Override
+        boolean isFromNetwork() {
+            return true;
+        }
+
+        @Override
+        boolean isLocalOnly() {
+            return false;
+        }
+
+        @Override
+        String getModelColumnName() {
+            return "topratedPosition";
+        }
+    },
+    Favorite(2) {
+        @Override
+        boolean isFromNetwork() {
+            return false;
+        }
+
+        @Override
+        boolean isLocalOnly() {
+            return true;
+        }
+
+        @Override
+        String getModelColumnName() {
+            return "favoritePosition";
+        }
+    };
 
     private int index;
 
@@ -17,5 +64,23 @@ public enum MovieListType {
 
     public int getIndex() {
         return index;
+    }
+
+    abstract boolean isFromNetwork();
+
+    abstract boolean isLocalOnly();
+
+    abstract String getModelColumnName();
+
+    String getTotalPagesKey() {
+        return name() + "total_pages";
+    }
+
+    String getTotalItemsKey() {
+        return name() + "total_items";
+    }
+
+    String getUpdateTimestampKey() {
+        return name() + "last_update";
     }
 }

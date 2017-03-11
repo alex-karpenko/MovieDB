@@ -8,6 +8,8 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 
 import com.example.leshik.moviedb.R;
+import com.example.leshik.moviedb.data.PreferenceStorage;
+import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
 import com.example.leshik.moviedb.utils.Utils;
 
 
@@ -17,6 +19,7 @@ import com.example.leshik.moviedb.utils.Utils;
  * create an instance of this fragment.
  */
 public class SettingsFragment extends PreferenceFragment implements Preference.OnPreferenceChangeListener {
+    PreferenceInterface prefStorage;
 
     public SettingsFragment() {
         // Required empty public constructor
@@ -36,6 +39,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        prefStorage = PreferenceStorage.getInstance(getActivity().getApplicationContext());
         // Add 'general' preferences, defined in the XML file
         addPreferencesFromResource(R.xml.pref_general);
         // For all preferences, attach an OnPreferenceChangeListener so the UI summary can be
@@ -80,9 +84,12 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         }
 
         if (preference.getKey().equals(getString(R.string.pref_theme_key))) {
-            Utils.setCurrentTheme(getActivity(), stringValue);
+            int oldThemeId = prefStorage.getTheme();
+            int newThemeId = prefStorage.setTheme(stringValue);
+
+            if (oldThemeId != newThemeId) Utils.scheduleActivityRestart();
         } else if (preference.getKey().equals(getString(R.string.pref_cache_key))) {
-            Utils.setCacheUpdateInterval(Long.valueOf(stringValue) * 60 * 60 * 1000);
+            prefStorage.setCacheUpdateIntervalHours(Integer.valueOf(stringValue));
         }
         return true;
     }

@@ -42,10 +42,6 @@
                 android:value="com.example.leshik.moviedb.ui.details.DetailActivity" />
         </activity>
 
-        <service
-            android:name=".service.CacheUpdateService"
-            android:exported="false" />
-
     </application>
 
 </manifest>

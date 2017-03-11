@@ -3,11 +3,13 @@ package com.example.leshik.moviedb.data;
 import android.content.Context;
 import android.util.Log;
 
+import com.example.leshik.moviedb.data.interfaces.CacheStorage;
 import com.example.leshik.moviedb.data.interfaces.MovieInteractor;
+import com.example.leshik.moviedb.data.interfaces.NetworkDataSource;
+import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
 import com.example.leshik.moviedb.data.model.Movie;
 import com.example.leshik.moviedb.data.model.Review;
 import com.example.leshik.moviedb.data.model.Video;
-import com.example.leshik.moviedb.utils.Utils;
 
 import java.util.Calendar;
 import java.util.List;
@@ -24,11 +26,13 @@ import io.reactivex.schedulers.Schedulers;
 
 public class MovieRepository implements MovieInteractor {
     private static final String TAG = "MovieRepository";
-    private final TmdbNetworkDataSource networkDataSource;
-    private final RealmCacheStorage cacheStorage;
+    private final NetworkDataSource networkDataSource;
+    private final CacheStorage cacheStorage;
+    private final PreferenceInterface prefStorage;
 
     public MovieRepository(Context context) {
-        networkDataSource = new TmdbNetworkDataSource(context, Utils.getBaseApiUrl());
+        prefStorage = PreferenceStorage.getInstance(context);
+        networkDataSource = new TmdbNetworkDataSource(prefStorage.getBaseApiUrl());
         cacheStorage = new RealmCacheStorage(context);
     }
 
@@ -55,7 +59,7 @@ public class MovieRepository implements MovieInteractor {
 
     private boolean isExpiredOrEmpty(Movie movie) {
         long currentTime = Calendar.getInstance().getTimeInMillis();
-        long cacheUpdateInterval = Utils.getCacheUpdateInterval();
+        long cacheUpdateInterval = prefStorage.getCacheUpdateInterval();
 
         // 1) obviously :)
         // 2) ...

@@ -15,6 +15,8 @@ import android.view.ViewGroup;
 
 import com.example.leshik.moviedb.R;
 import com.example.leshik.moviedb.data.MovieRepository;
+import com.example.leshik.moviedb.data.PreferenceStorage;
+import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
 import com.example.leshik.moviedb.data.model.Movie;
 import com.example.leshik.moviedb.ui.viewmodels.MovieViewModel;
 import com.example.leshik.moviedb.utils.Utils;
@@ -58,6 +60,8 @@ public class FullPosterFragment extends Fragment {
 
     MovieViewModel mViewModel;
     CompositeDisposable subscription = new CompositeDisposable();
+
+    PreferenceInterface prefStorage;
 
 
     public FullPosterFragment() {
@@ -111,8 +115,8 @@ public class FullPosterFragment extends Fragment {
             movieId = savedInstanceState.getLong(ARG_MOVIE_ID);
         }
 
-        // init view model
         mViewModel = new MovieViewModel(movieId, new MovieRepository(getActivity().getApplicationContext()));
+        prefStorage = PreferenceStorage.getInstance(getActivity().getApplicationContext());
     }
 
     @Override
@@ -189,7 +193,7 @@ public class FullPosterFragment extends Fragment {
             updateShareAction(mMovieTitle, mPosterName);
 
         Picasso.with(getActivity())
-                .load(Utils.getPosterFullUri(movie.getPosterPath()))
+                .load(prefStorage.getPosterFullUri(movie.getPosterPath()))
                 .into(mPosterImage, new Callback() {
                     @Override
                     public void onSuccess() {
@@ -219,7 +223,7 @@ public class FullPosterFragment extends Fragment {
      */
     void updateShareAction(String title, String poster) {
         // create intent
-        Intent myShareIntent = Utils.getShareIntent(getContext(), title, poster);
+        Intent myShareIntent = Utils.getShareIntent(getContext(), title, prefStorage.getPosterFullUri(poster).toString());
         // set intent into provider
         if (mShareActionProvider != null) mShareActionProvider.setShareIntent(myShareIntent);
     }

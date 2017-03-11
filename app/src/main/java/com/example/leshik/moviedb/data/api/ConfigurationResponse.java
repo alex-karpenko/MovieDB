@@ -49,4 +49,11 @@ public class ConfigurationResponse {
     @Expose
     public List<String> changeKeys = null;
 
+    public String getImagesBaseUrl() {
+        return images.baseUrl;
+    }
+
+    public String getImagesBaseSecureUrl() {
+        return images.secureBaseUrl;
+    }
 }

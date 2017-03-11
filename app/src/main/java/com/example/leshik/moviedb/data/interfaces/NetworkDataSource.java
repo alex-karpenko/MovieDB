@@ -2,6 +2,7 @@ package com.example.leshik.moviedb.data.interfaces;
 
 import com.example.leshik.moviedb.data.MovieListType;
 import com.example.leshik.moviedb.data.model.Movie;
+import com.example.leshik.moviedb.data.model.NetworkConfig;
 import com.example.leshik.moviedb.data.model.Review;
 import com.example.leshik.moviedb.data.model.Video;
 
@@ -14,6 +15,8 @@ import io.reactivex.Observable;
  */
 
 public interface NetworkDataSource {
+    NetworkConfig getNetworkConfig();
+
     Observable<Movie> readMovie(long movieId);
 
     Observable<List<Video>> readVideoList(long movieId);

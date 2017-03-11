@@ -21,6 +21,8 @@ import android.widget.TextView;
 
 import com.example.leshik.moviedb.R;
 import com.example.leshik.moviedb.data.MovieRepository;
+import com.example.leshik.moviedb.data.PreferenceStorage;
+import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
 import com.example.leshik.moviedb.data.model.Movie;
 import com.example.leshik.moviedb.data.model.Review;
 import com.example.leshik.moviedb.data.model.Video;
@@ -90,6 +92,8 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
     MovieViewModel mViewModel;
     CompositeDisposable subscription = new CompositeDisposable();
 
+    PreferenceInterface prefStorage;
+
     public DetailFragment() {
         // Required empty public constructor
     }
@@ -113,6 +117,8 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
         if (savedInstanceState != null) {
             movieId = savedInstanceState.getLong(ARG_MOVIE_ID);
         }
+
+        prefStorage = PreferenceStorage.getInstance(getContext().getApplicationContext());
     }
 
     @Override
@@ -218,7 +224,7 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
      */
     void updateShareAction(String title, String poster) {
         // create intent
-        Intent myShareIntent = Utils.getShareIntent(getContext(), title, poster);
+        Intent myShareIntent = Utils.getShareIntent(getContext(), title, prefStorage.getPosterFullUri(poster).toString());
         // set intent into provider
         if (mShareActionProvider != null) mShareActionProvider.setShareIntent(myShareIntent);
     }
@@ -238,7 +244,7 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
         // load poster image
         Picasso.with(getActivity())
-                .load(Utils.getPosterSmallUri(mPosterName))
+                .load(prefStorage.getPosterSmallUri(mPosterName))
                 .into(mPosterImage);
 
         // Setting all view's content

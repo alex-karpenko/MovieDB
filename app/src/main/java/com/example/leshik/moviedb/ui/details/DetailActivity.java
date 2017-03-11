@@ -10,6 +10,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.leshik.moviedb.R;
+import com.example.leshik.moviedb.data.PreferenceStorage;
+import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
 import com.example.leshik.moviedb.ui.poster.FullPosterActivity;
 import com.example.leshik.moviedb.ui.settings.SettingsActivity;
 import com.example.leshik.moviedb.utils.Utils;
@@ -30,6 +32,8 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
     @BindView(R.id.detail_toolbar)
     protected Toolbar mToolbar;
 
+    private PreferenceInterface prefStorage;
+
     // helper method to create proper intent to start DetailActivity
     static public Intent getIntentInstance(Context context, long movieId) {
         Intent intent = new Intent(context, DetailActivity.class);
@@ -39,7 +43,8 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Utils.applyCurrentTheme(this);
+        prefStorage = PreferenceStorage.getInstance(this.getApplicationContext());
+        Utils.applyTheme(this, prefStorage.getTheme());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 

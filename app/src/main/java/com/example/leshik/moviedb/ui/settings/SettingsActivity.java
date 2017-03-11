@@ -7,6 +7,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import com.example.leshik.moviedb.R;
+import com.example.leshik.moviedb.data.PreferenceStorage;
+import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
 import com.example.leshik.moviedb.utils.Utils;
 
 import butterknife.BindView;
@@ -21,9 +23,12 @@ public class SettingsActivity extends AppCompatActivity {
     @BindView(R.id.settings_toolbar)
     protected Toolbar mToolbar;
 
+    private PreferenceInterface prefStorage;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Utils.applyCurrentTheme(this);
+        prefStorage = PreferenceStorage.getInstance(this.getApplicationContext());
+        Utils.applyTheme(this, prefStorage.getTheme());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
         ButterKnife.bind(this);

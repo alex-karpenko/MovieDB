@@ -1,9 +1,9 @@
 package com.example.leshik.moviedb.data;
 
-import android.content.Context;
 import android.util.Log;
 
 import com.example.leshik.moviedb.BuildConfig;
+import com.example.leshik.moviedb.data.api.ConfigurationResponse;
 import com.example.leshik.moviedb.data.api.ListPageResponse;
 import com.example.leshik.moviedb.data.api.MovieResponse;
 import com.example.leshik.moviedb.data.api.ReviewsResponse;
@@ -11,13 +11,15 @@ import com.example.leshik.moviedb.data.api.VideosResponse;
 import com.example.leshik.moviedb.data.interfaces.ApiService;
 import com.example.leshik.moviedb.data.interfaces.NetworkDataSource;
 import com.example.leshik.moviedb.data.model.Movie;
+import com.example.leshik.moviedb.data.model.NetworkConfig;
 import com.example.leshik.moviedb.data.model.Review;
 import com.example.leshik.moviedb.data.model.Video;
-import com.example.leshik.moviedb.utils.Utils;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.Observable;
 import io.reactivex.functions.Consumer;
@@ -33,16 +35,18 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class TmdbNetworkDataSource implements NetworkDataSource {
     private static final String TAG = "TmdbNetworkDataSource";
     private Retrofit retrofit;
-    private Context context;
+    private Map<MovieListType, Integer> totalPages;
+    private Map<MovieListType, Integer> totalItems;
 
-    public TmdbNetworkDataSource(Context context, String apiUrl) {
+    public TmdbNetworkDataSource(String apiUrl) {
         retrofit = new Retrofit.Builder()
                 .baseUrl(apiUrl)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build();
 
-        this.context = context;
+        totalPages = new HashMap<>();
+        totalItems = new HashMap<>();
     }
 
     private ApiService getServiceInstance() {
@@ -51,6 +55,32 @@ public class TmdbNetworkDataSource implements NetworkDataSource {
 
     private String getApiKey() {
         return BuildConfig.THE_MOVIE_DB_API_KEY;
+    }
+
+    @Override
+    public NetworkConfig getNetworkConfig() {
+        final NetworkConfig networkConfig = new NetworkConfig();
+
+        ApiService service = getServiceInstance();
+        final Observable<NetworkConfig> newConfig = service.getConfiguration(getApiKey())
+                .subscribeOn(Schedulers.io())
+                .map(new Function<ConfigurationResponse, NetworkConfig>() {
+                    @Override
+                    public NetworkConfig apply(ConfigurationResponse configurationResponse) throws Exception {
+                        return new NetworkConfig(configurationResponse.getImagesBaseUrl(),
+                                configurationResponse.getImagesBaseSecureUrl());
+                    }
+                });
+
+        newConfig.blockingSubscribe(new Consumer<NetworkConfig>() {
+            @Override
+            public void accept(NetworkConfig config) throws Exception {
+                networkConfig.basePosterUrl = config.basePosterUrl;
+                networkConfig.basePosterSecureUrl = config.basePosterSecureUrl;
+            }
+        });
+
+        return networkConfig;
     }
 
     @Override
@@ -164,26 +194,20 @@ public class TmdbNetworkDataSource implements NetworkDataSource {
         return returnObservable;
     }
 
-    private void updateListTotals(MovieListType listType, int totalPages, int totalItems) {
-        Utils.setCachePreference(context, getPagesPrefKey(listType), totalPages);
-        Utils.setCachePreference(context, getItemsPrefKey(listType), totalItems);
-    }
-
-    private String getPagesPrefKey(MovieListType listType) {
-        return listType.toString() + "_total_pages";
-    }
-
-    private String getItemsPrefKey(MovieListType listType) {
-        return listType.toString() + "_total_items";
+    private void updateListTotals(MovieListType listType, int pages, int items) {
+        totalPages.put(listType, pages);
+        totalItems.put(listType, items);
     }
 
     @Override
     public int getTotalListPages(MovieListType listType) {
-        return Utils.getIntCachePreference(context, getPagesPrefKey(listType));
+        if (totalPages.containsKey(listType)) return totalPages.get(listType);
+        else return 0;
     }
 
     @Override
     public int getTotalListItems(MovieListType listType) {
-        return Utils.getIntCachePreference(context, getItemsPrefKey(listType));
+        if (totalItems.containsKey(listType)) return totalItems.get(listType);
+        else return 0;
     }
 }

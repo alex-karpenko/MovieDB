@@ -9,8 +9,9 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 
 import com.example.leshik.moviedb.R;
+import com.example.leshik.moviedb.data.PreferenceStorage;
+import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
 import com.example.leshik.moviedb.data.model.Movie;
-import com.example.leshik.moviedb.utils.Utils;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -25,10 +26,12 @@ import butterknife.ButterKnife;
 public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.ViewHolder> {
     Context context;
     private List<Movie> movieList;
+    PreferenceInterface prefStorage;
 
     public MovieListAdapter(Context context, List<Movie> movieList) {
         this.context = context;
         this.movieList = movieList;
+        prefStorage = PreferenceStorage.getInstance(context.getApplicationContext());
     }
 
     public void setMovieList(List<Movie> newList) {
@@ -48,7 +51,7 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
         if (movieList != null) {
             Movie movie = movieList.get(position);
             Picasso.with(context)
-                    .load(Utils.getPosterSmallUri(movie.getPosterPath()))
+                    .load(prefStorage.getPosterSmallUri(movie.getPosterPath()))
                     .into(holder.mPosterView);
 
             // set item click listener
