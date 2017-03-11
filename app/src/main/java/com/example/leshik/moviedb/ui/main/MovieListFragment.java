@@ -100,6 +100,7 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
 
         // Construct empty adapter ...
         mAdapter = new MovieListAdapter(getActivity(), null);
+        mAdapter.setHasStableIds(true);
         // ... and set it to recycle view
         mRecyclerView.setAdapter(mAdapter);
 

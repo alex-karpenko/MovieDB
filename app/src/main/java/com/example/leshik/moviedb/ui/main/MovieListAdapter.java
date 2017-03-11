@@ -19,6 +19,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static android.support.v7.widget.RecyclerView.NO_ID;
+
 /**
  * Created by alex on 3/7/17.
  */
@@ -72,6 +74,12 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
     public int getItemCount() {
         if (movieList != null) return movieList.size();
         else return 0;
+    }
+
+    @Override
+    public long getItemId(int position) {
+        if (movieList != null) return movieList.get(position).getMovieId();
+        else return NO_ID;
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
