@@ -1,6 +1,8 @@
 package com.example.leshik.moviedb.ui.details;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -45,6 +47,8 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
     private static final String TAG = "DetailFragment";
     // fragment args
     public static final String ARG_MOVIE_ID = "ARG_MOVIE_ID";
+    private static final String YOUTUBE_BASE_URL = "http://www.youtube.com/watch?v=";
+    private static final String YOUTUBE_BASE_CONTENT = "vnd.youtube:";
     // state variables
     private long movieId;
 
@@ -305,7 +309,7 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
                     @Override
                     public void onClick(View view) {
                         // start video watching, key of the video we extract from view's tag
-                        Utils.watchYoutubeVideo(getContext(), (String) view.getTag());
+                        watchYoutubeVideo((String) view.getTag());
                     }
                 });
 
@@ -321,6 +325,17 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
         }
         // and update mark
         Utils.setFavoriteIcon(isFavorite, mMenu);
+    }
+
+    private void watchYoutubeVideo(String id) {
+        Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(YOUTUBE_BASE_CONTENT + id));
+        Intent webIntent = new Intent(Intent.ACTION_VIEW,
+                Uri.parse(YOUTUBE_BASE_URL + id));
+        try {
+            getContext().startActivity(appIntent);
+        } catch (ActivityNotFoundException ex) {
+            getContext().startActivity(webIntent);
+        }
     }
 
     private void subscribeToMovie() {
