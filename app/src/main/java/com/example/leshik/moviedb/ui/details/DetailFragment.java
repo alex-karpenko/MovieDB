@@ -265,7 +265,7 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
         // Set homepage link, if present
         String homePage = movie.getHomePage();
         if (homePage != null && homePage.length() > 0) {
-            mHomepageText.setText("Homepage: " + homePage);
+            mHomepageText.setText(getString(R.string.homepage_format_str, homePage));
             mHomepageText.setVisibility(View.VISIBLE);
         } else {
             mHomepageText.setVisibility(View.GONE);
