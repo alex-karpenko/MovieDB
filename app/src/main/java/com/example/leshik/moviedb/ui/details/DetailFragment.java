@@ -251,16 +251,13 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
         mTitleText.setText(movie.getOriginalTitle());
         mReleasedText.setText(movie.getReleaseDate());
 
-        // TODO: make mRuntimeText formatting more reliable
         if (movie.getRunTime() > 0) {
-            mRuntimeText.setText(String.format("%d %s",
-                    movie.getRunTime(),
-                    getString(R.string.runtime_minutes_text)));
+            mRuntimeText.setText(getString(R.string.runtime_format_str, movie.getRunTime()));
         } else {
-            mRuntimeText.setText("-");
+            mRuntimeText.setText(getString(R.string.null_runtime_format_str));
         }
 
-        mRatingText.setText(String.format("%.1f/10", movie.getVoteAverage()));
+        mRatingText.setText(getString(R.string.rating_format_str, movie.getVoteAverage()));
 
         // Set homepage link, if present
         String homePage = movie.getHomePage();
