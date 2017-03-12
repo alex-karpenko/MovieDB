@@ -156,7 +156,7 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
             @Override
             public void onClick(View v) {
                 if (mPosterName != null) {
-                    ((DetailFragment.Callback) getContext()).onImageClicked(movieId);
+                    ((DetailFragment.Callback) getContext()).onImageClicked(movieId, (ImageView) v);
                 }
             }
         });
@@ -366,6 +366,6 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
         /**
          * DetailFragmentCallback for when an item has been selected.
          */
-        void onImageClicked(long movieId);
+        void onImageClicked(long movieId, ImageView posterView);
     }
 }
