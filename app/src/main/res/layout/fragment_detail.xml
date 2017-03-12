@@ -33,8 +33,7 @@
                 android:paddingRight="@dimen/detail_right_margin"
                 android:paddingStart="@dimen/detail_left_margin"
                 android:paddingTop="@dimen/detail_title_vertical_margin"
-                android:textSize="24sp"
-                tools:text="Original title" />
+                android:textSize="24sp" />
 
             <!-- Image, release date, rating -->
             <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -70,7 +69,6 @@
                         android:paddingRight="@dimen/detail_left_margin"
                         android:paddingStart="@dimen/detail_left_margin"
                         android:paddingTop="@dimen/detail_interviews_padding"
-                        android:text="Released"
                         android:textSize="18sp" />
                     <!-- runtime -->
                     <TextView
@@ -82,7 +80,6 @@
                         android:paddingRight="@dimen/detail_left_margin"
                         android:paddingStart="@dimen/detail_left_margin"
                         android:paddingTop="@dimen/detail_interviews_padding"
-                        android:text="-"
                         android:textSize="18sp"
                         android:textStyle="normal|italic" />
                     <!-- rating -->
@@ -95,7 +92,6 @@
                         android:paddingRight="@dimen/detail_left_margin"
                         android:paddingStart="@dimen/detail_left_margin"
                         android:paddingTop="@dimen/detail_interviews_padding"
-                        android:text="8.1/10"
                         android:textSize="14sp" />
 
                     <!-- end of text info block -->
@@ -103,6 +99,18 @@
                 <!-- end of middle block (poster + info) -->
             </LinearLayout>
 
+            <!-- homepage -->
+            <TextView
+                android:id="@+id/detail_homepage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingEnd="@dimen/detail_right_margin"
+                android:paddingLeft="@dimen/detail_left_margin"
+                android:paddingRight="@dimen/detail_right_margin"
+                android:paddingStart="@dimen/detail_left_margin"
+                android:paddingTop="@dimen/detail_title_vertical_margin"
+                android:autoLink="web"
+                android:visibility="gone" />
             <!-- Overview -->
             <TextView
                 android:id="@+id/detail_overview"
@@ -113,15 +121,15 @@
                 android:paddingLeft="@dimen/detail_left_margin"
                 android:paddingRight="@dimen/detail_right_margin"
                 android:paddingStart="@dimen/detail_left_margin"
-                android:paddingTop="@dimen/detail_title_vertical_margin"
-                android:text="Overview text" />
+                android:paddingTop="@dimen/detail_title_vertical_margin" />
 
             <!-- List of trailers -->
             <LinearLayout
                 android:id="@+id/videos_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <TextView
                     android:id="@+id/videos_list_title"
@@ -157,7 +165,8 @@
                 android:id="@+id/reviews_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <TextView
                     android:id="@+id/reviews_list_title"
