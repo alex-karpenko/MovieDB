@@ -83,9 +83,11 @@ public class PreferenceStorage implements PreferenceInterface {
         try {
             NetworkDataSource networkDataSource = new TmdbNetworkDataSource(baseApiSecureUrl);
             NetworkConfig newConfig = networkDataSource.getNetworkConfig();
-            networkConfig = newConfig;
-            setPreference(BASE_POSTER_URL_KEY, networkConfig.basePosterUrl);
-            setPreference(BASE_POSTER_SECURE_URL_KEY, networkConfig.basePosterSecureUrl);
+            if (newConfig.isValid()) {
+                networkConfig = newConfig;
+                setPreference(BASE_POSTER_URL_KEY, networkConfig.basePosterUrl);
+                setPreference(BASE_POSTER_SECURE_URL_KEY, networkConfig.basePosterSecureUrl);
+            }
         } catch (Exception e) {
         }
     }
