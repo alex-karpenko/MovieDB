@@ -43,6 +43,7 @@ public class FullPosterFragment extends Fragment {
     private static final String ARG_MOVIE_ID = "ARG_MOVIE_ID";
 
     private long movieId;
+    private Movie lastMovie;
 
     private Menu mMenu;
     private ShareActionProvider mShareActionProvider;
@@ -192,19 +193,21 @@ public class FullPosterFragment extends Fragment {
         if (mMenu != null)
             updateShareAction(mMovieTitle, mPosterName);
 
-        Picasso.with(getActivity())
-                .load(prefStorage.getPosterFullUri(movie.getPosterPath()))
-                .into(mPosterImage, new Callback() {
-                    @Override
-                    public void onSuccess() {
-                        mProgressBar.hide();
-                        attacher.update();
-                    }
+        if (isPosterChanged(movie)) {
+            Picasso.with(getActivity())
+                    .load(prefStorage.getPosterFullUri(movie.getPosterPath()))
+                    .into(mPosterImage, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                            mProgressBar.hide();
+                            attacher.update();
+                        }
 
-                    @Override
-                    public void onError() {
-                    }
-                });
+                        @Override
+                        public void onError() {
+                        }
+                    });
+        }
 
         // Favorite mark set
         isFavorite = false;
@@ -213,6 +216,12 @@ public class FullPosterFragment extends Fragment {
         }
         // and update it
         Utils.setFavoriteIcon(isFavorite, mMenu);
+
+        lastMovie = movie;
+    }
+
+    private boolean isPosterChanged(Movie newMovie) {
+        return lastMovie == null || !lastMovie.getPosterPath().equals(newMovie.getPosterPath());
     }
 
     /**

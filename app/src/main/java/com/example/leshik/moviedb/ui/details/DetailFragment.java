@@ -51,6 +51,7 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
     private static final String YOUTUBE_BASE_CONTENT = "vnd.youtube:";
     // state variables
     private long movieId;
+    private Movie lastMovie;
 
     // references for all views
     @BindView(R.id.poster_image)
@@ -246,10 +247,12 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
         if (mMenu != null)
             updateShareAction(mMovieTitle, mPosterName);
 
-        // load poster image
-        Picasso.with(getActivity())
-                .load(prefStorage.getPosterSmallUri(mPosterName))
-                .into(mPosterImage);
+        if (isPosterChanged(movie)) {
+            // load poster image
+            Picasso.with(getActivity())
+                    .load(prefStorage.getPosterSmallUri(mPosterName))
+                    .into(mPosterImage);
+        }
 
         // Setting all view's content
         mTitleText.setText(movie.getOriginalTitle());
@@ -325,6 +328,12 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
         }
         // and update mark
         Utils.setFavoriteIcon(isFavorite, mMenu);
+
+        lastMovie = movie;
+    }
+
+    private boolean isPosterChanged(Movie newMovie) {
+        return lastMovie == null || !lastMovie.getPosterPath().equals(newMovie.getPosterPath());
     }
 
     private void watchYoutubeVideo(String id) {
