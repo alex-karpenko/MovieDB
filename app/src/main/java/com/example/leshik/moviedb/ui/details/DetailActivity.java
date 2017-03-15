@@ -1,5 +1,6 @@
 package com.example.leshik.moviedb.ui.details;
 
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
 
 import com.example.leshik.moviedb.R;
 import com.example.leshik.moviedb.data.PreferenceStorage;
@@ -125,9 +127,15 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
 
 
     @Override
-    public void onImageClicked(long movieId) {
+    public void onImageClicked(long movieId, ImageView posterView) {
         // callback method that called when poster image is clicked
         // start full poster view activity
-        startActivity(FullPosterActivity.getIntentInstance(this, movieId));
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            ActivityOptions options = ActivityOptions
+                    .makeSceneTransitionAnimation(this, posterView, getString(R.string.poster_image));
+            startActivity(FullPosterActivity.getIntentInstance(this, movieId), options.toBundle());
+        } else {
+            startActivity(FullPosterActivity.getIntentInstance(this, movieId));
+        }
     }
 }

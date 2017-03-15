@@ -43,8 +43,11 @@
     <string name="favorites_tab_title">Favorites</string>
 
     <!-- Strings related to details view -->
-    <string name="runtime_minutes_text">min</string>
+    <string name="rating_format_str">%.1f/10</string>
+    <string name="runtime_format_str">%d min</string>
+    <string name="null_runtime_format_str">-</string>
     <string name="videos_list_title">Trailers</string>
     <string name="reviews_list_title">Reviews</string>
     <string name="share_action_subject">Popular movies:</string>
+    <string name="homepage_format_str">Homepage: %s</string>
 </resources>

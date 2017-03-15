@@ -17,4 +17,8 @@ public class NetworkConfig {
         this.basePosterUrl = basePosterUrl;
         this.basePosterSecureUrl = basePosterSecureUrl;
     }
+
+    public boolean isValid() {
+        return basePosterSecureUrl != null & basePosterUrl != null;
+    }
 }

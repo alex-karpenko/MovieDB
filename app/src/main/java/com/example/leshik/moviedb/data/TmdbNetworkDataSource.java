@@ -14,7 +14,6 @@ import com.example.leshik.moviedb.data.model.Movie;
 import com.example.leshik.moviedb.data.model.NetworkConfig;
 import com.example.leshik.moviedb.data.model.Review;
 import com.example.leshik.moviedb.data.model.Video;
-import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,14 +25,14 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Created by Leshik on 01.03.2017.
- *
+ * <p>
  * Implementation of the NetworkDataSource interface
  * with TheMovieDataBase API via Retrofit2
- *
  */
 
 class TmdbNetworkDataSource implements NetworkDataSource {
@@ -75,7 +74,8 @@ class TmdbNetworkDataSource implements NetworkDataSource {
                         return new NetworkConfig(configurationResponse.getImagesBaseUrl(),
                                 configurationResponse.getImagesBaseSecureUrl());
                     }
-                });
+                })
+                .onErrorReturnItem(new NetworkConfig());
 
         newConfig.blockingSubscribe(new Consumer<NetworkConfig>() {
             @Override
@@ -99,7 +99,8 @@ class TmdbNetworkDataSource implements NetworkDataSource {
                     public Movie apply(MovieResponse movieResponse) throws Exception {
                         return movieResponse.getMovieInstance();
                     }
-                });
+                })
+                .onErrorReturnItem(new Movie());
     }
 
     @Override
@@ -113,7 +114,8 @@ class TmdbNetworkDataSource implements NetworkDataSource {
                     public List<Video> apply(VideosResponse videosResponse) throws Exception {
                         return videosResponse.getVideoListInstance();
                     }
-                });
+                })
+                .onErrorReturnItem(new ArrayList<Video>());
     }
 
     @Override
@@ -147,7 +149,8 @@ class TmdbNetworkDataSource implements NetworkDataSource {
 
                         return newList;
                     }
-                });
+                })
+                .onErrorReturnItem(new ArrayList<Review>());
     }
 
     @Override
@@ -167,7 +170,8 @@ class TmdbNetworkDataSource implements NetworkDataSource {
                     public List<Movie> apply(ListPageResponse listPageResponse) throws Exception {
                         return listPageResponse.getListPageInstance(listType);
                     }
-                });
+                })
+                .onErrorReturnItem(new ArrayList<Movie>());
     }
 
     private Observable<ListPageResponse> getListResponseObservable(MovieListType listType, int page) {

@@ -1,6 +1,8 @@
 package com.example.leshik.moviedb.ui.details;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -45,8 +47,11 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
     private static final String TAG = "DetailFragment";
     // fragment args
     public static final String ARG_MOVIE_ID = "ARG_MOVIE_ID";
+    private static final String YOUTUBE_BASE_URL = "http://www.youtube.com/watch?v=";
+    private static final String YOUTUBE_BASE_CONTENT = "vnd.youtube:";
     // state variables
     private long movieId;
+    private Movie lastMovie;
 
     // references for all views
     @BindView(R.id.poster_image)
@@ -152,7 +157,7 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
             @Override
             public void onClick(View v) {
                 if (mPosterName != null) {
-                    ((DetailFragment.Callback) getContext()).onImageClicked(movieId);
+                    ((DetailFragment.Callback) getContext()).onImageClicked(movieId, (ImageView) v);
                 }
             }
         });
@@ -242,30 +247,29 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
         if (mMenu != null)
             updateShareAction(mMovieTitle, mPosterName);
 
-        // load poster image
-        Picasso.with(getActivity())
-                .load(prefStorage.getPosterSmallUri(mPosterName))
-                .into(mPosterImage);
+        if (isPosterChanged(movie)) {
+            // load poster image
+            Picasso.with(getActivity())
+                    .load(prefStorage.getPosterSmallUri(mPosterName))
+                    .into(mPosterImage);
+        }
 
         // Setting all view's content
         mTitleText.setText(movie.getOriginalTitle());
         mReleasedText.setText(movie.getReleaseDate());
 
-        // TODO: make mRuntimeText formatting more reliable
         if (movie.getRunTime() > 0) {
-            mRuntimeText.setText(String.format("%d %s",
-                    movie.getRunTime(),
-                    getString(R.string.runtime_minutes_text)));
+            mRuntimeText.setText(getString(R.string.runtime_format_str, movie.getRunTime()));
         } else {
-            mRuntimeText.setText("-");
+            mRuntimeText.setText(getString(R.string.null_runtime_format_str));
         }
 
-        mRatingText.setText(String.format("%.1f/10", movie.getVoteAverage()));
+        mRatingText.setText(getString(R.string.rating_format_str, movie.getVoteAverage()));
 
         // Set homepage link, if present
         String homePage = movie.getHomePage();
         if (homePage != null && homePage.length() > 0) {
-            mHomepageText.setText("Homepage: " + homePage);
+            mHomepageText.setText(getString(R.string.homepage_format_str, homePage));
             mHomepageText.setVisibility(View.VISIBLE);
         } else {
             mHomepageText.setVisibility(View.GONE);
@@ -308,7 +312,7 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
                     @Override
                     public void onClick(View view) {
                         // start video watching, key of the video we extract from view's tag
-                        Utils.watchYoutubeVideo(getContext(), (String) view.getTag());
+                        watchYoutubeVideo((String) view.getTag());
                     }
                 });
 
@@ -324,6 +328,23 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
         }
         // and update mark
         Utils.setFavoriteIcon(isFavorite, mMenu);
+
+        lastMovie = movie;
+    }
+
+    private boolean isPosterChanged(Movie newMovie) {
+        return lastMovie == null || !lastMovie.getPosterPath().equals(newMovie.getPosterPath());
+    }
+
+    private void watchYoutubeVideo(String id) {
+        Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(YOUTUBE_BASE_CONTENT + id));
+        Intent webIntent = new Intent(Intent.ACTION_VIEW,
+                Uri.parse(YOUTUBE_BASE_URL + id));
+        try {
+            getContext().startActivity(appIntent);
+        } catch (ActivityNotFoundException ex) {
+            getContext().startActivity(webIntent);
+        }
     }
 
     private void subscribeToMovie() {
@@ -354,6 +375,6 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
         /**
          * DetailFragmentCallback for when an item has been selected.
          */
-        void onImageClicked(long movieId);
+        void onImageClicked(long movieId, ImageView posterView);
     }
 }

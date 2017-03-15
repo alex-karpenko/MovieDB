@@ -154,7 +154,15 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
 
     // callback method from details fragment - called when poster image pressed to start full poster view
     @Override
-    public void onImageClicked(long movieId) {
-        startActivity(FullPosterActivity.getIntentInstance(this, movieId));
+    public void onImageClicked(long movieId, ImageView posterView) {
+        // callback method that called when poster image is clicked
+        // start full poster view activity
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            ActivityOptions options = ActivityOptions
+                    .makeSceneTransitionAnimation(this, posterView, getString(R.string.poster_image));
+            startActivity(FullPosterActivity.getIntentInstance(this, movieId), options.toBundle());
+        } else {
+            startActivity(FullPosterActivity.getIntentInstance(this, movieId));
+        }
     }
 }
