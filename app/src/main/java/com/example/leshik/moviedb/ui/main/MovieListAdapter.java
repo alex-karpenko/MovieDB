@@ -8,11 +8,11 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.example.leshik.moviedb.R;
 import com.example.leshik.moviedb.data.PreferenceStorage;
 import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
 import com.example.leshik.moviedb.data.model.Movie;
-import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -52,8 +52,12 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
     public void onBindViewHolder(ViewHolder holder, int position) {
         if (movieList != null) {
             Movie movie = movieList.get(position);
-            Picasso.with(context)
+//            Picasso.with(context)
+            Glide.with(context)
                     .load(prefStorage.getPosterSmallUri(movie.getPosterPath()))
+                    .thumbnail(0.01f)
+                    .crossFade()
+                    .fitCenter()
                     .into(holder.mPosterView);
 
             // set item click listener
