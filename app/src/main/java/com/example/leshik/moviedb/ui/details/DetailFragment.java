@@ -30,6 +30,7 @@ import com.example.leshik.moviedb.data.model.Review;
 import com.example.leshik.moviedb.data.model.Video;
 import com.example.leshik.moviedb.ui.viewmodels.MovieViewModel;
 import com.example.leshik.moviedb.utils.Utils;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.ms.square.android.expandabletextview.ExpandableTextView;
 import com.squareup.picasso.Picasso;
 
@@ -99,6 +100,8 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     PreferenceInterface prefStorage;
 
+    private FirebaseAnalytics mFirebaseAnalytics;
+
     public DetailFragment() {
         // Required empty public constructor
     }
@@ -124,6 +127,9 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
         }
 
         prefStorage = PreferenceStorage.getInstance(getContext().getApplicationContext());
+
+        // Obtain the FirebaseAnalytics instance.
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getActivity());
     }
 
     @Override
@@ -163,6 +169,9 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
         });
 
         subscribeToMovie();
+
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.VIEW_ITEM,
+                Utils.createAnalyticsViewItemBundle(TAG, "" + movieId));
 
         return rootView;
     }
