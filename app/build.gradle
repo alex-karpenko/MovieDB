@@ -13,8 +13,8 @@ android {
         applicationId "com.example.leshik.moviedb"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 4
-        versionName '0.3'
+        versionCode 5
+        versionName '0.4-develop-debug'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         signingConfig signingConfigs.config
@@ -47,6 +47,7 @@ ext {
     okHttpLib = "3.6.0"
     butterKnifeLib = "8.5.1"
     retrofitLib = "2.2.0"
+    firebaseLib = "10.0.1"
 }
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
@@ -60,27 +61,32 @@ dependencies {
     compile "com.android.support:support-vector-drawable:${supportLib}"
     compile "com.android.support:design:${supportLib}"
     //
-    compile 'com.squareup.picasso:picasso:2.5.2'
-//    compile "com.squareup.okhttp3:okhttp:${okHttpLib}"
+    //    compile "com.squareup.okhttp3:okhttp:${okHttpLib}"
     compile "com.squareup.okhttp3:okhttp-urlconnection:${okHttpLib}"
-    compile 'com.ms-square:expandableTextView:0.1.4'
     // PhotoView
-    compile 'com.github.chrisbanes:PhotoView:1.3.1'
     // ButterKnife
     compile "com.jakewharton:butterknife:${butterKnifeLib}"
     annotationProcessor "com.jakewharton:butterknife-compiler:${butterKnifeLib}"
     // RxJava
-    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
-    compile 'io.reactivex.rxjava2:rxjava:2.0.7'
     // Retrofit
     compile "com.squareup.retrofit2:retrofit:${retrofitLib}"
     compile "com.squareup.retrofit2:converter-gson:${retrofitLib}"
     compile "com.squareup.retrofit2:adapter-rxjava2:${retrofitLib}"
-    compile 'com.google.code.gson:gson:2.8.0'
     // Glide
+    //
+    compile "com.google.firebase:firebase-core:${firebaseLib}"
+    compile "com.google.firebase:firebase-crash:${firebaseLib}"
+    //
+    compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'com.ms-square:expandableTextView:0.1.4'
+    compile 'com.github.chrisbanes:PhotoView:1.3.1'
+    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    compile 'io.reactivex.rxjava2:rxjava:2.0.7'
+    compile 'com.google.code.gson:gson:2.8.0'
     compile 'com.github.bumptech.glide:glide:3.7.0'
     compile 'com.github.bumptech.glide:okhttp3-integration:1.4.0@aar'
-    //
     testCompile 'junit:junit:4.12'
 }
 
+
+apply plugin: 'com.google.gms.google-services'
