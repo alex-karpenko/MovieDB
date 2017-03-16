@@ -19,6 +19,7 @@ import com.example.leshik.moviedb.ui.details.DetailFragment;
 import com.example.leshik.moviedb.ui.poster.FullPosterActivity;
 import com.example.leshik.moviedb.ui.settings.SettingsActivity;
 import com.example.leshik.moviedb.utils.Utils;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -46,6 +47,8 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
     private long selectedMovieId = 0;
 
     private PreferenceInterface prefStorage;
+
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +91,11 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
                         .commit();
             }
         }
+
+        // Obtain the FirebaseAnalytics instance.
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT,
+                Utils.createAnalyticsSelectBundle(TAG, "Start Main Activity", "-"));
     }
 
     @Override
