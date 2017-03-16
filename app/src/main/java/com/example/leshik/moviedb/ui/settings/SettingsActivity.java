@@ -10,6 +10,7 @@ import com.example.leshik.moviedb.R;
 import com.example.leshik.moviedb.data.PreferenceStorage;
 import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
 import com.example.leshik.moviedb.utils.Utils;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -24,6 +25,8 @@ public class SettingsActivity extends AppCompatActivity {
     protected Toolbar mToolbar;
 
     private PreferenceInterface prefStorage;
+
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -45,6 +48,8 @@ public class SettingsActivity extends AppCompatActivity {
         getFragmentManager().beginTransaction()
                 .replace(R.id.settings_container, SettingsFragment.newInstance())
                 .commit();
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
 
     @Override

@@ -20,6 +20,7 @@ import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
 import com.example.leshik.moviedb.data.model.Movie;
 import com.example.leshik.moviedb.ui.viewmodels.MovieViewModel;
 import com.example.leshik.moviedb.utils.Utils;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -71,6 +72,8 @@ public class FullPosterActivity extends AppCompatActivity implements FullPosterF
     CompositeDisposable subscription = new CompositeDisposable();
 
     private PreferenceInterface prefStorage;
+
+    FirebaseAnalytics mFirebaseAnalytics;
 
     // helper method to create proper intent to start FullPosterActivity
     static public Intent getIntentInstance(Context context, long movieId) {
@@ -161,6 +164,8 @@ public class FullPosterActivity extends AppCompatActivity implements FullPosterF
         // init view model
         mViewModel = new MovieViewModel(movieId, new MovieRepository(getApplicationContext()));
         subscribeToMovie();
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
 
     @Override
