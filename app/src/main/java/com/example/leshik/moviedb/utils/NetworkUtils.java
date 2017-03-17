@@ -6,6 +6,8 @@ import android.net.NetworkInfo;
 
 /**
  * Created by alex on 3/17/17.
+ *
+ * Class with some utility methods related to network state
  */
 
 public class NetworkUtils {
