@@ -9,6 +9,9 @@ import com.google.firebase.analytics.FirebaseAnalytics;
  */
 
 public class FirebaseUtils {
+    private FirebaseUtils() {
+    }
+
     public static Bundle createAnalyticsSelectBundle(String id, String name, String type) {
         Bundle bundle = new Bundle();
         bundle.putString(FirebaseAnalytics.Param.ITEM_ID, id);
