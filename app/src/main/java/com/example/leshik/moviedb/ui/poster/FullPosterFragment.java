@@ -19,7 +19,7 @@ import com.example.leshik.moviedb.data.PreferenceStorage;
 import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
 import com.example.leshik.moviedb.data.model.Movie;
 import com.example.leshik.moviedb.ui.viewmodels.MovieViewModel;
-import com.example.leshik.moviedb.utils.Utils;
+import com.example.leshik.moviedb.utils.ViewUtils;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -97,7 +97,7 @@ public class FullPosterFragment extends Fragment {
             MenuItemCompat.setActionProvider(menu.findItem(R.id.action_share), mShareActionProvider);
             updateShareAction(mMovieTitle, mPosterName);
 
-            Utils.setFavoriteIcon(isFavorite, mMenu);
+            ViewUtils.setFavoriteIcon(isFavorite, mMenu);
         }
     }
 
@@ -132,7 +132,7 @@ public class FullPosterFragment extends Fragment {
             // toggle favorite flag
             isFavorite = !isFavorite;
             // change mark on the toolbar
-            Utils.setFavoriteIcon(isFavorite, mMenu);
+            ViewUtils.setFavoriteIcon(isFavorite, mMenu);
             // update favorite flag in the db
             mViewModel.invertFavorite();
             return true;
@@ -214,7 +214,7 @@ public class FullPosterFragment extends Fragment {
             isFavorite = true;
         }
         // and update it
-        Utils.setFavoriteIcon(isFavorite, mMenu);
+        ViewUtils.setFavoriteIcon(isFavorite, mMenu);
 
         lastMovie = movie;
     }
@@ -231,7 +231,7 @@ public class FullPosterFragment extends Fragment {
      */
     void updateShareAction(String title, String poster) {
         // create intent
-        Intent myShareIntent = Utils.getShareIntent(getContext(), title, prefStorage.getPosterFullUri(poster).toString());
+        Intent myShareIntent = ViewUtils.getShareIntent(getContext(), title, prefStorage.getPosterFullUri(poster).toString());
         // set intent into provider
         if (mShareActionProvider != null) mShareActionProvider.setShareIntent(myShareIntent);
     }

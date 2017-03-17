@@ -16,7 +16,7 @@ import com.example.leshik.moviedb.data.PreferenceStorage;
 import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
 import com.example.leshik.moviedb.ui.poster.FullPosterActivity;
 import com.example.leshik.moviedb.ui.settings.SettingsActivity;
-import com.example.leshik.moviedb.utils.Utils;
+import com.example.leshik.moviedb.utils.ViewUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -46,7 +46,7 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         prefStorage = PreferenceStorage.getInstance(this.getApplicationContext());
-        Utils.applyTheme(this, prefStorage.getTheme());
+        ViewUtils.applyTheme(this, prefStorage.getTheme());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
@@ -96,7 +96,7 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
     protected void onResume() {
         super.onResume();
         // restart activity after theme change
-        Utils.restartActivityIfNeed(this);
+        ViewUtils.restartActivityIfNeed(this);
     }
 
     @Override

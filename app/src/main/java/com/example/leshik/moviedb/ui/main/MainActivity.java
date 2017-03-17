@@ -18,7 +18,8 @@ import com.example.leshik.moviedb.ui.details.DetailActivity;
 import com.example.leshik.moviedb.ui.details.DetailFragment;
 import com.example.leshik.moviedb.ui.poster.FullPosterActivity;
 import com.example.leshik.moviedb.ui.settings.SettingsActivity;
-import com.example.leshik.moviedb.utils.Utils;
+import com.example.leshik.moviedb.utils.FirebaseUtils;
+import com.example.leshik.moviedb.utils.ViewUtils;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import butterknife.BindView;
@@ -53,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         prefStorage = PreferenceStorage.getInstance(this.getApplicationContext());
-        Utils.applyTheme(this, prefStorage.getTheme());
+        ViewUtils.applyTheme(this, prefStorage.getTheme());
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
@@ -61,8 +62,8 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
 
         // check if the details container is present - two pane layout was loaded
         if (findViewById(R.id.detail_container) != null) {
-            Utils.setTwoPane(true);
-        } else Utils.setTwoPane(false);
+            ViewUtils.setTwoPane(true);
+        } else ViewUtils.setTwoPane(false);
 
         setSupportActionBar(mToolbar);
 
@@ -83,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
             mViewPager.setCurrentItem(selectedTab);
 
             // restore content of the details fragment if it present
-            if (selectedMovieId != 0 && Utils.isTwoPane()) {
+            if (selectedMovieId != 0 && ViewUtils.isTwoPane()) {
                 // replace fragment into details frame
                 DetailFragment fragment = DetailFragment.newInstance(selectedMovieId);
                 getSupportFragmentManager().beginTransaction()
@@ -95,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
         // Obtain the FirebaseAnalytics instance.
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT,
-                Utils.createAnalyticsSelectBundle(TAG, "Start Main Activity", TAG));
+                FirebaseUtils.createAnalyticsSelectBundle(TAG, "Start Main Activity", TAG));
     }
 
     @Override
@@ -109,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
     protected void onResume() {
         super.onResume();
         // if theme was changed - restart activity
-        Utils.restartActivityIfNeed(this);
+        ViewUtils.restartActivityIfNeed(this);
     }
 
     @Override
@@ -137,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
     @Override
     public void onItemSelected(long movieId, ImageView posterView) {
 
-        if (!Utils.isTwoPane()) {
+        if (!ViewUtils.isTwoPane()) {
             Intent intent = DetailActivity.getIntentInstance(this, movieId);
 
             // If one pane - start details activity

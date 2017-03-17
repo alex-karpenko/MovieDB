@@ -19,7 +19,8 @@ import com.example.leshik.moviedb.data.PreferenceStorage;
 import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
 import com.example.leshik.moviedb.data.model.Movie;
 import com.example.leshik.moviedb.ui.viewmodels.MovieViewModel;
-import com.example.leshik.moviedb.utils.Utils;
+import com.example.leshik.moviedb.utils.FirebaseUtils;
+import com.example.leshik.moviedb.utils.ViewUtils;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import butterknife.BindView;
@@ -120,7 +121,7 @@ public class FullPosterActivity extends AppCompatActivity implements FullPosterF
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         prefStorage = PreferenceStorage.getInstance(this.getApplicationContext());
-        Utils.applyTheme(this, prefStorage.getTheme());
+        ViewUtils.applyTheme(this, prefStorage.getTheme());
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState == null) {
@@ -167,7 +168,7 @@ public class FullPosterActivity extends AppCompatActivity implements FullPosterF
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT,
-                Utils.createAnalyticsSelectBundle(TAG, "Create Full Poster Activity", "Poster"));
+                FirebaseUtils.createAnalyticsSelectBundle(TAG, "Create Full Poster Activity", "Poster"));
     }
 
     @Override
