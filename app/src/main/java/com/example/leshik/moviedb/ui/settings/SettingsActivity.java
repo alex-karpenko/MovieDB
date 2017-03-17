@@ -10,6 +10,7 @@ import com.example.leshik.moviedb.R;
 import com.example.leshik.moviedb.data.PreferenceStorage;
 import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
 import com.example.leshik.moviedb.utils.Utils;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -19,11 +20,14 @@ import butterknife.ButterKnife;
  * Now we use only one setting - sorting order
  */
 public class SettingsActivity extends AppCompatActivity {
+    private static final String TAG = "SettingsActivity";
 
     @BindView(R.id.settings_toolbar)
     protected Toolbar mToolbar;
 
     private PreferenceInterface prefStorage;
+
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -45,6 +49,10 @@ public class SettingsActivity extends AppCompatActivity {
         getFragmentManager().beginTransaction()
                 .replace(R.id.settings_container, SettingsFragment.newInstance())
                 .commit();
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT,
+                Utils.createAnalyticsSelectBundle(TAG, "Create Settings Activity", "Settings"));
     }
 
     @Override

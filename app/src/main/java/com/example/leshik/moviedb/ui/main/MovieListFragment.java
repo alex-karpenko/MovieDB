@@ -20,6 +20,7 @@ import com.example.leshik.moviedb.data.MovieListType;
 import com.example.leshik.moviedb.data.model.Movie;
 import com.example.leshik.moviedb.ui.viewmodels.MovieListViewModel;
 import com.example.leshik.moviedb.utils.Utils;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.List;
 
@@ -63,6 +64,9 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
     private MovieListViewModel viewModel;
     private Disposable subscription;
 
+    private FirebaseAnalytics mFirebaseAnalytics;
+
+
     // TODO: 3/7/17 Change arguments to MovieListType enum
     public static MovieListFragment newInstance(int listType) {
         MovieListFragment fragment = new MovieListFragment();
@@ -78,6 +82,8 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        // Obtain the FirebaseAnalytics instance.
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getActivity());
     }
 
 
@@ -111,6 +117,9 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
         mRecyclerView.addOnScrollListener(new AutoLoadingScrollListener());
 
         subscribeToMovieList();
+
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.VIEW_ITEM_LIST,
+                Utils.createAnalyticsSelectBundle(TAG, "Create Movie List Fragment", fragmentType.toString()));
 
         return rootView;
     }

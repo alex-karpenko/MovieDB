@@ -3,12 +3,14 @@ package com.example.leshik.moviedb.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.leshik.moviedb.R;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 /**
  * Utility class for provide some common (project-wide) methods, variables and constants
@@ -114,5 +116,30 @@ public final class Utils {
         intent.setType("text/*");
 
         return intent;
+    }
+
+    public static Bundle createAnalyticsSelectBundle(String id, String name, String type) {
+        Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.ITEM_ID, id);
+        bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, name);
+        bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, type);
+
+        return bundle;
+    }
+
+    public static Bundle createAnalyticsViewListBundle(String category) {
+        Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.ITEM_CATEGORY, category);
+
+        return bundle;
+    }
+
+    public static Bundle createAnalyticsViewItemBundle(String id, String name) {
+        Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.ITEM_ID, id);
+        bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, name);
+
+        return bundle;
+
     }
 }

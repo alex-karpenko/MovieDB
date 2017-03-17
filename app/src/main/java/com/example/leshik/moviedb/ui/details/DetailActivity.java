@@ -84,7 +84,6 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
                     .add(R.id.detail_container, fragment)
                     .commit();
         }
-
     }
 
     @Override
