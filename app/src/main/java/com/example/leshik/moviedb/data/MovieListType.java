@@ -39,7 +39,23 @@ public enum MovieListType {
             return "topratedPosition";
         }
     },
-    Favorite(2) {
+    Upcoming(2) {
+        @Override
+        boolean isFromNetwork() {
+            return true;
+        }
+
+        @Override
+        boolean isLocalOnly() {
+            return false;
+        }
+
+        @Override
+        String getModelColumnName() {
+            return "upcomingPosition";
+        }
+    },
+    Favorite(3) {
         @Override
         boolean isFromNetwork() {
             return false;

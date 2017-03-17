@@ -105,6 +105,7 @@ public class ListPageResponse {
                 movie.setFavoritePosition(null);
                 movie.setPopularPosition(null);
                 movie.setTopratedPosition(null);
+                movie.setUpcomingPosition(null);
 
                 switch (listType) {
                     case Popular:
@@ -112,6 +113,9 @@ public class ListPageResponse {
                         break;
                     case Toprated:
                         movie.setTopratedPosition(startPosition);
+                        break;
+                    case Upcoming:
+                        movie.setUpcomingPosition(startPosition);
                         break;
                     default:
                         throw new IllegalArgumentException("ListPageResponse: instance type does not supported");

@@ -30,6 +30,7 @@
     <string-array name="main_tab_names">
         <item>@string/popular_tab_title</item>
         <item>@string/toprated_tab_title</item>
+        <item>@string/upcoming_tab_title</item>
         <item>@string/favorites_tab_title</item>
     </string-array>
 </resources>

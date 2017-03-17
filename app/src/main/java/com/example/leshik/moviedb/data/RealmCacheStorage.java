@@ -295,6 +295,9 @@ class RealmCacheStorage implements CacheStorage {
                 case Toprated:
                     m.setTopratedPosition(0);
                     break;
+                case Upcoming:
+                    m.setUpcomingPosition(0);
+                    break;
                 default:
                     throw new IllegalArgumentException("Clearing not supported for the list type");
             }

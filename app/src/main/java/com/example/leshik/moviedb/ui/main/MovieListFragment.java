@@ -131,6 +131,8 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
             if (typeFromIntent == MovieListType.Popular.getIndex()) return MovieListType.Popular;
             else if (typeFromIntent == MovieListType.Toprated.getIndex())
                 return MovieListType.Toprated;
+            else if (typeFromIntent == MovieListType.Upcoming.getIndex())
+                return MovieListType.Upcoming;
             else if (typeFromIntent == MovieListType.Favorite.getIndex())
                 return MovieListType.Favorite;
             else throw new IllegalArgumentException("Incorrect fragment type argument");
