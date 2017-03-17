@@ -42,4 +42,8 @@ public interface ApiService {
     // retrieve list of movies sorted by rating
     @GET("movie/top_rated")
     Observable<ListPageResponse> getToprated(@Query("api_key") String apiKey, @Query("page") int page);
+
+    // retrieve list of movies sorted by upcoming date
+    @GET("movie/upcoming")
+    Observable<ListPageResponse> getUpcoming(@Query("api_key") String apiKey, @Query("page") int page);
 }

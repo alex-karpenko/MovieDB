@@ -185,6 +185,9 @@ class TmdbNetworkDataSource implements NetworkDataSource {
             case Toprated:
                 returnObservable = service.getToprated(getApiKey(), page);
                 break;
+            case Upcoming:
+                returnObservable = service.getUpcoming(getApiKey(), page);
+                break;
             default:
                 throw new IllegalArgumentException("NetworkDataSource: list type does not supported");
         }

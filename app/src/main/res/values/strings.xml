@@ -41,6 +41,7 @@
     <string name="popular_tab_title">Popular</string>
     <string name="toprated_tab_title">Top rated</string>
     <string name="favorites_tab_title">Favorites</string>
+    <string name="upcoming_tab_title">Upcoming</string>
 
     <!-- Strings related to details view -->
     <string name="rating_format_str">%.1f/10</string>

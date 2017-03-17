@@ -37,6 +37,8 @@ public class Movie extends RealmObject {
     private Integer popularPosition;
     @Index
     private Integer topratedPosition;
+    @Index
+    private Integer upcomingPosition;
 
     public boolean isEmpty() {
         return movieId == 0;
@@ -63,6 +65,8 @@ public class Movie extends RealmObject {
                 popularPosition = existentMovie.getPopularPosition();
             if (topratedPosition == null || topratedPosition <= 0)
                 topratedPosition = existentMovie.getTopratedPosition();
+            if (upcomingPosition == null || upcomingPosition <= 0)
+                upcomingPosition = existentMovie.getUpcomingPosition();
 
             if (lastUpdate == null) lastUpdate = existentMovie.getLastUpdate();
         }
@@ -192,6 +196,14 @@ public class Movie extends RealmObject {
 
     public void setTopratedPosition(Integer topratedPosition) {
         this.topratedPosition = topratedPosition;
+    }
+
+    public Integer getUpcomingPosition() {
+        return upcomingPosition;
+    }
+
+    public void setUpcomingPosition(Integer upcomingPosition) {
+        this.upcomingPosition = upcomingPosition;
     }
 
     public RealmList<Video> getVideos() {
