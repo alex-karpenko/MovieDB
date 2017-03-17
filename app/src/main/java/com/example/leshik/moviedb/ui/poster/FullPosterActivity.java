@@ -166,6 +166,8 @@ public class FullPosterActivity extends AppCompatActivity implements FullPosterF
         subscribeToMovie();
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT,
+                Utils.createAnalyticsSelectBundle(TAG, "Create Full Poster Activity", "Poster"));
     }
 
     @Override

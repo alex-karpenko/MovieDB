@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
         // Obtain the FirebaseAnalytics instance.
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT,
-                Utils.createAnalyticsSelectBundle(TAG, "Start Main Activity", "-"));
+                Utils.createAnalyticsSelectBundle(TAG, "Start Main Activity", TAG));
     }
 
     @Override

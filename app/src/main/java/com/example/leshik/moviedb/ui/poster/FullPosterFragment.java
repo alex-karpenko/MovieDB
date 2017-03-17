@@ -64,7 +64,6 @@ public class FullPosterFragment extends Fragment {
 
     PreferenceInterface prefStorage;
 
-
     public FullPosterFragment() {
         // Required empty public constructor
     }

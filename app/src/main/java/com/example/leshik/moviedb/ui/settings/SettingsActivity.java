@@ -20,6 +20,7 @@ import butterknife.ButterKnife;
  * Now we use only one setting - sorting order
  */
 public class SettingsActivity extends AppCompatActivity {
+    private static final String TAG = "SettingsActivity";
 
     @BindView(R.id.settings_toolbar)
     protected Toolbar mToolbar;
@@ -50,6 +51,8 @@ public class SettingsActivity extends AppCompatActivity {
                 .commit();
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT,
+                Utils.createAnalyticsSelectBundle(TAG, "Create Settings Activity", "Settings"));
     }
 
     @Override

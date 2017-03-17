@@ -171,7 +171,7 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
         subscribeToMovie();
 
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.VIEW_ITEM,
-                Utils.createAnalyticsViewItemBundle(TAG, "" + movieId));
+                Utils.createAnalyticsSelectBundle(TAG, "Create Detail Fragment", "Movie Details"));
 
         return rootView;
     }

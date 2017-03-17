@@ -17,7 +17,6 @@ import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
 import com.example.leshik.moviedb.ui.poster.FullPosterActivity;
 import com.example.leshik.moviedb.ui.settings.SettingsActivity;
 import com.example.leshik.moviedb.utils.Utils;
-import com.google.firebase.analytics.FirebaseAnalytics;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -36,8 +35,6 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
     protected Toolbar mToolbar;
 
     private PreferenceInterface prefStorage;
-
-    private FirebaseAnalytics mFirebaseAnalytics;
 
     // helper method to create proper intent to start DetailActivity
     static public Intent getIntentInstance(Context context, long movieId) {
@@ -87,10 +84,6 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
                     .add(R.id.detail_container, fragment)
                     .commit();
         }
-        // Obtain the FirebaseAnalytics instance.
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
-        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT,
-                Utils.createAnalyticsSelectBundle(TAG, "Start Detail Activity", "-"));
     }
 
     @Override
