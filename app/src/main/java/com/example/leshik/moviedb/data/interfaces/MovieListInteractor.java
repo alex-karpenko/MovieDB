@@ -17,7 +17,7 @@ import io.reactivex.Observable;
 public interface MovieListInteractor {
     Observable<List<Movie>> getList(MovieListType listType);
 
-    void forceRefreshList(MovieListType listType);
+    boolean forceRefreshList(MovieListType listType);
 
-    void loadNextPage(MovieListType listType);
+    boolean loadNextPage(MovieListType listType);
 }
