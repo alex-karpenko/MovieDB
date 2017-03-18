@@ -8,6 +8,7 @@ import com.example.leshik.moviedb.data.interfaces.MovieListInteractor;
 import com.example.leshik.moviedb.data.interfaces.NetworkDataSource;
 import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
 import com.example.leshik.moviedb.data.model.Movie;
+import com.example.leshik.moviedb.utils.NetworkUtils;
 
 import java.util.Calendar;
 import java.util.List;
@@ -28,11 +29,13 @@ public class MovieListRepository implements MovieListInteractor {
     private final NetworkDataSource networkDataSource;
     private final CacheStorage cacheStorage;
     private final PreferenceInterface prefStorage;
+    private final Context context;
 
     public MovieListRepository(Context context) {
         prefStorage = PreferenceStorage.getInstance(context);
         networkDataSource = new TmdbNetworkDataSource(prefStorage.getBaseApiUrl());
         cacheStorage = new RealmCacheStorage(context);
+        this.context = context;
     }
 
     @Override
@@ -70,38 +73,47 @@ public class MovieListRepository implements MovieListInteractor {
     }
 
     @Override
-    public void forceRefreshList(MovieListType listType) {
+    public boolean forceRefreshList(MovieListType listType) {
         Log.i(TAG, "forceRefreshList: " + listType);
-        if (listType.isLocalOnly()) return;
+        if (listType.isLocalOnly()) return false;
 
         if (listType.isFromNetwork()) {
-            cacheStorage.clearMovieListPositionsAndInsertOrUpdateData(listType,
-                    networkDataSource.readMovieListPage(listType, 1));
-            prefStorage.setMovieListUpdateTimestampToCurrent(listType);
-            prefStorage.setMovieListTotalPages(listType, networkDataSource.getTotalListPages(listType));
-            prefStorage.setMovieListTotalItems(listType, networkDataSource.getTotalListItems(listType));
+            if (NetworkUtils.isNetworkConnected(context)) {
+                cacheStorage.clearMovieListPositionsAndInsertOrUpdateData(listType,
+                        networkDataSource.readMovieListPage(listType, 1));
+                prefStorage.setMovieListUpdateTimestampToCurrent(listType);
+                prefStorage.setMovieListTotalPages(listType, networkDataSource.getTotalListPages(listType));
+                prefStorage.setMovieListTotalItems(listType, networkDataSource.getTotalListItems(listType));
+                return true;
+            }
         }
+
+        return false;
     }
 
     @Override
-    public void loadNextPage(MovieListType listType) {
-        if (listType.isFromNetwork()) {
-            int lastPageInStorage = cacheStorage.getMovieListLastPageNumber(listType);
-            int lastPageInNetwork = networkDataSource.getTotalListPages(listType);
-            Log.i(TAG, "loadNextPage: last_cache_page=" + lastPageInStorage);
-            Log.i(TAG, "loadNextPage: last_network_page=" + lastPageInNetwork);
+    public boolean loadNextPage(MovieListType listType) {
+        if (!listType.isFromNetwork()) return false;
 
-            if (lastPageInNetwork <= 0) {
-                lastPageInNetwork = prefStorage.getMovieListTotalPages(listType);
-                Log.i(TAG, "loadNextPage: last_network_page from prefs=" + lastPageInNetwork);
-            }
+        int lastPageInStorage = cacheStorage.getMovieListLastPageNumber(listType);
+        int lastPageInNetwork = networkDataSource.getTotalListPages(listType);
+        Log.i(TAG, "loadNextPage: last_cache_page=" + lastPageInStorage);
+        Log.i(TAG, "loadNextPage: last_network_page=" + lastPageInNetwork);
 
-            if (lastPageInStorage < lastPageInNetwork || lastPageInNetwork <= 0) {
-                cacheStorage.insertOrUpdateMovieList(listType,
-                        networkDataSource.readMovieListPage(listType, lastPageInStorage + 1));
-                prefStorage.setMovieListTotalPages(listType, networkDataSource.getTotalListPages(listType));
-                prefStorage.setMovieListTotalItems(listType, networkDataSource.getTotalListItems(listType));
-            }
+        if (lastPageInNetwork <= 0) {
+            lastPageInNetwork = prefStorage.getMovieListTotalPages(listType);
+            Log.i(TAG, "loadNextPage: last_network_page from prefs=" + lastPageInNetwork);
+        }
+
+        if ((lastPageInStorage < lastPageInNetwork || lastPageInNetwork <= 0)
+                && NetworkUtils.isNetworkConnected(context)) {
+            cacheStorage.insertOrUpdateMovieList(listType,
+                    networkDataSource.readMovieListPage(listType, lastPageInStorage + 1));
+            prefStorage.setMovieListTotalPages(listType, networkDataSource.getTotalListPages(listType));
+            prefStorage.setMovieListTotalItems(listType, networkDataSource.getTotalListItems(listType));
+            return true;
+        } else {
+            return false;
         }
     }
 }
