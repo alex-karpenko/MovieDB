@@ -373,7 +373,8 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     // starting intent services to update cache tables
     void refreshCurrentMovie() {
-        mViewModel.forceRefresh();
+        boolean isRefreshStarted = mViewModel.forceRefresh();
+        if (!isRefreshStarted) mSwipeRefreshLayout.setRefreshing(false);
     }
 
     /**

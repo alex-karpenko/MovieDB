@@ -16,5 +16,5 @@ public interface MovieInteractor {
 
     void invertFavorite(long movieId);
 
-    void forceRefresh(long movieId);
+    boolean forceRefresh(long movieId);
 }
