@@ -189,9 +189,8 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
 
     // update cache for current page type
     private void updateCurrentPageCache() {
-        viewModel.forceRefresh();
-        // FIXME: 3/8/17 Somewhat must be dealt with this favorites type
-        if (fragmentType == MovieListType.Favorite) mSwipeRefreshLayout.setRefreshing(false);
+        boolean refreshResult = viewModel.forceRefresh();
+        if (!refreshResult) mSwipeRefreshLayout.setRefreshing(false);
     }
 
     // listener for check every scroll event on list view and start loading cache content
@@ -206,8 +205,8 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
             int lastVisibleItem = ((LinearLayoutManager) mLayoutManager).findLastVisibleItemPosition(); // last visible item
             // if last view under threshold position - start loading cache
             if (lastVisibleItem + scrollingThreshold >= totalItems) {
-                loadingCache = true;
-                viewModel.loadNextPage();
+                boolean isLoadStarted = viewModel.loadNextPage();
+                loadingCache = isLoadStarted;
             }
         }
     }
