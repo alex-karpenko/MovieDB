@@ -10,6 +10,7 @@ import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
 import com.example.leshik.moviedb.data.model.Movie;
 import com.example.leshik.moviedb.data.model.Review;
 import com.example.leshik.moviedb.data.model.Video;
+import com.example.leshik.moviedb.utils.EventsUtils;
 import com.example.leshik.moviedb.utils.NetworkUtils;
 
 import java.util.Calendar;
@@ -93,6 +94,8 @@ public class MovieRepository implements MovieInteractor {
                             cacheStorage.updateOrInsertMovie(movie);
                         }
                     });
+        } else {
+            EventsUtils.postEvent(EventsUtils.EventType.NetworkUnavailable);
         }
 
         return false;
