@@ -3,6 +3,7 @@ package com.example.leshik.moviedb.ui.main;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.example.leshik.moviedb.R;
 import com.example.leshik.moviedb.data.PreferenceStorage;
@@ -18,12 +20,16 @@ import com.example.leshik.moviedb.ui.details.DetailActivity;
 import com.example.leshik.moviedb.ui.details.DetailFragment;
 import com.example.leshik.moviedb.ui.poster.FullPosterActivity;
 import com.example.leshik.moviedb.ui.settings.SettingsActivity;
+import com.example.leshik.moviedb.utils.EventsUtils;
 import com.example.leshik.moviedb.utils.FirebaseUtils;
 import com.example.leshik.moviedb.utils.ViewUtils;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 
 public class MainActivity extends AppCompatActivity implements MovieListFragment.Callback, DetailFragment.Callback {
     private static final String TAG = "MainActivity";
@@ -37,6 +43,8 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
     // adapter to create fragments to pager
     private MainPagerAdapter mPagerAdapter;
 
+    @BindView(R.id.main_frame)
+    protected LinearLayout mMainFrame;
     @BindView(R.id.main_pager)
     protected ViewPager mViewPager;
     @BindView(R.id.main_tabs)
@@ -50,6 +58,8 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
     private PreferenceInterface prefStorage;
 
     private FirebaseAnalytics mFirebaseAnalytics;
+
+    private Disposable subscription;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +107,20 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT,
                 FirebaseUtils.createAnalyticsSelectBundle(TAG, "Start Main Activity", TAG));
+
+        subscription = EventsUtils.getEventObservable()
+                .subscribe(new Consumer<EventsUtils.EventType>() {
+                    @Override
+                    public void accept(@NonNull EventsUtils.EventType eventType) throws Exception {
+                        Snackbar.make(mMainFrame, eventType.getMessageId(), Snackbar.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    @Override
+    protected void onDestroy() {
+        subscription.dispose();
+        super.onDestroy();
     }
 
     @Override

@@ -8,6 +8,7 @@ import com.example.leshik.moviedb.data.interfaces.MovieListInteractor;
 import com.example.leshik.moviedb.data.interfaces.NetworkDataSource;
 import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
 import com.example.leshik.moviedb.data.model.Movie;
+import com.example.leshik.moviedb.utils.EventsUtils;
 import com.example.leshik.moviedb.utils.NetworkUtils;
 
 import java.util.Calendar;
@@ -45,8 +46,10 @@ public class MovieListRepository implements MovieListInteractor {
         return listFromCache.doOnNext(new Consumer<List<Movie>>() {
             @Override
             public void accept(List<Movie> movies) throws Exception {
-                if (isExpiredOrEmptyList(movies, listType))
+                if (isExpiredOrEmptyList(movies, listType)) {
+                    EventsUtils.postEvent(EventsUtils.EventType.Refreshing);
                     forceRefreshList(listType);
+                }
             }
         })
                 .filter(new Predicate<List<Movie>>() {
@@ -85,6 +88,8 @@ public class MovieListRepository implements MovieListInteractor {
                 prefStorage.setMovieListTotalPages(listType, networkDataSource.getTotalListPages(listType));
                 prefStorage.setMovieListTotalItems(listType, networkDataSource.getTotalListItems(listType));
                 return true;
+            } else {
+                EventsUtils.postEvent(EventsUtils.EventType.NetworkUnavailable);
             }
         }
 
