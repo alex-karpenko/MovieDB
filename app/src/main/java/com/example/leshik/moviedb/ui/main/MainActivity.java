@@ -3,7 +3,6 @@ package com.example.leshik.moviedb.ui.main;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.example.leshik.moviedb.R;
 import com.example.leshik.moviedb.data.PreferenceStorage;
@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
                 .subscribe(new Consumer<EventsUtils.EventType>() {
                     @Override
                     public void accept(@NonNull EventsUtils.EventType eventType) throws Exception {
-                        Snackbar.make(mMainFrame, eventType.getMessageId(), Snackbar.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, eventType.getMessageId(), Toast.LENGTH_LONG).show();
                     }
                 });
     }
