@@ -5,17 +5,14 @@ import android.util.Log;
 import com.example.leshik.moviedb.R;
 
 import io.reactivex.Observable;
-import io.reactivex.annotations.NonNull;
-import io.reactivex.functions.Consumer;
 import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.Subject;
 
 /**
  * Created by alex on 3/19/17.
- *
+ * <p>
  * Events' queue class to propagate system-wide events,
  * such as network state changes, list refreshing, etc.
- *
  */
 
 public class EventsUtils {
@@ -27,13 +24,11 @@ public class EventsUtils {
     static {
         Log.i(TAG, "EventsUtils: initializing");
         eventSubject = PublishSubject.create();
-        eventObservable = eventSubject.distinctUntilChanged();
-        eventObservable.subscribe(new Consumer<EventType>() {
-            @Override
-            public void accept(@NonNull EventType eventType) throws Exception {
-                Log.i(TAG, "accept: " + eventType.toString());
-            }
-        });
+        eventObservable = eventSubject
+                .distinctUntilChanged()
+                .serialize()
+                .publish()
+                .refCount();
     }
 
     private EventsUtils() {

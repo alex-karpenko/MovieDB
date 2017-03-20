@@ -49,6 +49,7 @@ public class MovieRepository implements MovieInteractor {
             public void accept(Movie movie) throws Exception {
                 if (isExpiredOrEmpty(movie)) {
                     Log.i(TAG, "expired or empty movie, refreshing...");
+                    EventsUtils.postEvent(EventsUtils.EventType.Refreshing);
                     forceRefresh(movieId);
                 }
             }
