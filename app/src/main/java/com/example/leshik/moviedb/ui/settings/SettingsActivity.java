@@ -9,7 +9,8 @@ import android.view.MenuItem;
 import com.example.leshik.moviedb.R;
 import com.example.leshik.moviedb.data.PreferenceStorage;
 import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
-import com.example.leshik.moviedb.utils.Utils;
+import com.example.leshik.moviedb.utils.FirebaseUtils;
+import com.example.leshik.moviedb.utils.ViewUtils;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import butterknife.BindView;
@@ -32,7 +33,7 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         prefStorage = PreferenceStorage.getInstance(this.getApplicationContext());
-        Utils.applyTheme(this, prefStorage.getTheme());
+        ViewUtils.applyTheme(this, prefStorage.getTheme());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
         ButterKnife.bind(this);
@@ -52,7 +53,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT,
-                Utils.createAnalyticsSelectBundle(TAG, "Create Settings Activity", "Settings"));
+                FirebaseUtils.createAnalyticsSelectBundle(TAG, "Create Settings Activity", "Settings"));
     }
 
     @Override

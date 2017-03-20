@@ -10,6 +10,8 @@ import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
 import com.example.leshik.moviedb.data.model.Movie;
 import com.example.leshik.moviedb.data.model.Review;
 import com.example.leshik.moviedb.data.model.Video;
+import com.example.leshik.moviedb.utils.EventsUtils;
+import com.example.leshik.moviedb.utils.NetworkUtils;
 
 import java.util.Calendar;
 import java.util.List;
@@ -29,11 +31,13 @@ public class MovieRepository implements MovieInteractor {
     private final NetworkDataSource networkDataSource;
     private final CacheStorage cacheStorage;
     private final PreferenceInterface prefStorage;
+    private final Context context;
 
     public MovieRepository(Context context) {
         prefStorage = PreferenceStorage.getInstance(context);
         networkDataSource = new TmdbNetworkDataSource(prefStorage.getBaseApiUrl());
         cacheStorage = new RealmCacheStorage(context);
+        this.context = context;
     }
 
     @Override
@@ -45,6 +49,7 @@ public class MovieRepository implements MovieInteractor {
             public void accept(Movie movie) throws Exception {
                 if (isExpiredOrEmpty(movie)) {
                     Log.i(TAG, "expired or empty movie, refreshing...");
+                    EventsUtils.postEvent(EventsUtils.EventType.Refreshing);
                     forceRefresh(movieId);
                 }
             }
@@ -77,18 +82,24 @@ public class MovieRepository implements MovieInteractor {
     }
 
     @Override
-    public void forceRefresh(long movieId) {
-        // TODO: 04.03.2017 Must be checked for memory leaks
-        buildMovieFromNetworkObservable(movieId)
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
-                .subscribe(new Consumer<Movie>() {
-                    @Override
-                    public void accept(Movie movie) throws Exception {
-                        Log.i(TAG, "forceRefresh: +");
-                        cacheStorage.updateOrInsertMovie(movie);
-                    }
-                });
+    public boolean forceRefresh(long movieId) {
+        if (NetworkUtils.isNetworkConnected(context)) {
+            // TODO: 04.03.2017 Must be checked for memory leaks
+            buildMovieFromNetworkObservable(movieId)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(Schedulers.io())
+                    .subscribe(new Consumer<Movie>() {
+                        @Override
+                        public void accept(Movie movie) throws Exception {
+                            Log.i(TAG, "forceRefresh: +");
+                            cacheStorage.updateOrInsertMovie(movie);
+                        }
+                    });
+        } else {
+            EventsUtils.postEvent(EventsUtils.EventType.NetworkUnavailable);
+        }
+
+        return false;
     }
 
     private Observable<Movie> buildMovieFromNetworkObservable(long movieId) {

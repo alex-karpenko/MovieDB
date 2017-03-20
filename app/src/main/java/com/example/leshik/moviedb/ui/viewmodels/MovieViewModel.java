@@ -30,7 +30,7 @@ public class MovieViewModel {
         mMovieInteractor.invertFavorite(movieId);
     }
 
-    public void forceRefresh() {
-        mMovieInteractor.forceRefresh(movieId);
+    public boolean forceRefresh() {
+        return mMovieInteractor.forceRefresh(movieId);
     }
 }

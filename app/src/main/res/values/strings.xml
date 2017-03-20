@@ -51,4 +51,9 @@
     <string name="reviews_list_title">Reviews</string>
     <string name="share_action_subject">Popular movies:</string>
     <string name="homepage_format_str">Homepage: %s</string>
+
+    <!-- Events messages -->
+    <string name="event_message_refreshing">Refreshing...</string>
+    <string name="event_message_network_down">Network is unavailable</string>
+    <string name="event_message_network_up">Network is available</string>
 </resources>

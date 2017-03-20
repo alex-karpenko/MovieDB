@@ -11,6 +11,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 
 /**
  * Created by alex on 3/7/17.
+ *
+ * ViewModel class for MovieList loading
+ *
  */
 
 public class MovieListViewModel {
@@ -27,11 +30,11 @@ public class MovieListViewModel {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public void loadNextPage() {
-        movieListInteractor.loadNextPage(listType);
+    public boolean loadNextPage() {
+        return movieListInteractor.loadNextPage(listType);
     }
 
-    public void forceRefresh() {
-        movieListInteractor.forceRefreshList(listType);
+    public boolean forceRefresh() {
+        return movieListInteractor.forceRefreshList(listType);
     }
 }

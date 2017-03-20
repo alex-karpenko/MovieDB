@@ -10,7 +10,7 @@ import android.support.v4.app.Fragment;
 import com.example.leshik.moviedb.R;
 import com.example.leshik.moviedb.data.PreferenceStorage;
 import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
-import com.example.leshik.moviedb.utils.Utils;
+import com.example.leshik.moviedb.utils.ViewUtils;
 
 
 /**
@@ -87,7 +87,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
             int oldThemeId = prefStorage.getTheme();
             int newThemeId = prefStorage.setTheme(stringValue);
 
-            if (oldThemeId != newThemeId) Utils.scheduleActivityRestart();
+            if (oldThemeId != newThemeId) ViewUtils.scheduleActivityRestart();
         } else if (preference.getKey().equals(getString(R.string.pref_cache_key))) {
             prefStorage.setCacheUpdateIntervalHours(Integer.valueOf(stringValue));
         }

@@ -19,7 +19,8 @@ import com.example.leshik.moviedb.data.MovieListRepository;
 import com.example.leshik.moviedb.data.MovieListType;
 import com.example.leshik.moviedb.data.model.Movie;
 import com.example.leshik.moviedb.ui.viewmodels.MovieListViewModel;
-import com.example.leshik.moviedb.utils.Utils;
+import com.example.leshik.moviedb.utils.FirebaseUtils;
+import com.example.leshik.moviedb.utils.ViewUtils;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.List;
@@ -101,7 +102,7 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
         mSwipeRefreshLayout.setOnRefreshListener(this);
 
         // Create layout manager and attach it to recycle view
-        mLayoutManager = new GridLayoutManager(getActivity(), Utils.calculateNoOfColumns(getActivity()));
+        mLayoutManager = new GridLayoutManager(getActivity(), ViewUtils.calculateNoOfColumns(getActivity()));
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         // Construct empty adapter ...
@@ -112,14 +113,14 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
 
         // Set up scroll listener for auto load list's tail
         // set scrolling threshold
-        scrollingThreshold = scrollingThreshold * Utils.calculateNoOfColumns(getActivity());
+        scrollingThreshold = scrollingThreshold * ViewUtils.calculateNoOfColumns(getActivity());
         // set scroll listener
         mRecyclerView.addOnScrollListener(new AutoLoadingScrollListener());
 
         subscribeToMovieList();
 
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.VIEW_ITEM_LIST,
-                Utils.createAnalyticsSelectBundle(TAG, "Create Movie List Fragment", fragmentType.toString()));
+                FirebaseUtils.createAnalyticsSelectBundle(TAG, "Create Movie List Fragment", fragmentType.toString()));
 
         return rootView;
     }
@@ -188,9 +189,8 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
 
     // update cache for current page type
     private void updateCurrentPageCache() {
-        viewModel.forceRefresh();
-        // FIXME: 3/8/17 Somewhat must be dealt with this favorites type
-        if (fragmentType == MovieListType.Favorite) mSwipeRefreshLayout.setRefreshing(false);
+        boolean refreshResult = viewModel.forceRefresh();
+        if (!refreshResult) mSwipeRefreshLayout.setRefreshing(false);
     }
 
     // listener for check every scroll event on list view and start loading cache content
@@ -205,8 +205,8 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
             int lastVisibleItem = ((LinearLayoutManager) mLayoutManager).findLastVisibleItemPosition(); // last visible item
             // if last view under threshold position - start loading cache
             if (lastVisibleItem + scrollingThreshold >= totalItems) {
-                loadingCache = true;
-                viewModel.loadNextPage();
+                boolean isLoadStarted = viewModel.loadNextPage();
+                loadingCache = isLoadStarted;
             }
         }
     }

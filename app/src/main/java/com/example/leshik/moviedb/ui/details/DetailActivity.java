@@ -10,16 +10,22 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.example.leshik.moviedb.R;
 import com.example.leshik.moviedb.data.PreferenceStorage;
 import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
 import com.example.leshik.moviedb.ui.poster.FullPosterActivity;
 import com.example.leshik.moviedb.ui.settings.SettingsActivity;
-import com.example.leshik.moviedb.utils.Utils;
+import com.example.leshik.moviedb.utils.EventsUtils;
+import com.example.leshik.moviedb.utils.ViewUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 
 /**
  * Activity class for deal with detail movie information
@@ -33,8 +39,12 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
 
     @BindView(R.id.detail_toolbar)
     protected Toolbar mToolbar;
+    @BindView(R.id.detail_frame)
+    protected LinearLayout mDetailFrame;
 
     private PreferenceInterface prefStorage;
+
+    private Disposable subscription;
 
     // helper method to create proper intent to start DetailActivity
     static public Intent getIntentInstance(Context context, long movieId) {
@@ -46,7 +56,7 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         prefStorage = PreferenceStorage.getInstance(this.getApplicationContext());
-        Utils.applyTheme(this, prefStorage.getTheme());
+        ViewUtils.applyTheme(this, prefStorage.getTheme());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
@@ -84,6 +94,20 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
                     .add(R.id.detail_container, fragment)
                     .commit();
         }
+
+        subscription = EventsUtils.getEventObservable()
+                .subscribe(new Consumer<EventsUtils.EventType>() {
+                    @Override
+                    public void accept(@NonNull EventsUtils.EventType eventType) throws Exception {
+                        Toast.makeText(DetailActivity.this, eventType.getMessageId(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    @Override
+    protected void onDestroy() {
+        subscription.dispose();
+        super.onDestroy();
     }
 
     @Override
@@ -96,7 +120,7 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
     protected void onResume() {
         super.onResume();
         // restart activity after theme change
-        Utils.restartActivityIfNeed(this);
+        ViewUtils.restartActivityIfNeed(this);
     }
 
     @Override

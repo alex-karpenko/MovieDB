@@ -29,7 +29,8 @@ import com.example.leshik.moviedb.data.model.Movie;
 import com.example.leshik.moviedb.data.model.Review;
 import com.example.leshik.moviedb.data.model.Video;
 import com.example.leshik.moviedb.ui.viewmodels.MovieViewModel;
-import com.example.leshik.moviedb.utils.Utils;
+import com.example.leshik.moviedb.utils.FirebaseUtils;
+import com.example.leshik.moviedb.utils.ViewUtils;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.ms.square.android.expandabletextview.ExpandableTextView;
 import com.squareup.picasso.Picasso;
@@ -171,7 +172,7 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
         subscribeToMovie();
 
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.VIEW_ITEM,
-                Utils.createAnalyticsSelectBundle(TAG, "Create Detail Fragment", "Movie Details"));
+                FirebaseUtils.createAnalyticsSelectBundle(TAG, "Create Detail Fragment", "Movie Details"));
 
         return rootView;
     }
@@ -197,7 +198,7 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
             MenuItemCompat.setActionProvider(menu.findItem(R.id.action_share), mShareActionProvider);
             updateShareAction(mMovieTitle, mPosterName);
 
-            Utils.setFavoriteIcon(isFavorite, mMenu);
+            ViewUtils.setFavoriteIcon(isFavorite, mMenu);
         }
     }
 
@@ -215,7 +216,7 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
             // reverse mark flag
             isFavorite = !isFavorite;
             // and change mark on the menu with dependence on the theme
-            Utils.setFavoriteIcon(isFavorite, mMenu);
+            ViewUtils.setFavoriteIcon(isFavorite, mMenu);
             // update favorite flag in the db
             mViewModel.invertFavorite();
 
@@ -238,7 +239,7 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
      */
     void updateShareAction(String title, String poster) {
         // create intent
-        Intent myShareIntent = Utils.getShareIntent(getContext(), title, prefStorage.getPosterFullUri(poster).toString());
+        Intent myShareIntent = ViewUtils.getShareIntent(getContext(), title, prefStorage.getPosterFullUri(poster).toString());
         // set intent into provider
         if (mShareActionProvider != null) mShareActionProvider.setShareIntent(myShareIntent);
     }
@@ -336,7 +337,7 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
             isFavorite = true;
         }
         // and update mark
-        Utils.setFavoriteIcon(isFavorite, mMenu);
+        ViewUtils.setFavoriteIcon(isFavorite, mMenu);
 
         lastMovie = movie;
     }
@@ -372,7 +373,8 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     // starting intent services to update cache tables
     void refreshCurrentMovie() {
-        mViewModel.forceRefresh();
+        boolean isRefreshStarted = mViewModel.forceRefresh();
+        if (!isRefreshStarted) mSwipeRefreshLayout.setRefreshing(false);
     }
 
     /**
