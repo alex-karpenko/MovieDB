@@ -32,7 +32,6 @@ import com.example.leshik.moviedb.ui.viewmodels.MovieViewModel;
 import com.example.leshik.moviedb.utils.FirebaseUtils;
 import com.example.leshik.moviedb.utils.ViewUtils;
 import com.google.firebase.analytics.FirebaseAnalytics;
-import com.ms.square.android.expandabletextview.ExpandableTextView;
 import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
@@ -45,7 +44,8 @@ import io.reactivex.functions.Consumer;
  * Fragment class with detail info about movie
  * Information. From intent gets URI with movie
  */
-public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+
+public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, View.OnClickListener {
     private static final String TAG = "DetailFragment";
     // fragment args
     public static final String ARG_MOVIE_ID = "ARG_MOVIE_ID";
@@ -275,61 +275,11 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
         }
 
         mRatingText.setText(getString(R.string.rating_format_str, movie.getVoteAverage()));
-
-        // Set homepage link, if present
-        String homePage = movie.getHomePage();
-        if (homePage != null && homePage.length() > 0) {
-            mHomepageText.setText(getString(R.string.homepage_format_str, homePage));
-            mHomepageText.setVisibility(View.VISIBLE);
-        } else {
-            mHomepageText.setVisibility(View.GONE);
-        }
-
         mOverviewText.setText(movie.getOverview());
 
-        // Inflater for creating reviews and videos lists
-        LayoutInflater inflater = LayoutInflater.from(getContext());
-        // Review list
-        mReviewsListTable.removeAllViews();
-        if (movie.getReviews() != null && movie.getReviews().size() > 0) {
-            for (Review r : movie.getReviews()) {
-                View v = inflater.inflate(R.layout.reviews_list_item, mReviewsListTable, false);
-
-                TextView authorView = ButterKnife.findById(v, R.id.reviews_list_item_author);
-                ExpandableTextView contentView = ButterKnife.findById(v, R.id.reviews_list_item_content);
-
-                authorView.setText(r.getAuthor());
-                contentView.setText(r.getContent());
-
-                mReviewsListTable.addView(v);
-            }
-
-            mReviewsListLayout.setVisibility(View.VISIBLE);
-        } else mReviewsListLayout.setVisibility(View.GONE);
-
-        // Video list
-        mVideosListTable.removeAllViews();
-        if (movie.getVideos() != null && movie.getVideos().size() > 0) {
-            for (Video video : movie.getVideos()) {
-                View v = inflater.inflate(R.layout.videos_list_item, mVideosListTable, false);
-
-                TextView titleView = ButterKnife.findById(v, R.id.videos_list_item_title);
-                titleView.setText(video.getName());
-
-                // setup listener
-                v.setTag(video.getKey());
-                v.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        // start video watching, key of the video we extract from view's tag
-                        watchYoutubeVideo((String) view.getTag());
-                    }
-                });
-
-                mVideosListTable.addView(v);
-            }
-            mVideosListLayout.setVisibility(View.VISIBLE);
-        } else mVideosListLayout.setVisibility(View.GONE);
+        updateHomepageLinkView(movie);
+        updateReviewListView(movie);
+        updateVideoListView(movie);
 
         // Favorite mark
         isFavorite = false;
@@ -344,6 +294,85 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     private boolean isPosterChanged(Movie newMovie) {
         return lastMovie == null || !lastMovie.getPosterPath().equals(newMovie.getPosterPath());
+    }
+
+    private void updateHomepageLinkView(Movie movie) {
+        // Set homepage link, if present
+        String homePage = movie.getHomePage();
+        if (homePage != null && homePage.length() > 0) {
+            mHomepageText.setText(getString(R.string.homepage_format_str, homePage));
+            mHomepageText.setVisibility(View.VISIBLE);
+        } else {
+            mHomepageText.setVisibility(View.GONE);
+        }
+    }
+
+    private void updateReviewListView(Movie movie) {
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+        // Review list
+        mReviewsListTable.removeAllViews();
+        if (movie.getReviews() != null && movie.getReviews().size() > 0) {
+            for (Review r : movie.getReviews()) {
+                View v = inflater.inflate(R.layout.reviews_list_item, mReviewsListTable, false);
+
+                TextView authorView = ButterKnife.findById(v, R.id.review_list_item_author);
+                TextView contentView = ButterKnife.findById(v, R.id.review_list_item_content);
+
+                authorView.setText(r.getAuthor());
+                contentView.setText(r.getContent());
+                contentView.setOnClickListener(this);
+
+                mReviewsListTable.addView(v);
+            }
+
+            mReviewsListLayout.setVisibility(View.VISIBLE);
+        } else mReviewsListLayout.setVisibility(View.GONE);
+    }
+
+    private void updateVideoListView(Movie movie) {
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+        // Video list
+        mVideosListTable.removeAllViews();
+        if (movie.getVideos() != null && movie.getVideos().size() > 0) {
+            for (Video video : movie.getVideos()) {
+                View v = inflater.inflate(R.layout.videos_list_item, mVideosListTable, false);
+
+                TextView titleView = ButterKnife.findById(v, R.id.videos_list_item_title);
+                titleView.setText(video.getName());
+
+                // setup listener
+                v.setTag(video.getKey());
+                v.setOnClickListener(this);
+
+                mVideosListTable.addView(v);
+            }
+            mVideosListLayout.setVisibility(View.VISIBLE);
+        } else mVideosListLayout.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.review_list_item_content:
+                onReviewClick((TextView) v);
+                break;
+            case R.id.videos_list_item_frame:
+                onVideoClick(v);
+                break;
+        }
+
+    }
+
+    private void onReviewClick(TextView view) {
+        if (view.getMaxLines() == 5) {
+            view.setMaxLines(500);
+        } else {
+            view.setMaxLines(5);
+        }
+    }
+
+    private void onVideoClick(View view) {
+        watchYoutubeVideo((String) view.getTag());
     }
 
     private void watchYoutubeVideo(String id) {
