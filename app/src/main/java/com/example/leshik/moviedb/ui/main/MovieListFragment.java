@@ -119,7 +119,7 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
 
         subscribeToMovieList();
 
-        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.VIEW_ITEM_LIST,
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT,
                 FirebaseUtils.createAnalyticsSelectBundle(TAG, "Create Movie List Fragment", fragmentType.toString()));
 
         return rootView;
