@@ -37,7 +37,7 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
     private static final String ARG_MOVIE_ID = "ARG_MOVIE_ID";
     long movieId;
 
-    @BindView(R.id.detail_toolbar)
+    @BindView(R.id.toolbar)
     protected Toolbar mToolbar;
     @BindView(R.id.detail_frame)
     protected LinearLayout mDetailFrame;

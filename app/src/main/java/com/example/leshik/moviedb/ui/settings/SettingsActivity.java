@@ -23,7 +23,7 @@ import butterknife.ButterKnife;
 public class SettingsActivity extends AppCompatActivity {
     private static final String TAG = "SettingsActivity";
 
-    @BindView(R.id.settings_toolbar)
+    @BindView(R.id.toolbar)
     protected Toolbar mToolbar;
 
     private PreferenceInterface prefStorage;

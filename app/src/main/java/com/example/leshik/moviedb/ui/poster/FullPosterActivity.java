@@ -65,7 +65,7 @@ public class FullPosterActivity extends AppCompatActivity implements FullPosterF
     // views to fast access
     @BindView(R.id.full_poster_title)
     protected TextView mTitleView;
-    @BindView(R.id.poster_toolbar)
+    @BindView(R.id.toolbar)
     protected Toolbar mToolbar;
 
     Unbinder unbinder;

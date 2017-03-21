@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
     protected ViewPager mViewPager;
     @BindView(R.id.main_tabs)
     protected TabLayout mTabLayout;
-    @BindView(R.id.main_toolbar)
+    @BindView(R.id.toolbar)
     protected Toolbar mToolbar;
 
     // current selected movie (for two pane view)
