@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
@@ -37,8 +36,6 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
     private static final String ARG_MOVIE_ID = "ARG_MOVIE_ID";
     long movieId;
 
-    @BindView(R.id.toolbar)
-    protected Toolbar mToolbar;
     @BindView(R.id.detail_frame)
     protected LinearLayout mDetailFrame;
 
@@ -61,8 +58,6 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
         setContentView(R.layout.activity_detail);
 
         ButterKnife.bind(this);
-
-        setSupportActionBar(mToolbar);
 
         // Get a support ActionBar corresponding to this toolbar
         ActionBar ab = getSupportActionBar();
