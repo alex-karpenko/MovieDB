@@ -53,7 +53,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     // fragment args
     public static final String ARG_MOVIE_ID = "ARG_MOVIE_ID";
     private static final String YOUTUBE_BASE_URL = "http://www.youtube.com/watch?v=";
-    private static final String YOUTUBE_THUMB_URL = "http://img.youtube.com/vi/%s/2.jpg";
+    private static final String YOUTUBE_THUMB_URL = "http://img.youtube.com/vi/%s/mqdefault.jpg";
     private static final String YOUTUBE_BASE_CONTENT = "vnd.youtube:";
     // state variables
     private long movieId;
