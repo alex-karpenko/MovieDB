@@ -173,7 +173,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
                     mAppBar.setLayoutParams(params);
 
                     mPosterImage.setOnClickListener(null);
-                    // ((DetailFragment.Callback) getContext()).onImageClicked(movieId, (ImageView) v);
                 }
             }
         });
@@ -414,17 +413,5 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     // starting intent services to update cache tables
     void refreshCurrentMovie() {
         mViewModel.forceRefresh();
-    }
-
-    /**
-     * A callback interface that all activities containing this fragment must
-     * implement. This mechanism allows activities to be notified of poster image
-     * clicked.
-     */
-    public interface Callback {
-        /**
-         * DetailFragmentCallback for when an item has been selected.
-         */
-        void onImageClicked(long movieId, ImageView posterView);
     }
 }
