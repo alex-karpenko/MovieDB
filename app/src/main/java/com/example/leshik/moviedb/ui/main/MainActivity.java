@@ -18,7 +18,6 @@ import com.example.leshik.moviedb.data.PreferenceStorage;
 import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
 import com.example.leshik.moviedb.ui.details.DetailActivity;
 import com.example.leshik.moviedb.ui.details.DetailFragment;
-import com.example.leshik.moviedb.ui.poster.FullPosterActivity;
 import com.example.leshik.moviedb.ui.settings.SettingsActivity;
 import com.example.leshik.moviedb.utils.EventsUtils;
 import com.example.leshik.moviedb.utils.FirebaseUtils;
@@ -31,7 +30,7 @@ import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 
-public class MainActivity extends AppCompatActivity implements MovieListFragment.Callback, DetailFragment.Callback {
+public class MainActivity extends AppCompatActivity implements MovieListFragment.Callback {
     private static final String TAG = "MainActivity";
     // tags to saved state bundle
     private static final String STATE_CURRENT_PAGE = "STATE_CURRENT_PAGE";
@@ -182,20 +181,6 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.detail_container, fragment)
                     .commit();
-        }
-    }
-
-    // callback method from details fragment - called when poster image pressed to start full poster view
-    @Override
-    public void onImageClicked(long movieId, ImageView posterView) {
-        // callback method that called when poster image is clicked
-        // start full poster view activity
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            ActivityOptions options = ActivityOptions
-                    .makeSceneTransitionAnimation(this, posterView, getString(R.string.poster_image));
-            startActivity(FullPosterActivity.getIntentInstance(this, movieId), options.toBundle());
-        } else {
-            startActivity(FullPosterActivity.getIntentInstance(this, movieId));
         }
     }
 }
