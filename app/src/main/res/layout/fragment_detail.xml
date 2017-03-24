@@ -1,25 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/swiperefresh"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_content"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:layout_alignParentTop="true">
 
-    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/detail_fragment_scroll_view"
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar"
+        android:layout_width="match_parent"
+        android:layout_height="320dp"
+        android:elevation="4dp">
+
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:id="@+id/collapsing_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+
+            <!-- poster -->
+            <ImageView
+                android:id="@+id/poster_image"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:cropToPadding="true"
+                android:fitsSystemWindows="true"
+                android:scaleType="centerCrop"
+                android:transitionName="@string/poster_image"
+                app:layout_collapseMode="parallax" />
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:layout_collapseMode="pin" />
+
+        </android.support.design.widget.CollapsingToolbarLayout>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/scrolling_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fadingEdgeLength="0dp"
-        android:fillViewport="true"
-        android:overScrollMode="never"
-        android:scrollbars="none">
+        android:layout_weight="1"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <!-- Main block, includes 3 section: title (text), image+info (linear), overview (text) -->
-        <!-- May by in future I will bring Title TextView out of scrolling area -->
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
+
             <!-- Title -->
             <TextView
                 android:id="@+id/detail_title"
@@ -35,82 +67,41 @@
                 android:paddingTop="@dimen/detail_title_vertical_margin"
                 android:textSize="24sp" />
 
-            <!-- Image, release date, rating -->
-            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <!-- poster -->
-                <ImageView
-                    android:id="@+id/poster_image"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:adjustViewBounds="true"
-                    android:cropToPadding="true"
-                    android:paddingLeft="@dimen/detail_left_margin"
-                    android:paddingTop="@dimen/detail_interviews_padding"
-                    android:transitionName="@string/poster_image" />
-
-                <!-- text info (release date, rating) -->
-                <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-                    <!-- release date -->
-                    <TextView
-                        android:id="@+id/detail_released"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingEnd="@dimen/detail_right_margin"
-                        android:paddingLeft="@dimen/detail_left_margin"
-                        android:paddingRight="@dimen/detail_left_margin"
-                        android:paddingStart="@dimen/detail_left_margin"
-                        android:paddingTop="@dimen/detail_interviews_padding"
-                        android:textSize="18sp" />
-                    <!-- runtime -->
-                    <TextView
-                        android:id="@+id/detail_runtime"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingEnd="@dimen/detail_right_margin"
-                        android:paddingLeft="@dimen/detail_left_margin"
-                        android:paddingRight="@dimen/detail_left_margin"
-                        android:paddingStart="@dimen/detail_left_margin"
-                        android:paddingTop="@dimen/detail_interviews_padding"
-                        android:textSize="18sp"
-                        android:textStyle="normal|italic" />
-                    <!-- rating -->
-                    <TextView
-                        android:id="@+id/detail_rating"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingEnd="@dimen/detail_right_margin"
-                        android:paddingLeft="@dimen/detail_left_margin"
-                        android:paddingRight="@dimen/detail_left_margin"
-                        android:paddingStart="@dimen/detail_left_margin"
-                        android:paddingTop="@dimen/detail_interviews_padding"
-                        android:textSize="14sp" />
-
-                    <!-- end of text info block -->
-                </LinearLayout>
-                <!-- end of middle block (poster + info) -->
-            </LinearLayout>
-
-            <!-- homepage -->
+            <!-- release date -->
             <TextView
-                android:id="@+id/detail_homepage"
+                android:id="@+id/detail_released"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingEnd="@dimen/detail_right_margin"
                 android:paddingLeft="@dimen/detail_left_margin"
-                android:paddingRight="@dimen/detail_right_margin"
+                android:paddingRight="@dimen/detail_left_margin"
                 android:paddingStart="@dimen/detail_left_margin"
-                android:paddingTop="@dimen/detail_title_vertical_margin"
-                android:autoLink="web"
-                android:visibility="gone" />
+                android:paddingTop="@dimen/detail_interviews_padding"
+                android:textSize="18sp" />
+            <!-- runtime -->
+            <TextView
+                android:id="@+id/detail_runtime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingEnd="@dimen/detail_right_margin"
+                android:paddingLeft="@dimen/detail_left_margin"
+                android:paddingRight="@dimen/detail_left_margin"
+                android:paddingStart="@dimen/detail_left_margin"
+                android:paddingTop="@dimen/detail_interviews_padding"
+                android:textSize="18sp"
+                android:textStyle="normal|italic" />
+            <!-- rating -->
+            <TextView
+                android:id="@+id/detail_rating"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingEnd="@dimen/detail_right_margin"
+                android:paddingLeft="@dimen/detail_left_margin"
+                android:paddingRight="@dimen/detail_left_margin"
+                android:paddingStart="@dimen/detail_left_margin"
+                android:paddingTop="@dimen/detail_interviews_padding"
+                android:textSize="14sp" />
+
             <!-- Overview -->
             <TextView
                 android:id="@+id/detail_overview"
@@ -123,82 +114,25 @@
                 android:paddingStart="@dimen/detail_left_margin"
                 android:paddingTop="@dimen/detail_title_vertical_margin" />
 
-            <!-- List of trailers -->
-            <LinearLayout
-                android:id="@+id/videos_layout"
+            <!-- homepage -->
+            <TextView
+                android:id="@+id/detail_homepage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="gone">
+                android:autoLink="web"
+                android:paddingBottom="@dimen/detail_title_vertical_margin"
+                android:paddingEnd="@dimen/detail_right_margin"
+                android:paddingLeft="@dimen/detail_left_margin"
+                android:paddingRight="@dimen/detail_right_margin"
+                android:paddingStart="@dimen/detail_left_margin"
+                android:visibility="gone" />
 
-                <TextView
-                    android:id="@+id/videos_list_title"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@color/colorTitleBackground"
-                    android:elevation="4dp"
-                    android:gravity="center_vertical"
-                    android:labelFor="@+id/videos_list"
-                    android:paddingBottom="@dimen/detail_interviews_padding"
-                    android:paddingEnd="@dimen/detail_right_margin"
-                    android:paddingLeft="@dimen/detail_left_margin"
-                    android:paddingRight="@dimen/detail_left_margin"
-                    android:paddingStart="@dimen/detail_left_margin"
-                    android:paddingTop="@dimen/detail_interviews_padding"
-                    android:text="@string/videos_list_title"
-                    android:textSize="18sp"
-                    android:textStyle="normal|bold|italic" />
-
-                <TableLayout
-                    android:id="@+id/videos_list"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingEnd="@dimen/detail_right_margin"
-                    android:paddingLeft="@dimen/detail_left_margin"
-                    android:paddingRight="@dimen/detail_left_margin"
-                    android:paddingStart="@dimen/detail_left_margin" />
-
-            </LinearLayout>
-
-            <!-- List of reviews -->
-            <LinearLayout
-                android:id="@+id/reviews_layout"
+            <include
+                layout="@layout/videos_and_reviews"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="gone">
+                android:layout_height="wrap_content" />
 
-                <TextView
-                    android:id="@+id/reviews_list_title"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@color/colorTitleBackground"
-                    android:elevation="4dp"
-                    android:gravity="center_vertical"
-                    android:labelFor="@+id/reviews_list"
-                    android:paddingBottom="@dimen/detail_interviews_padding"
-                    android:paddingEnd="@dimen/detail_right_margin"
-                    android:paddingLeft="@dimen/detail_left_margin"
-                    android:paddingRight="@dimen/detail_left_margin"
-                    android:paddingStart="@dimen/detail_left_margin"
-                    android:paddingTop="@dimen/detail_interviews_padding"
-                    android:text="@string/reviews_list_title"
-                    android:textSize="18sp"
-                    android:textStyle="normal|bold|italic" />
-
-                <TableLayout
-                    android:id="@+id/reviews_list"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingEnd="@dimen/detail_right_margin"
-                    android:paddingLeft="@dimen/detail_left_margin"
-                    android:paddingRight="@dimen/detail_left_margin"
-                    android:paddingStart="@dimen/detail_left_margin" />
-
-            </LinearLayout>
-
-            <!-- End of main block -->
         </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
 
-    </ScrollView>
-</android.support.v4.widget.SwipeRefreshLayout>
+</android.support.design.widget.CoordinatorLayout>

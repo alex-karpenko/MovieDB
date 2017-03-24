@@ -5,10 +5,13 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ShareActionProvider;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -45,7 +48,7 @@ import io.reactivex.functions.Consumer;
  * Information. From intent gets URI with movie
  */
 
-public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, View.OnClickListener {
+public class DetailFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "DetailFragment";
     // fragment args
     public static final String ARG_MOVIE_ID = "ARG_MOVIE_ID";
@@ -70,9 +73,10 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
     protected TextView mOverviewText;
     @BindView(R.id.detail_homepage)
     protected TextView mHomepageText;
-
-    @BindView(R.id.swiperefresh)
-    protected SwipeRefreshLayout mSwipeRefreshLayout;
+    @BindView(R.id.toolbar)
+    protected Toolbar mToolbar;
+    @BindView(R.id.appbar)
+    protected AppBarLayout mAppBar;
 
     @BindView(R.id.videos_layout)
     protected LinearLayout mVideosListLayout;
@@ -154,8 +158,7 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
         unbinder = ButterKnife.bind(this, rootView);
 
-        mSwipeRefreshLayout.setOnRefreshListener(this);
-
+        setupToolbar();
         isFavorite = false;
 
         // set onClick listener for poster image
@@ -164,7 +167,13 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
             @Override
             public void onClick(View v) {
                 if (mPosterName != null) {
-                    ((DetailFragment.Callback) getContext()).onImageClicked(movieId, (ImageView) v);
+                    // Change AppBarLayout height to wrap_content
+                    ViewGroup.LayoutParams params = mAppBar.getLayoutParams();
+                    params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                    mAppBar.setLayoutParams(params);
+
+                    mPosterImage.setOnClickListener(null);
+                    // ((DetailFragment.Callback) getContext()).onImageClicked(movieId, (ImageView) v);
                 }
             }
         });
@@ -175,6 +184,19 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 FirebaseUtils.createAnalyticsSelectBundle(TAG, "Create Detail Fragment", "Movie Details"));
 
         return rootView;
+    }
+
+    private void setupToolbar() {
+        // Toolbar setup
+        if (mToolbar != null) {
+            ((AppCompatActivity) getActivity()).setSupportActionBar(mToolbar);
+
+            ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+            if (actionBar != null) {
+                actionBar.setDisplayHomeAsUpEnabled(true);
+                actionBar.setDisplayShowTitleEnabled(false);
+            }
+        }
     }
 
     @Override
@@ -206,8 +228,6 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
-            // set refresh mark
-            mSwipeRefreshLayout.setRefreshing(true);
             // and start update action
             refreshCurrentMovie();
             return true;
@@ -223,12 +243,6 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    // swipe refresh layout callback
-    @Override
-    public void onRefresh() {
-        refreshCurrentMovie();
     }
 
     /**
@@ -247,9 +261,6 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
     private void updateUi(Movie movie) {
         Log.i(TAG, "updateUi: +");
 
-        // stop refresh circle
-        mSwipeRefreshLayout.setRefreshing(false);
-
         // update variables for share action provider
         mPosterName = movie.getPosterPath();
         mMovieTitle = movie.getOriginalTitle();
@@ -260,7 +271,7 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
         if (isPosterChanged(movie)) {
             // load poster image
             Picasso.with(getActivity())
-                    .load(prefStorage.getPosterSmallUri(mPosterName))
+                    .load(prefStorage.getPosterMediumUri(mPosterName))
                     .into(mPosterImage);
         }
 
@@ -402,8 +413,7 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     // starting intent services to update cache tables
     void refreshCurrentMovie() {
-        boolean isRefreshStarted = mViewModel.forceRefresh();
-        if (!isRefreshStarted) mSwipeRefreshLayout.setRefreshing(false);
+        mViewModel.forceRefresh();
     }
 
     /**
