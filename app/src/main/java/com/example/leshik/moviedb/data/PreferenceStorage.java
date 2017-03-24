@@ -39,6 +39,7 @@ public class PreferenceStorage implements PreferenceInterface {
     private static long cacheUpdateInterval = ONE_HOUR_MILLIS * 24; // 24 hours
     // Default image width
     private String posterSmallWidthStr = "w185";
+    private String posterMediumWidthStr = "w342";
     private String posterFullWidthStr = "original";
     // current theme id
     private static int currentTheme = R.style.AppThemeDark;
@@ -205,6 +206,13 @@ public class PreferenceStorage implements PreferenceInterface {
     public Uri getPosterSmallUri(String poster) {
         return Uri.parse(networkConfig.basePosterSecureUrl
                 + posterSmallWidthStr
+                + poster);
+    }
+
+    @Override
+    public Uri getPosterMediumUri(String poster) {
+        return Uri.parse(networkConfig.basePosterSecureUrl
+                + posterMediumWidthStr
                 + poster);
     }
 

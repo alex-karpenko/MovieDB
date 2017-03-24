@@ -32,6 +32,8 @@ public interface PreferenceInterface {
 
     Uri getPosterSmallUri(String poster);
 
+    Uri getPosterMediumUri(String poster);
+
     Uri getPosterFullUri(String poster);
 
     long getCacheUpdateInterval();
