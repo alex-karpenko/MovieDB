@@ -44,13 +44,16 @@
     <string name="upcoming_tab_title">Upcoming</string>
 
     <!-- Strings related to details view -->
-    <string name="rating_format_str">%.1f/10</string>
-    <string name="runtime_format_str">%d min</string>
-    <string name="null_runtime_format_str">-</string>
+    <string name="released_format_str">Release date: %s</string>
+    <string name="rating_format_str">Rating: %.1f/10</string>
+    <string name="runtime_format_str">Runtime: %d min</string>
+    <string name="null_runtime_format_str">Runtime: -</string>
     <string name="videos_list_title">Trailers</string>
     <string name="reviews_list_title">Reviews</string>
     <string name="share_action_subject">Popular movies:</string>
     <string name="homepage_format_str">Homepage: %s</string>
+    <string name="detail_overview_title">Summary</string>
+
 
     <!-- Events messages -->
     <string name="event_message_refreshing">Refreshing...</string>

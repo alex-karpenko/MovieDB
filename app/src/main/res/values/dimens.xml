@@ -5,6 +5,7 @@
     <dimen name="detail_left_margin">16dp</dimen>
     <dimen name="detail_right_margin">16dp</dimen>
     <dimen name="detail_title_vertical_margin">16dp</dimen>
-    <dimen name="detail_interviews_padding">8dp</dimen>
+    <dimen name="detail_interviews_padding">16dp</dimen>
     <dimen name="detail_video_list_items_padding">4dp</dimen>
+    <dimen name="details_review_interline_margin">8dp</dimen>
 </resources>

@@ -62,62 +62,47 @@
                 android:id="@+id/detail_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/colorTitleBackground"
-                android:elevation="4dp"
+                android:fontFamily="sans-serif"
                 android:paddingBottom="@dimen/detail_title_vertical_margin"
                 android:paddingEnd="@dimen/detail_right_margin"
                 android:paddingLeft="@dimen/detail_left_margin"
                 android:paddingRight="@dimen/detail_right_margin"
                 android:paddingStart="@dimen/detail_left_margin"
                 android:paddingTop="@dimen/detail_title_vertical_margin"
-                android:textSize="24sp" />
+                android:textColor="@android:color/white"
+                android:textSize="32sp" />
 
             <!-- release date -->
             <TextView
                 android:id="@+id/detail_released"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingEnd="@dimen/detail_right_margin"
+                android:fontFamily="sans-serif-light"
                 android:paddingLeft="@dimen/detail_left_margin"
                 android:paddingRight="@dimen/detail_left_margin"
-                android:paddingStart="@dimen/detail_left_margin"
-                android:paddingTop="@dimen/detail_interviews_padding"
-                android:textSize="18sp" />
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:textColor="@android:color/white" />
+
             <!-- runtime -->
             <TextView
                 android:id="@+id/detail_runtime"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingEnd="@dimen/detail_right_margin"
+                android:fontFamily="sans-serif-light"
                 android:paddingLeft="@dimen/detail_left_margin"
                 android:paddingRight="@dimen/detail_left_margin"
-                android:paddingStart="@dimen/detail_left_margin"
-                android:paddingTop="@dimen/detail_interviews_padding"
-                android:textSize="18sp"
-                android:textStyle="normal|italic" />
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:textColor="@android:color/white" />
             <!-- rating -->
             <TextView
                 android:id="@+id/detail_rating"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingEnd="@dimen/detail_right_margin"
+                android:fontFamily="sans-serif-light"
                 android:paddingLeft="@dimen/detail_left_margin"
                 android:paddingRight="@dimen/detail_left_margin"
-                android:paddingStart="@dimen/detail_left_margin"
-                android:paddingTop="@dimen/detail_interviews_padding"
-                android:textSize="14sp" />
-
-            <!-- Overview -->
-            <TextView
-                android:id="@+id/detail_overview"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingBottom="@dimen/detail_title_vertical_margin"
-                android:paddingEnd="@dimen/detail_right_margin"
-                android:paddingLeft="@dimen/detail_left_margin"
-                android:paddingRight="@dimen/detail_right_margin"
-                android:paddingStart="@dimen/detail_left_margin"
-                android:paddingTop="@dimen/detail_title_vertical_margin" />
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:textColor="@android:color/white" />
 
             <!-- homepage -->
             <TextView
@@ -125,17 +110,45 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:autoLink="web"
+                android:fontFamily="sans-serif-light"
+                android:paddingLeft="@dimen/detail_left_margin"
+                android:paddingRight="@dimen/detail_right_margin"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:textColor="@android:color/white"
+                android:background="?android:attr/selectableItemBackground"
+                android:visibility="gone" />
+
+            <!-- Overview -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/detail_left_margin"
+                android:layout_marginRight="@dimen/detail_right_margin"
+                android:layout_marginTop="32dp"
+                android:text="@string/detail_overview_title"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:textColor="@android:color/white" />
+
+            <TextView
+                android:id="@+id/detail_overview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-light"
+                android:lineSpacingMultiplier="1.2"
                 android:paddingBottom="@dimen/detail_title_vertical_margin"
                 android:paddingEnd="@dimen/detail_right_margin"
                 android:paddingLeft="@dimen/detail_left_margin"
                 android:paddingRight="@dimen/detail_right_margin"
                 android:paddingStart="@dimen/detail_left_margin"
-                android:visibility="gone" />
+                android:paddingTop="@dimen/detail_title_vertical_margin"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textColor="@android:color/white" />
 
             <include
                 layout="@layout/videos_and_reviews"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp" />
 
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>

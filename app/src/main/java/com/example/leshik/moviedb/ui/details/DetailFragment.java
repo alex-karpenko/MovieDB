@@ -276,7 +276,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
 
         // Setting all view's content
         mTitleText.setText(movie.getOriginalTitle());
-        mReleasedText.setText(movie.getReleaseDate());
+        mReleasedText.setText(getString(R.string.released_format_str, movie.getReleaseDate()));
 
         if (movie.getRunTime() > 0) {
             mRuntimeText.setText(getString(R.string.runtime_format_str, movie.getRunTime()));
