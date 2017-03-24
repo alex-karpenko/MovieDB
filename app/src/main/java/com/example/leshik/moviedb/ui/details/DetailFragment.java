@@ -53,6 +53,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     // fragment args
     public static final String ARG_MOVIE_ID = "ARG_MOVIE_ID";
     private static final String YOUTUBE_BASE_URL = "http://www.youtube.com/watch?v=";
+    private static final String YOUTUBE_THUMB_URL = "http://img.youtube.com/vi/%s/2.jpg";
     private static final String YOUTUBE_BASE_CONTENT = "vnd.youtube:";
     // state variables
     private long movieId;
@@ -84,7 +85,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     protected LinearLayout mReviewsListLayout;
 
     @BindView(R.id.videos_list)
-    protected TableLayout mVideosListTable;
+    protected LinearLayout mVideosListTable;
     @BindView(R.id.reviews_list)
     protected TableLayout mReviewsListTable;
 
@@ -347,17 +348,21 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
             for (Video video : movie.getVideos()) {
                 View v = inflater.inflate(R.layout.videos_list_item, mVideosListTable, false);
 
-                TextView titleView = ButterKnife.findById(v, R.id.videos_list_item_title);
-                titleView.setText(video.getName());
+                ImageView thumbView = ButterKnife.findById(v, R.id.video_thumb);
+                Picasso.with(getActivity()).load(getVideoThumbUrl(video.getKey())).into(thumbView);
 
                 // setup listener
-                v.setTag(video.getKey());
-                v.setOnClickListener(this);
+                thumbView.setTag(video.getKey());
+                thumbView.setOnClickListener(this);
 
                 mVideosListTable.addView(v);
             }
             mVideosListLayout.setVisibility(View.VISIBLE);
         } else mVideosListLayout.setVisibility(View.GONE);
+    }
+
+    private Uri getVideoThumbUrl(String key) {
+        return Uri.parse(String.format(YOUTUBE_THUMB_URL, key));
     }
 
     @Override
@@ -366,7 +371,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
             case R.id.review_list_item_content:
                 onReviewClick((TextView) v);
                 break;
-            case R.id.videos_list_item_frame:
+            case R.id.video_thumb:
                 onVideoClick(v);
                 break;
         }

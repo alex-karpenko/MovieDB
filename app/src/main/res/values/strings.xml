@@ -51,7 +51,7 @@
     <string name="videos_list_title">Trailers</string>
     <string name="reviews_list_title">Reviews</string>
     <string name="share_action_subject">Popular movies:</string>
-    <string name="homepage_format_str">Homepage: %s</string>
+    <string name="homepage_format_str">%s</string>
     <string name="detail_overview_title">Summary</string>
 
 
