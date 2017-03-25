@@ -9,4 +9,5 @@
     <dimen name="detail_video_list_items_padding">4dp</dimen>
     <dimen name="details_review_interline_margin">8dp</dimen>
     <dimen name="detail_inter_video_margin">16dp</dimen>
+    <dimen name="default_layout_margin">16dp</dimen>
 </resources>
