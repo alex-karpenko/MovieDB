@@ -9,8 +9,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.leshik.moviedb.R;
@@ -50,6 +52,8 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
     protected TabLayout mTabLayout;
     @BindView(R.id.toolbar)
     protected Toolbar mToolbar;
+    @BindView(R.id.toolbar_spinner)
+    protected Spinner mToolbarSpinner;
 
     // current selected movie (for two pane view)
     private long selectedMovieId = 0;
@@ -75,6 +79,7 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
         } else ViewUtils.setTwoPane(false);
 
         setSupportActionBar(mToolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         // create pager adapter and set it to the pager view
         mPagerAdapter = new MainPagerAdapter(getSupportFragmentManager());
@@ -85,6 +90,12 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
 
         // Assign pager to tab layout
         mTabLayout.setupWithViewPager(mViewPager);
+
+        // Setup spinner
+        ArrayAdapter<CharSequence> spinnerAdapter =
+                ArrayAdapter.createFromResource(this, R.array.main_tab_names, android.R.layout.simple_spinner_item);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mToolbarSpinner.setAdapter(spinnerAdapter);
 
         // restore state, if it was save
         if (savedInstanceState != null) {
