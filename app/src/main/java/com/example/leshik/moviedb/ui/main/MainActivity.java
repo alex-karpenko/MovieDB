@@ -3,7 +3,6 @@ package com.example.leshik.moviedb.ui.main;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -53,8 +52,6 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
     protected LinearLayout mMainFrame;
     @BindView(R.id.main_pager)
     protected ViewPager mViewPager;
-    @BindView(R.id.main_tabs)
-    protected TabLayout mTabLayout;
     @BindView(R.id.toolbar)
     protected Toolbar mToolbar;
     @BindView(R.id.toolbar_spinner)
@@ -86,15 +83,11 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
+        // Get list of tab's titles from resources
+        tabFragmentNames = getResources().getStringArray(R.array.main_tab_names);
         // create pager adapter and set it to the pager view
         mPagerAdapter = new MainPagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mPagerAdapter);
-
-        // Get list of tab's titles from resources
-        tabFragmentNames = getResources().getStringArray(R.array.main_tab_names);
-
-        // Assign pager to tab layout
-        mTabLayout.setupWithViewPager(mViewPager);
 
         // Setup spinner
         ArrayAdapter<CharSequence> spinnerAdapter =
@@ -211,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
     static class ViewPagerListener extends ViewPager.SimpleOnPageChangeListener {
         private Spinner spinner;
 
-        public ViewPagerListener(Spinner spinner) {
+        ViewPagerListener(Spinner spinner) {
             this.spinner = spinner;
         }
 
@@ -226,7 +219,7 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
     static class SpinnerListener implements AdapterView.OnItemSelectedListener {
         ViewPager pager;
 
-        public SpinnerListener(ViewPager pager) {
+        SpinnerListener(ViewPager pager) {
             this.pager = pager;
         }
 
