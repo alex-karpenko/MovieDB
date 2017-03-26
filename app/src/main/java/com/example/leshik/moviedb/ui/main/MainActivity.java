@@ -7,8 +7,11 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -43,6 +46,8 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
 
     // adapter to create fragments to pager
     private MainPagerAdapter mPagerAdapter;
+    private ViewPagerListener mViewPagerListener;
+    private SpinnerListener mSpinnerListener;
 
     @BindView(R.id.main_frame)
     protected LinearLayout mMainFrame;
@@ -97,6 +102,12 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mToolbarSpinner.setAdapter(spinnerAdapter);
 
+        mViewPagerListener = new ViewPagerListener(mToolbarSpinner);
+        mViewPager.addOnPageChangeListener(mViewPagerListener);
+
+        mSpinnerListener = new SpinnerListener(mViewPager);
+        mToolbarSpinner.setOnItemSelectedListener(mSpinnerListener);
+
         // restore state, if it was save
         if (savedInstanceState != null) {
             int selectedTab = savedInstanceState.getInt(STATE_CURRENT_PAGE);
@@ -130,6 +141,8 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
     @Override
     protected void onDestroy() {
         subscription.dispose();
+        mToolbarSpinner.setOnItemSelectedListener(null);
+        mViewPager.removeOnPageChangeListener(mViewPagerListener);
         super.onDestroy();
     }
 
@@ -192,6 +205,40 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.detail_container, fragment)
                     .commit();
+        }
+    }
+
+    static class ViewPagerListener extends ViewPager.SimpleOnPageChangeListener {
+        private Spinner spinner;
+
+        public ViewPagerListener(Spinner spinner) {
+            this.spinner = spinner;
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+            super.onPageSelected(position);
+            spinner.setSelection(position, true);
+            Log.i(TAG, "onPageSelected: page changed to " + position);
+        }
+    }
+
+    static class SpinnerListener implements AdapterView.OnItemSelectedListener {
+        ViewPager pager;
+
+        public SpinnerListener(ViewPager pager) {
+            this.pager = pager;
+        }
+
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            pager.setCurrentItem(position, true);
+            Log.i(TAG, "onItemSelected: spinner changed to " + position);
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+
         }
     }
 }
