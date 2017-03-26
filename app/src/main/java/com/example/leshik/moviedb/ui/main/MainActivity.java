@@ -176,7 +176,7 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
 
     // listener action - if image from the list pressed - start details activity or update detail frame (if two panes)
     @Override
-    public void onItemSelected(long movieId, ImageView posterView) {
+    public void onMovieListItemSelected(long movieId, ImageView posterView) {
 
         if (!ViewUtils.isTwoPane()) {
             Intent intent = DetailActivity.getIntentInstance(this, movieId);
