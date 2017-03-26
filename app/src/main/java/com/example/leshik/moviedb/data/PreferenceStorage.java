@@ -10,6 +10,7 @@ import com.example.leshik.moviedb.R;
 import com.example.leshik.moviedb.data.interfaces.NetworkDataSource;
 import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
 import com.example.leshik.moviedb.data.model.NetworkConfig;
+import com.example.leshik.moviedb.utils.ViewUtils;
 
 import java.util.Calendar;
 
@@ -221,6 +222,14 @@ public class PreferenceStorage implements PreferenceInterface {
         return Uri.parse(networkConfig.basePosterSecureUrl
                 + posterFullWidthStr
                 + poster);
+    }
+
+    @Override
+    public Uri getOptimalImageUri(NetworkConfig.ImageType type, String imageName) {
+        int screenDpWidth = ViewUtils.getScreenDpWidth(context);
+        return Uri.parse(networkConfig.basePosterSecureUrl
+                + networkConfig.getOptimalWidthString(type, screenDpWidth)
+                + imageName);
     }
 
     @Override

@@ -4,6 +4,7 @@ package com.example.leshik.moviedb.data.api;
  * Created by Leshik on 19.12.2016.
  */
 
+import com.example.leshik.moviedb.data.model.NetworkConfig;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -55,5 +56,22 @@ public class ConfigurationResponse {
 
     public String getImagesBaseSecureUrl() {
         return images.secureBaseUrl;
+    }
+
+    public List<String> getImageSizes(NetworkConfig.ImageType type) {
+        switch (type) {
+            case Poster:
+                return images.posterSizes;
+            case Backdrop:
+                return images.backdropSizes;
+            case Logo:
+                return images.logoSizes;
+            case Profile:
+                return images.profileSizes;
+            case Still:
+                return images.stillSizes;
+        }
+
+        return null;
     }
 }

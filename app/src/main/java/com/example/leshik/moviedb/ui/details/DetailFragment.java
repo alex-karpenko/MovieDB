@@ -29,6 +29,7 @@ import com.example.leshik.moviedb.data.MovieRepository;
 import com.example.leshik.moviedb.data.PreferenceStorage;
 import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
 import com.example.leshik.moviedb.data.model.Movie;
+import com.example.leshik.moviedb.data.model.NetworkConfig;
 import com.example.leshik.moviedb.data.model.Review;
 import com.example.leshik.moviedb.data.model.Video;
 import com.example.leshik.moviedb.ui.viewmodels.MovieViewModel;
@@ -271,8 +272,9 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         if (isPosterChanged(movie)) {
             // load poster image
             Picasso.with(getActivity())
-                    .load(prefStorage.getPosterMediumUri(mPosterName))
+                    .load(prefStorage.getOptimalImageUri(NetworkConfig.ImageType.Poster, mPosterName))
                     .into(mPosterImage);
+            Log.i(TAG, "updateUi: image = " + prefStorage.getOptimalImageUri(NetworkConfig.ImageType.Poster, mPosterName));
         }
 
         // Setting all view's content
