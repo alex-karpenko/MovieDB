@@ -18,7 +18,7 @@ public class NetworkConfig {
     public static final int OriginalSize = Integer.MAX_VALUE;
     public String basePosterUrl;
     public String basePosterSecureUrl;
-    private Map<Integer, String>[] imageSizes = new Map[ImageType.getTypesSize()];
+    private Map<Integer, String>[] imageSizes = new Map[ImageType.getNumberOfTypes()];
 
     public NetworkConfig() {
     }
@@ -37,8 +37,8 @@ public class NetworkConfig {
         if (imagesSizesStr == null)
             throw new IllegalArgumentException("Null pointer to list isn't acceptable.");
 
-        imageSizes[type.getType()] = parseSizesStringList(imagesSizesStr);
-        Log.i(TAG, "setupImageSizes: type=" + type + ", source_list=" + imagesSizesStr + ", result_map=" + imageSizes[type.getType()]);
+        imageSizes[type.getIndex()] = parseSizesStringList(imagesSizesStr);
+        Log.i(TAG, "setupImageSizes: index=" + type + ", source_list=" + imagesSizesStr + ", result_map=" + imageSizes[type.getIndex()]);
     }
 
     private Map<Integer, String> parseSizesStringList(List<String> sizesList) {
@@ -54,7 +54,8 @@ public class NetworkConfig {
                 } catch (Exception e) {
                     throw new IllegalArgumentException("Bad value '" + s + "' in the list.");
                 }
-            } else if (s.startsWith("h")) continue;
+            } else if (s.startsWith("h"))
+                continue; // TODO: 3/26/17 Now is ignoring h---- values, but we have to deal with it...
             else throw new IllegalArgumentException("Bad value '" + s + "' in the list.");
         }
 
@@ -72,12 +73,7 @@ public class NetworkConfig {
 
     public String getOptimalWidthString(ImageType type, int viewWidth) {
         TreeSet<Integer> widthsSet = new TreeSet<>();
-        Map<Integer, String> configSizes = imageSizes[type.getType()];
-
-        // FIXME: 3/26/17 remove next
-        for (int i = 0; i < ImageType.getTypesSize(); i++) {
-            Log.i(TAG, "getOptimalWidthString: index=" + i + ", map=" + imageSizes[i]);
-        }
+        Map<Integer, String> configSizes = imageSizes[type.getIndex()];
 
         widthsSet.addAll(configSizes.keySet());
 
@@ -99,17 +95,17 @@ public class NetworkConfig {
         Profile(3),
         Still(4);
 
-        private int type;
+        private int index;
 
         ImageType(int i) {
-            type = i;
+            index = i;
         }
 
-        public int getType() {
-            return type;
+        public int getIndex() {
+            return index;
         }
 
-        static int getTypesSize() {
+        static int getNumberOfTypes() {
             return values().length;
         }
     }
