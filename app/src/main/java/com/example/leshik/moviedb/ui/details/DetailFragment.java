@@ -128,7 +128,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-        // restore movie uri
         if (savedInstanceState != null) {
             movieId = savedInstanceState.getLong(ARG_MOVIE_ID);
         }
@@ -164,16 +163,11 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         isFavorite = false;
 
         // set onClick listener for poster image
-        // click on poster image - call to full poster image view via callback in the activity
         mPosterImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mPosterName != null) {
-                    // Change AppBarLayout height to wrap_content
-                    ViewGroup.LayoutParams params = mAppBar.getLayoutParams();
-                    params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-                    mAppBar.setLayoutParams(params);
-
+                    setupFullAppBarHeight();
                     mPosterImage.setOnClickListener(null);
                 }
             }
@@ -185,6 +179,13 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
                 FirebaseUtils.createAnalyticsSelectBundle(TAG, "Create Detail Fragment", "Movie Details"));
 
         return rootView;
+    }
+
+    private void setupFullAppBarHeight() {
+        // Change AppBarLayout height to wrap_content
+        ViewGroup.LayoutParams params = mAppBar.getLayoutParams();
+        params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+        mAppBar.setLayoutParams(params);
     }
 
     private void setupToolbar() {
