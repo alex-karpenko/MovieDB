@@ -91,8 +91,9 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
 
         // Setup spinner
         ArrayAdapter<CharSequence> spinnerAdapter =
-                ArrayAdapter.createFromResource(this, R.array.main_tab_names, android.R.layout.simple_spinner_item);
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                ArrayAdapter.createFromResource(getSupportActionBar().getThemedContext(),
+                        R.array.main_tab_names, R.layout.spinner_item);
+        spinnerAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         mToolbarSpinner.setAdapter(spinnerAdapter);
 
         mViewPagerListener = new ViewPagerListener(mToolbarSpinner);
