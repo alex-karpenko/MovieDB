@@ -2,7 +2,6 @@
     <string name="app_name">Popular Movies</string>
     <string name="content_authority">com.example.leshik.moviedb</string>
     <string name="title_activity_detail">Movie details</string>
-    <string name="title_activity_full_poster">Poster</string>
     <string name="title_activity_settings">Settings</string>
     <!-- Strings related to menu actions -->
     <string name="action_refresh_list">Refresh list</string>
