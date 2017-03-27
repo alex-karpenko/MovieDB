@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
         ViewUtils.applyTheme(this, prefStorage.getTheme());
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.main_activity);
         ButterKnife.bind(this);
 
         // check if the details container is present - two pane layout was loaded
@@ -92,8 +92,8 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
         // Setup spinner
         ArrayAdapter<CharSequence> spinnerAdapter =
                 ArrayAdapter.createFromResource(getSupportActionBar().getThemedContext(),
-                        R.array.main_tab_names, R.layout.spinner_item);
-        spinnerAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+                        R.array.main_tab_names, R.layout.main_spinner_item);
+        spinnerAdapter.setDropDownViewResource(R.layout.main_spinner_dropdown_item);
         mToolbarSpinner.setAdapter(spinnerAdapter);
 
         mViewPagerListener = new ViewPagerListener(mToolbarSpinner);

@@ -52,7 +52,7 @@ public class DetailActivity extends AppCompatActivity {
         prefStorage = PreferenceStorage.getInstance(this.getApplicationContext());
         ViewUtils.applyTheme(this, prefStorage.getTheme());
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detail);
+        setContentView(R.layout.detail_activity);
 
         ButterKnife.bind(this);
 

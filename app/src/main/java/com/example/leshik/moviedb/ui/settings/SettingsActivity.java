@@ -35,7 +35,7 @@ public class SettingsActivity extends AppCompatActivity {
         prefStorage = PreferenceStorage.getInstance(this.getApplicationContext());
         ViewUtils.applyTheme(this, prefStorage.getTheme());
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings);
+        setContentView(R.layout.settings_activity);
         ButterKnife.bind(this);
 
         setSupportActionBar(mToolbar);

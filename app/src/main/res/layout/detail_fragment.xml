@@ -144,7 +144,7 @@
                 android:textColor="@android:color/white" />
 
             <include
-                layout="@layout/videos_and_reviews"
+                layout="@layout/detail_videos_and_reviews"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/default_layout_margin" />

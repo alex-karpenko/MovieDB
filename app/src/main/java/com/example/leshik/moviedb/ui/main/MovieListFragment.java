@@ -93,7 +93,7 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
                 new MovieListRepository(getActivity().getApplicationContext()));
 
         // Inflate fragment
-        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        View rootView = inflater.inflate(R.layout.main_fragment, container, false);
         unbinder = ButterKnife.bind(this, rootView);
 
         // store view's references

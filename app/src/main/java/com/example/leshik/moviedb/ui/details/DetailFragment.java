@@ -156,7 +156,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         mViewModel = new MovieViewModel(movieId, new MovieRepository(getActivity().getApplicationContext()));
 
         // Inflate fragment
-        View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
+        View rootView = inflater.inflate(R.layout.detail_fragment, container, false);
         unbinder = ButterKnife.bind(this, rootView);
 
         setupToolbar();
@@ -327,7 +327,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         mReviewsListTable.removeAllViews();
         if (movie.getReviews() != null && movie.getReviews().size() > 0) {
             for (Review r : movie.getReviews()) {
-                View v = inflater.inflate(R.layout.reviews_list_item, mReviewsListTable, false);
+                View v = inflater.inflate(R.layout.detail_reviews_list_item, mReviewsListTable, false);
 
                 TextView authorView = ButterKnife.findById(v, R.id.review_list_item_author);
                 TextView contentView = ButterKnife.findById(v, R.id.review_list_item_content);
@@ -349,7 +349,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         mVideosListTable.removeAllViews();
         if (movie.getVideos() != null && movie.getVideos().size() > 0) {
             for (Video video : movie.getVideos()) {
-                View v = inflater.inflate(R.layout.videos_list_item, mVideosListTable, false);
+                View v = inflater.inflate(R.layout.detail_videos_list_item, mVideosListTable, false);
 
                 ImageView thumbView = ButterKnife.findById(v, R.id.video_thumb);
                 Picasso.with(getActivity()).load(getVideoThumbUrl(video.getKey())).into(thumbView);
