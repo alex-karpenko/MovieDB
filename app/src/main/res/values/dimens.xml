@@ -10,4 +10,6 @@
     <dimen name="details_review_interline_margin">8dp</dimen>
     <dimen name="detail_inter_video_margin">16dp</dimen>
     <dimen name="default_layout_margin">16dp</dimen>
+    <dimen name="padding_spinner_right">16dp</dimen>
+    <dimen name="padding_spinner_left">16dp</dimen>
 </resources>
