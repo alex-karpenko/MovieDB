@@ -8,4 +8,5 @@
     android:gravity="center_vertical"
     android:paddingRight="@dimen/padding_spinner_right"
     android:paddingLeft="@dimen/padding_spinner_left"
+    android:fontFamily="sans-serif"
     android:textAppearance="@style/TextAppearance.AppCompat.Title" />

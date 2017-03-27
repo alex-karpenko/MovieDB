@@ -124,6 +124,7 @@
                 android:layout_marginLeft="@dimen/detail_left_margin"
                 android:layout_marginRight="@dimen/detail_right_margin"
                 android:layout_marginTop="32dp"
+                android:fontFamily="sans-serif"
                 android:text="@string/detail_overview_title"
                 android:textAppearance="@style/TextAppearance.AppCompat.Title"
                 android:textColor="@android:color/white" />

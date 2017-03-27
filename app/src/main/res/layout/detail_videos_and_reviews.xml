@@ -18,6 +18,7 @@
             android:layout_height="wrap_content"
             android:labelFor="@+id/videos_list"
             android:text="@string/videos_list_title"
+            android:fontFamily="sans-serif"
             android:textAppearance="@style/TextAppearance.AppCompat.Title"
             android:textColor="@android:color/white" />
 
@@ -54,6 +55,7 @@
             android:labelFor="@+id/reviews_list"
             android:paddingTop="@dimen/detail_interviews_padding"
             android:text="@string/reviews_list_title"
+            android:fontFamily="sans-serif"
             android:textAppearance="@style/TextAppearance.AppCompat.Title"
             android:textColor="@android:color/white" />
 

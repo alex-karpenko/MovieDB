@@ -6,5 +6,6 @@
     android:layout_height="?attr/dropdownListPreferredItemHeight"
     android:gravity="center_vertical"
     android:paddingRight="@dimen/padding_spinner_right"
+    android:fontFamily="sans-serif"
     android:paddingLeft="@dimen/padding_spinner_left"
     android:textAppearance="@style/TextAppearance.AppCompat.Title" />
