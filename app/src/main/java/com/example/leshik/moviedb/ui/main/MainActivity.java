@@ -69,7 +69,6 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         prefStorage = PreferenceStorage.getInstance(this.getApplicationContext());
-        ViewUtils.applyTheme(this, prefStorage.getTheme());
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.main_activity);
@@ -145,13 +144,6 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
         super.onSaveInstanceState(outState);
         outState.putInt(STATE_CURRENT_PAGE, mViewPager.getCurrentItem());
         if (selectedMovieId != 0) outState.putLong(STATE_SELECTED_MOVIE_ID, selectedMovieId);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        // if theme was changed - restart activity
-        ViewUtils.restartActivityIfNeed(this);
     }
 
     @Override

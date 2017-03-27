@@ -44,8 +44,4 @@ public interface PreferenceInterface {
     void setCacheUpdateIntervalMillis(long cacheUpdateInterval);
 
     void setCacheUpdateIntervalHours(int cacheUpdateIntervalHours);
-
-    int getTheme();
-
-    int setTheme(String newTheme);
 }

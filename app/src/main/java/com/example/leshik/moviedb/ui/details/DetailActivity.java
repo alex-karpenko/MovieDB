@@ -15,7 +15,6 @@ import com.example.leshik.moviedb.data.PreferenceStorage;
 import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
 import com.example.leshik.moviedb.ui.settings.SettingsActivity;
 import com.example.leshik.moviedb.utils.EventsUtils;
-import com.example.leshik.moviedb.utils.ViewUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -50,7 +49,6 @@ public class DetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         prefStorage = PreferenceStorage.getInstance(this.getApplicationContext());
-        ViewUtils.applyTheme(this, prefStorage.getTheme());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detail_activity);
 
@@ -106,13 +104,6 @@ public class DetailActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putLong(ARG_MOVIE_ID, movieId);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        // restart activity after theme change
-        ViewUtils.restartActivityIfNeed(this);
     }
 
     @Override
