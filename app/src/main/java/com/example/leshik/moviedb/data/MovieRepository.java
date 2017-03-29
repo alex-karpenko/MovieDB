@@ -22,6 +22,7 @@ import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
+import io.reactivex.functions.Predicate;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -47,17 +48,19 @@ public class MovieRepository implements MovieInteractor {
         final Observable<Movie> movieFromCache = cacheStorage.getMovieObservable(movieId);
         final Observable<Movie> movieFromNetwork = buildMovieFromNetworkObservable(movieId);
 
+
         Observable<Movie> returnMovie = movieFromCache.flatMap(new Function<Movie, ObservableSource<Movie>>() {
             @Override
             public ObservableSource<Movie> apply(@NonNull Movie movie) throws Exception {
 
-                if (isEmpty(movie)) return movieFromNetwork.map(new Function<Movie, Movie>() {
-                    @Override
-                    public Movie apply(@NonNull Movie movie) throws Exception {
-                        cacheStorage.updateOrInsertMovieAsync(movie);
-                        return movie;
-                    }
-                });
+                if (isEmpty(movie)) return movieFromNetwork
+                        .map(new Function<Movie, Movie>() {
+                            @Override
+                            public Movie apply(@NonNull Movie movie) throws Exception {
+                                cacheStorage.updateOrInsertMovieAsync(movie);
+                                return movie;
+                            }
+                        });
 
                 if (isExpired(movie))
                     return movieFromCache.concatWith(movieFromNetwork.map(new Function<Movie, Movie>() {
@@ -133,6 +136,12 @@ public class MovieRepository implements MovieInteractor {
                                 movie.setReviews(reviews);
                                 return movie;
                             }
-                        });
+                        })
+                .filter(new Predicate<Movie>() {
+                    @Override
+                    public boolean test(@NonNull Movie movie) throws Exception {
+                        return !isEmpty(movie);
+                    }
+                });
     }
 }
