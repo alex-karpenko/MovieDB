@@ -4,7 +4,7 @@
     tools:context=".ui.details.DetailActivity">
     <item
         android:id="@+id/action_favorite"
-        android:icon="@drawable/ic_favorite_outline_light"
+        android:icon="@drawable/ic_favorite_outline_dark"
         android:title="@string/action_favorite"
         app:showAsAction="ifRoom" />
     <item

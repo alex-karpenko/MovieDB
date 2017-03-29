@@ -44,7 +44,7 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.list_item, parent, false);
+                .inflate(R.layout.main_list_item, parent, false);
         return new ViewHolder(itemView);
     }
 
@@ -64,7 +64,7 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
                 public void onClick(View v) {
                     // Call callback interface method to start detail activity with cursor data
                     ((MovieListFragment.Callback) context).
-                            onItemSelected(movieId, posterView);
+                            onMovieListItemSelected(movieId, posterView);
                 }
             });
         }

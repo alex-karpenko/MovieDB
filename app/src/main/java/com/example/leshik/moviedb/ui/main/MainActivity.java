@@ -3,14 +3,18 @@ package com.example.leshik.moviedb.ui.main;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.leshik.moviedb.R;
@@ -18,7 +22,6 @@ import com.example.leshik.moviedb.data.PreferenceStorage;
 import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
 import com.example.leshik.moviedb.ui.details.DetailActivity;
 import com.example.leshik.moviedb.ui.details.DetailFragment;
-import com.example.leshik.moviedb.ui.poster.FullPosterActivity;
 import com.example.leshik.moviedb.ui.settings.SettingsActivity;
 import com.example.leshik.moviedb.utils.EventsUtils;
 import com.example.leshik.moviedb.utils.FirebaseUtils;
@@ -31,7 +34,7 @@ import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 
-public class MainActivity extends AppCompatActivity implements MovieListFragment.Callback, DetailFragment.Callback {
+public class MainActivity extends AppCompatActivity implements MovieListFragment.Callback {
     private static final String TAG = "MainActivity";
     // tags to saved state bundle
     private static final String STATE_CURRENT_PAGE = "STATE_CURRENT_PAGE";
@@ -42,15 +45,17 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
 
     // adapter to create fragments to pager
     private MainPagerAdapter mPagerAdapter;
+    private ViewPagerListener mViewPagerListener;
+    private SpinnerListener mSpinnerListener;
 
     @BindView(R.id.main_frame)
     protected LinearLayout mMainFrame;
     @BindView(R.id.main_pager)
     protected ViewPager mViewPager;
-    @BindView(R.id.main_tabs)
-    protected TabLayout mTabLayout;
-    @BindView(R.id.main_toolbar)
+    @BindView(R.id.toolbar)
     protected Toolbar mToolbar;
+    @BindView(R.id.toolbar_spinner)
+    protected Spinner mToolbarSpinner;
 
     // current selected movie (for two pane view)
     private long selectedMovieId = 0;
@@ -64,10 +69,9 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         prefStorage = PreferenceStorage.getInstance(this.getApplicationContext());
-        ViewUtils.applyTheme(this, prefStorage.getTheme());
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.main_activity);
         ButterKnife.bind(this);
 
         // check if the details container is present - two pane layout was loaded
@@ -76,16 +80,26 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
         } else ViewUtils.setTwoPane(false);
 
         setSupportActionBar(mToolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
+        // Get list of tab's titles from resources
+        tabFragmentNames = getResources().getStringArray(R.array.main_tab_names);
         // create pager adapter and set it to the pager view
         mPagerAdapter = new MainPagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mPagerAdapter);
 
-        // Get list of tab's titles from resources
-        tabFragmentNames = getResources().getStringArray(R.array.main_tab_names);
+        // Setup spinner
+        ArrayAdapter<CharSequence> spinnerAdapter =
+                ArrayAdapter.createFromResource(getSupportActionBar().getThemedContext(),
+                        R.array.main_tab_names, R.layout.main_spinner_item);
+        spinnerAdapter.setDropDownViewResource(R.layout.main_spinner_dropdown_item);
+        mToolbarSpinner.setAdapter(spinnerAdapter);
 
-        // Assign pager to tab layout
-        mTabLayout.setupWithViewPager(mViewPager);
+        mViewPagerListener = new ViewPagerListener(mToolbarSpinner);
+        mViewPager.addOnPageChangeListener(mViewPagerListener);
+
+        mSpinnerListener = new SpinnerListener(mViewPager);
+        mToolbarSpinner.setOnItemSelectedListener(mSpinnerListener);
 
         // restore state, if it was save
         if (savedInstanceState != null) {
@@ -120,6 +134,8 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
     @Override
     protected void onDestroy() {
         subscription.dispose();
+        mToolbarSpinner.setOnItemSelectedListener(null);
+        mViewPager.removeOnPageChangeListener(mViewPagerListener);
         super.onDestroy();
     }
 
@@ -128,13 +144,6 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
         super.onSaveInstanceState(outState);
         outState.putInt(STATE_CURRENT_PAGE, mViewPager.getCurrentItem());
         if (selectedMovieId != 0) outState.putLong(STATE_SELECTED_MOVIE_ID, selectedMovieId);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        // if theme was changed - restart activity
-        ViewUtils.restartActivityIfNeed(this);
     }
 
     @Override
@@ -160,7 +169,7 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
 
     // listener action - if image from the list pressed - start details activity or update detail frame (if two panes)
     @Override
-    public void onItemSelected(long movieId, ImageView posterView) {
+    public void onMovieListItemSelected(long movieId, ImageView posterView) {
 
         if (!ViewUtils.isTwoPane()) {
             Intent intent = DetailActivity.getIntentInstance(this, movieId);
@@ -185,17 +194,37 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
         }
     }
 
-    // callback method from details fragment - called when poster image pressed to start full poster view
-    @Override
-    public void onImageClicked(long movieId, ImageView posterView) {
-        // callback method that called when poster image is clicked
-        // start full poster view activity
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            ActivityOptions options = ActivityOptions
-                    .makeSceneTransitionAnimation(this, posterView, getString(R.string.poster_image));
-            startActivity(FullPosterActivity.getIntentInstance(this, movieId), options.toBundle());
-        } else {
-            startActivity(FullPosterActivity.getIntentInstance(this, movieId));
+    static class ViewPagerListener extends ViewPager.SimpleOnPageChangeListener {
+        private Spinner spinner;
+
+        ViewPagerListener(Spinner spinner) {
+            this.spinner = spinner;
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+            super.onPageSelected(position);
+            spinner.setSelection(position, true);
+            Log.i(TAG, "onPageSelected: page changed to " + position);
+        }
+    }
+
+    static class SpinnerListener implements AdapterView.OnItemSelectedListener {
+        ViewPager pager;
+
+        SpinnerListener(ViewPager pager) {
+            this.pager = pager;
+        }
+
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            pager.setCurrentItem(position, true);
+            Log.i(TAG, "onItemSelected: spinner changed to " + position);
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+
         }
     }
 }

@@ -1,25 +1,20 @@
 package com.example.leshik.moviedb.ui.details;
 
-import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.leshik.moviedb.R;
 import com.example.leshik.moviedb.data.PreferenceStorage;
 import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
-import com.example.leshik.moviedb.ui.poster.FullPosterActivity;
 import com.example.leshik.moviedb.ui.settings.SettingsActivity;
 import com.example.leshik.moviedb.utils.EventsUtils;
-import com.example.leshik.moviedb.utils.ViewUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -31,14 +26,12 @@ import io.reactivex.functions.Consumer;
  * Activity class for deal with detail movie information
  * It starts from MainActivity by clicking on the poster image in list
  */
-public class DetailActivity extends AppCompatActivity implements DetailFragment.Callback {
+public class DetailActivity extends AppCompatActivity {
     private static final String TAG = "DetailActivity";
     // marker string and variable to state saving
     private static final String ARG_MOVIE_ID = "ARG_MOVIE_ID";
     long movieId;
 
-    @BindView(R.id.detail_toolbar)
-    protected Toolbar mToolbar;
     @BindView(R.id.detail_frame)
     protected LinearLayout mDetailFrame;
 
@@ -56,13 +49,10 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         prefStorage = PreferenceStorage.getInstance(this.getApplicationContext());
-        ViewUtils.applyTheme(this, prefStorage.getTheme());
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detail);
+        setContentView(R.layout.detail_activity);
 
         ButterKnife.bind(this);
-
-        setSupportActionBar(mToolbar);
 
         // Get a support ActionBar corresponding to this toolbar
         ActionBar ab = getSupportActionBar();
@@ -117,13 +107,6 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        // restart activity after theme change
-        ViewUtils.restartActivityIfNeed(this);
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.detail, menu);
         return true;
@@ -146,19 +129,5 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-
-    @Override
-    public void onImageClicked(long movieId, ImageView posterView) {
-        // callback method that called when poster image is clicked
-        // start full poster view activity
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            ActivityOptions options = ActivityOptions
-                    .makeSceneTransitionAnimation(this, posterView, getString(R.string.poster_image));
-            startActivity(FullPosterActivity.getIntentInstance(this, movieId), options.toBundle());
-        } else {
-            startActivity(FullPosterActivity.getIntentInstance(this, movieId));
-        }
     }
 }

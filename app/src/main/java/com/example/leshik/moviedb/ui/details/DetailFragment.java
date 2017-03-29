@@ -5,10 +5,13 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ShareActionProvider;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -26,13 +29,13 @@ import com.example.leshik.moviedb.data.MovieRepository;
 import com.example.leshik.moviedb.data.PreferenceStorage;
 import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
 import com.example.leshik.moviedb.data.model.Movie;
+import com.example.leshik.moviedb.data.model.NetworkConfig;
 import com.example.leshik.moviedb.data.model.Review;
 import com.example.leshik.moviedb.data.model.Video;
 import com.example.leshik.moviedb.ui.viewmodels.MovieViewModel;
 import com.example.leshik.moviedb.utils.FirebaseUtils;
 import com.example.leshik.moviedb.utils.ViewUtils;
 import com.google.firebase.analytics.FirebaseAnalytics;
-import com.ms.square.android.expandabletextview.ExpandableTextView;
 import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
@@ -45,11 +48,13 @@ import io.reactivex.functions.Consumer;
  * Fragment class with detail info about movie
  * Information. From intent gets URI with movie
  */
-public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+
+public class DetailFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "DetailFragment";
     // fragment args
     public static final String ARG_MOVIE_ID = "ARG_MOVIE_ID";
     private static final String YOUTUBE_BASE_URL = "http://www.youtube.com/watch?v=";
+    private static final String YOUTUBE_THUMB_URL = "http://img.youtube.com/vi/%s/mqdefault.jpg";
     private static final String YOUTUBE_BASE_CONTENT = "vnd.youtube:";
     // state variables
     private long movieId;
@@ -70,9 +75,10 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
     protected TextView mOverviewText;
     @BindView(R.id.detail_homepage)
     protected TextView mHomepageText;
-
-    @BindView(R.id.swiperefresh)
-    protected SwipeRefreshLayout mSwipeRefreshLayout;
+    @BindView(R.id.toolbar)
+    protected Toolbar mToolbar;
+    @BindView(R.id.appbar)
+    protected AppBarLayout mAppBar;
 
     @BindView(R.id.videos_layout)
     protected LinearLayout mVideosListLayout;
@@ -80,7 +86,7 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
     protected LinearLayout mReviewsListLayout;
 
     @BindView(R.id.videos_list)
-    protected TableLayout mVideosListTable;
+    protected LinearLayout mVideosListTable;
     @BindView(R.id.reviews_list)
     protected TableLayout mReviewsListTable;
 
@@ -122,7 +128,6 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-        // restore movie uri
         if (savedInstanceState != null) {
             movieId = savedInstanceState.getLong(ARG_MOVIE_ID);
         }
@@ -151,20 +156,19 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
         mViewModel = new MovieViewModel(movieId, new MovieRepository(getActivity().getApplicationContext()));
 
         // Inflate fragment
-        View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
+        View rootView = inflater.inflate(R.layout.detail_fragment, container, false);
         unbinder = ButterKnife.bind(this, rootView);
 
-        mSwipeRefreshLayout.setOnRefreshListener(this);
-
+        setupToolbar();
         isFavorite = false;
 
         // set onClick listener for poster image
-        // click on poster image - call to full poster image view via callback in the activity
         mPosterImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mPosterName != null) {
-                    ((DetailFragment.Callback) getContext()).onImageClicked(movieId, (ImageView) v);
+                    setupFullAppBarHeight();
+                    mPosterImage.setOnClickListener(null);
                 }
             }
         });
@@ -175,6 +179,26 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 FirebaseUtils.createAnalyticsSelectBundle(TAG, "Create Detail Fragment", "Movie Details"));
 
         return rootView;
+    }
+
+    private void setupFullAppBarHeight() {
+        // Change AppBarLayout height to wrap_content
+        ViewGroup.LayoutParams params = mAppBar.getLayoutParams();
+        params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+        mAppBar.setLayoutParams(params);
+    }
+
+    private void setupToolbar() {
+        // Toolbar setup
+        if (mToolbar != null) {
+            ((AppCompatActivity) getActivity()).setSupportActionBar(mToolbar);
+
+            ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+            if (actionBar != null) {
+                actionBar.setDisplayHomeAsUpEnabled(true);
+                actionBar.setDisplayShowTitleEnabled(false);
+            }
+        }
     }
 
     @Override
@@ -206,8 +230,6 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
-            // set refresh mark
-            mSwipeRefreshLayout.setRefreshing(true);
             // and start update action
             refreshCurrentMovie();
             return true;
@@ -223,12 +245,6 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    // swipe refresh layout callback
-    @Override
-    public void onRefresh() {
-        refreshCurrentMovie();
     }
 
     /**
@@ -247,9 +263,6 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
     private void updateUi(Movie movie) {
         Log.i(TAG, "updateUi: +");
 
-        // stop refresh circle
-        mSwipeRefreshLayout.setRefreshing(false);
-
         // update variables for share action provider
         mPosterName = movie.getPosterPath();
         mMovieTitle = movie.getOriginalTitle();
@@ -260,13 +273,14 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
         if (isPosterChanged(movie)) {
             // load poster image
             Picasso.with(getActivity())
-                    .load(prefStorage.getPosterSmallUri(mPosterName))
+                    .load(prefStorage.getOptimalImageUri(NetworkConfig.ImageType.Poster, mPosterName))
                     .into(mPosterImage);
+            Log.i(TAG, "updateUi: image = " + prefStorage.getOptimalImageUri(NetworkConfig.ImageType.Poster, mPosterName));
         }
 
         // Setting all view's content
         mTitleText.setText(movie.getOriginalTitle());
-        mReleasedText.setText(movie.getReleaseDate());
+        mReleasedText.setText(getString(R.string.released_format_str, movie.getReleaseDate()));
 
         if (movie.getRunTime() > 0) {
             mRuntimeText.setText(getString(R.string.runtime_format_str, movie.getRunTime()));
@@ -275,61 +289,11 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
         }
 
         mRatingText.setText(getString(R.string.rating_format_str, movie.getVoteAverage()));
-
-        // Set homepage link, if present
-        String homePage = movie.getHomePage();
-        if (homePage != null && homePage.length() > 0) {
-            mHomepageText.setText(getString(R.string.homepage_format_str, homePage));
-            mHomepageText.setVisibility(View.VISIBLE);
-        } else {
-            mHomepageText.setVisibility(View.GONE);
-        }
-
         mOverviewText.setText(movie.getOverview());
 
-        // Inflater for creating reviews and videos lists
-        LayoutInflater inflater = LayoutInflater.from(getContext());
-        // Review list
-        mReviewsListTable.removeAllViews();
-        if (movie.getReviews() != null && movie.getReviews().size() > 0) {
-            for (Review r : movie.getReviews()) {
-                View v = inflater.inflate(R.layout.reviews_list_item, mReviewsListTable, false);
-
-                TextView authorView = ButterKnife.findById(v, R.id.reviews_list_item_author);
-                ExpandableTextView contentView = ButterKnife.findById(v, R.id.reviews_list_item_content);
-
-                authorView.setText(r.getAuthor());
-                contentView.setText(r.getContent());
-
-                mReviewsListTable.addView(v);
-            }
-
-            mReviewsListLayout.setVisibility(View.VISIBLE);
-        } else mReviewsListLayout.setVisibility(View.GONE);
-
-        // Video list
-        mVideosListTable.removeAllViews();
-        if (movie.getVideos() != null && movie.getVideos().size() > 0) {
-            for (Video video : movie.getVideos()) {
-                View v = inflater.inflate(R.layout.videos_list_item, mVideosListTable, false);
-
-                TextView titleView = ButterKnife.findById(v, R.id.videos_list_item_title);
-                titleView.setText(video.getName());
-
-                // setup listener
-                v.setTag(video.getKey());
-                v.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        // start video watching, key of the video we extract from view's tag
-                        watchYoutubeVideo((String) view.getTag());
-                    }
-                });
-
-                mVideosListTable.addView(v);
-            }
-            mVideosListLayout.setVisibility(View.VISIBLE);
-        } else mVideosListLayout.setVisibility(View.GONE);
+        updateHomepageLinkView(movie);
+        updateReviewListView(movie);
+        updateVideoListView(movie);
 
         // Favorite mark
         isFavorite = false;
@@ -344,6 +308,89 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     private boolean isPosterChanged(Movie newMovie) {
         return lastMovie == null || !lastMovie.getPosterPath().equals(newMovie.getPosterPath());
+    }
+
+    private void updateHomepageLinkView(Movie movie) {
+        // Set homepage link, if present
+        String homePage = movie.getHomePage();
+        if (homePage != null && homePage.length() > 0) {
+            mHomepageText.setText(getString(R.string.homepage_format_str, homePage));
+            mHomepageText.setVisibility(View.VISIBLE);
+        } else {
+            mHomepageText.setVisibility(View.GONE);
+        }
+    }
+
+    private void updateReviewListView(Movie movie) {
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+        // Review list
+        mReviewsListTable.removeAllViews();
+        if (movie.getReviews() != null && movie.getReviews().size() > 0) {
+            for (Review r : movie.getReviews()) {
+                View v = inflater.inflate(R.layout.detail_reviews_list_item, mReviewsListTable, false);
+
+                TextView authorView = ButterKnife.findById(v, R.id.review_list_item_author);
+                TextView contentView = ButterKnife.findById(v, R.id.review_list_item_content);
+
+                authorView.setText(r.getAuthor());
+                contentView.setText(r.getContent());
+                contentView.setOnClickListener(this);
+
+                mReviewsListTable.addView(v);
+            }
+
+            mReviewsListLayout.setVisibility(View.VISIBLE);
+        } else mReviewsListLayout.setVisibility(View.GONE);
+    }
+
+    private void updateVideoListView(Movie movie) {
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+        // Video list
+        mVideosListTable.removeAllViews();
+        if (movie.getVideos() != null && movie.getVideos().size() > 0) {
+            for (Video video : movie.getVideos()) {
+                View v = inflater.inflate(R.layout.detail_videos_list_item, mVideosListTable, false);
+
+                ImageView thumbView = ButterKnife.findById(v, R.id.video_thumb);
+                Picasso.with(getActivity()).load(getVideoThumbUrl(video.getKey())).into(thumbView);
+
+                // setup listener
+                thumbView.setTag(video.getKey());
+                thumbView.setOnClickListener(this);
+
+                mVideosListTable.addView(v);
+            }
+            mVideosListLayout.setVisibility(View.VISIBLE);
+        } else mVideosListLayout.setVisibility(View.GONE);
+    }
+
+    private Uri getVideoThumbUrl(String key) {
+        return Uri.parse(String.format(YOUTUBE_THUMB_URL, key));
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.review_list_item_content:
+                onReviewClick((TextView) v);
+                break;
+            case R.id.video_thumb:
+                onVideoClick(v);
+                break;
+        }
+
+    }
+
+    private void onReviewClick(TextView view) {
+        if (view.getMaxLines() == 5) {
+            view.setMaxLines(500);
+        } else {
+            view.setMaxLines(5);
+        }
+    }
+
+    private void onVideoClick(View view) {
+        watchYoutubeVideo((String) view.getTag());
     }
 
     private void watchYoutubeVideo(String id) {
@@ -373,19 +420,6 @@ public class DetailFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     // starting intent services to update cache tables
     void refreshCurrentMovie() {
-        boolean isRefreshStarted = mViewModel.forceRefresh();
-        if (!isRefreshStarted) mSwipeRefreshLayout.setRefreshing(false);
-    }
-
-    /**
-     * A callback interface that all activities containing this fragment must
-     * implement. This mechanism allows activities to be notified of poster image
-     * clicked.
-     */
-    public interface Callback {
-        /**
-         * DetailFragmentCallback for when an item has been selected.
-         */
-        void onImageClicked(long movieId, ImageView posterView);
+        mViewModel.forceRefresh();
     }
 }

@@ -42,8 +42,6 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
     private static final String TAG = "MovieListFragment";
     public static final String ARG_FRAGMENT_TYPE = "FRAGMENT_TYPE";
 
-    // Current fragment type
-    private MovieListType fragmentType;
     private static final MovieListType DEFAULT_FRAGMENT_TYPE = MovieListType.Favorite;
 
     // views in the fragment
@@ -90,12 +88,12 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        fragmentType = getFragmentTypeFromArgs();
+        MovieListType fragmentType = getFragmentTypeFromArgs();
         viewModel = new MovieListViewModel(fragmentType,
                 new MovieListRepository(getActivity().getApplicationContext()));
 
         // Inflate fragment
-        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        View rootView = inflater.inflate(R.layout.main_fragment, container, false);
         unbinder = ButterKnife.bind(this, rootView);
 
         // store view's references
@@ -222,10 +220,10 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
      * implement. This mechanism allows activities to be notified of item
      * selections.
      */
-    public interface Callback {
+    interface Callback {
         /**
          * DetailFragmentCallback for when an item has been selected.
          */
-        void onItemSelected(long movieId, ImageView posterView);
+        void onMovieListItemSelected(long movieId, ImageView posterView);
     }
 }

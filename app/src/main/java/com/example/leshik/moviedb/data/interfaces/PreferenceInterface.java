@@ -3,6 +3,7 @@ package com.example.leshik.moviedb.data.interfaces;
 import android.net.Uri;
 
 import com.example.leshik.moviedb.data.MovieListType;
+import com.example.leshik.moviedb.data.model.NetworkConfig;
 
 /**
  * Created by alex on 3/9/17.
@@ -32,15 +33,15 @@ public interface PreferenceInterface {
 
     Uri getPosterSmallUri(String poster);
 
+    Uri getPosterMediumUri(String poster);
+
     Uri getPosterFullUri(String poster);
+
+    Uri getOptimalImageUri(NetworkConfig.ImageType type, String imageName);
 
     long getCacheUpdateInterval();
 
     void setCacheUpdateIntervalMillis(long cacheUpdateInterval);
 
     void setCacheUpdateIntervalHours(int cacheUpdateIntervalHours);
-
-    int getTheme();
-
-    int setTheme(String newTheme);
 }

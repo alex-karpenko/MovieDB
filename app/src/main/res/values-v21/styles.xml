@@ -1,24 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="AppThemeLight" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- enable window content transitions -->
-        <item name="android:windowContentTransitions">true</item>
-        <!-- specify enter and exit transitions -->
-        <item name="android:windowEnterTransition">@transition/inter_activity_transform</item>
-        <item name="android:windowExitTransition">@transition/inter_activity_transform</item>
-
-        <!-- specify shared element transitions -->
-        <item name="android:windowSharedElementEnterTransition">
-            @transition/change_image_transform
-        </item>
-        <item name="android:windowSharedElementExitTransition">
-            @transition/change_image_transform
-        </item>
-        <!-- Customize your theme here. -->
-    </style>
-
-    <style name="AppThemeDark" parent="Theme.AppCompat.NoActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
         <!-- enable window content transitions -->
         <item name="android:windowContentTransitions">true</item>
         <!-- specify enter and exit transitions -->

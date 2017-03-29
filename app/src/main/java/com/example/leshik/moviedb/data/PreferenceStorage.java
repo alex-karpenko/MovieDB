@@ -10,6 +10,7 @@ import com.example.leshik.moviedb.R;
 import com.example.leshik.moviedb.data.interfaces.NetworkDataSource;
 import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
 import com.example.leshik.moviedb.data.model.NetworkConfig;
+import com.example.leshik.moviedb.utils.ViewUtils;
 
 import java.util.Calendar;
 
@@ -39,9 +40,8 @@ public class PreferenceStorage implements PreferenceInterface {
     private static long cacheUpdateInterval = ONE_HOUR_MILLIS * 24; // 24 hours
     // Default image width
     private String posterSmallWidthStr = "w185";
+    private String posterMediumWidthStr = "w342";
     private String posterFullWidthStr = "original";
-    // current theme id
-    private static int currentTheme = R.style.AppThemeDark;
 
     private PreferenceStorage() {
     }
@@ -66,9 +66,6 @@ public class PreferenceStorage implements PreferenceInterface {
     private static void loadDefaultPreferences() {
         // set defaults, if need
         PreferenceManager.setDefaultValues(context, R.xml.pref_general, false);
-        // Theme
-        String themeName = getCurrentThemeNameFromPreferenceFile();
-        currentTheme = getThemeIdFromName(themeName);
         // Update interval
         cacheUpdateInterval = getCacheUpdateIntervalHoursFromPreferenceFile() * ONE_HOUR_MILLIS;
 
@@ -96,34 +93,8 @@ public class PreferenceStorage implements PreferenceInterface {
         return getCurrentPreferences().getString(key, null);
     }
 
-    private static String getCurrentThemeNameFromPreferenceFile() {
-        return getCurrentPreferences().getString(context.getString(R.string.pref_theme_key), context.getString(R.string.pref_theme_default));
-    }
-
-    @Override
-    public int getTheme() {
-        return currentTheme;
-    }
-
-    @Override
-    public int setTheme(String newTheme) {
-        currentTheme = getThemeIdFromName(newTheme);
-        return currentTheme;
-    }
-
     private static SharedPreferences getCurrentPreferences() {
         return PreferenceManager.getDefaultSharedPreferences(context);
-    }
-
-    private static int getThemeIdFromName(String themeName) {
-        int themeId = R.style.AppThemeDark;
-
-        if (themeName.equals(context.getString(R.string.pref_theme_dark)))
-            themeId = R.style.AppThemeDark;
-        else if (themeName.equals(context.getString(R.string.pref_theme_light)))
-            themeId = R.style.AppThemeLight;
-
-        return themeId;
     }
 
     private static long getCacheUpdateIntervalHoursFromPreferenceFile() {
@@ -209,10 +180,25 @@ public class PreferenceStorage implements PreferenceInterface {
     }
 
     @Override
+    public Uri getPosterMediumUri(String poster) {
+        return Uri.parse(networkConfig.basePosterSecureUrl
+                + posterMediumWidthStr
+                + poster);
+    }
+
+    @Override
     public Uri getPosterFullUri(String poster) {
         return Uri.parse(networkConfig.basePosterSecureUrl
                 + posterFullWidthStr
                 + poster);
+    }
+
+    @Override
+    public Uri getOptimalImageUri(NetworkConfig.ImageType type, String imageName) {
+        int screenDpWidth = ViewUtils.getScreenDpWidth(context);
+        return Uri.parse(networkConfig.basePosterSecureUrl
+                + networkConfig.getOptimalWidthString(type, screenDpWidth)
+                + imageName);
     }
 
     @Override

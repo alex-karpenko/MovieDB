@@ -2,7 +2,6 @@
     <string name="app_name">Popular Movies</string>
     <string name="content_authority">com.example.leshik.moviedb</string>
     <string name="title_activity_detail">Movie details</string>
-    <string name="title_activity_full_poster">Poster</string>
     <string name="title_activity_settings">Settings</string>
     <!-- Strings related to menu actions -->
     <string name="action_refresh_list">Refresh list</string>
@@ -11,14 +10,6 @@
     <string name="action_favorite">Favorite</string>
     <string name="action_share">Share</string>
     <!-- Strings related to Settings -->
-    <!-- theme -->
-    <string name="pref_theme_dark" translatable="false">dark</string>
-    <string name="pref_theme_light" translatable="false">light</string>
-    <string name="pref_theme_default" translatable="false">@string/pref_theme_dark</string>
-    <string name="pref_theme_key" translatable="false">theme</string>
-    <string name="pref_theme_label">Application theme</string>
-    <string name="pref_theme_label_dark">Dark</string>
-    <string name="pref_theme_label_light">Light</string>
     <!-- cache update interval -->
     <string name="pref_cache_never" translatable="false">0</string>
     <string name="pref_cache_1h" translatable="false">1</string>
@@ -44,13 +35,16 @@
     <string name="upcoming_tab_title">Upcoming</string>
 
     <!-- Strings related to details view -->
-    <string name="rating_format_str">%.1f/10</string>
-    <string name="runtime_format_str">%d min</string>
-    <string name="null_runtime_format_str">-</string>
+    <string name="released_format_str">Release date: %s</string>
+    <string name="rating_format_str">Rating: %.1f/10</string>
+    <string name="runtime_format_str">Runtime: %d min</string>
+    <string name="null_runtime_format_str">Runtime: -</string>
     <string name="videos_list_title">Trailers</string>
     <string name="reviews_list_title">Reviews</string>
     <string name="share_action_subject">Popular movies:</string>
-    <string name="homepage_format_str">Homepage: %s</string>
+    <string name="homepage_format_str">%s</string>
+    <string name="detail_overview_title">Summary</string>
+
 
     <!-- Events messages -->
     <string name="event_message_refreshing">Refreshing...</string>

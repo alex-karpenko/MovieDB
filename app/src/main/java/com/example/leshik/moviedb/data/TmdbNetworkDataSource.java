@@ -16,6 +16,7 @@ import com.example.leshik.moviedb.data.model.Review;
 import com.example.leshik.moviedb.data.model.Video;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +31,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Created by Leshik on 01.03.2017.
- * <p>
+ *
  * Implementation of the NetworkDataSource interface
  * with TheMovieDataBase API via Retrofit2
  */
@@ -71,17 +72,28 @@ class TmdbNetworkDataSource implements NetworkDataSource {
                 .map(new Function<ConfigurationResponse, NetworkConfig>() {
                     @Override
                     public NetworkConfig apply(ConfigurationResponse configurationResponse) throws Exception {
-                        return new NetworkConfig(configurationResponse.getImagesBaseUrl(),
+                        NetworkConfig newConfig = new NetworkConfig(configurationResponse.getImagesBaseUrl(),
                                 configurationResponse.getImagesBaseSecureUrl());
+
+                        for (NetworkConfig.ImageType t : NetworkConfig.ImageType.values()) {
+                            Log.i(TAG, "getNetworkConfig: setup image sizes, type=" + t);
+                            if (configurationResponse.getImageSizes(t) != null)
+                                newConfig.setupImageSizes(t, configurationResponse.getImageSizes(t));
+                        }
+
+                        return newConfig;
                     }
                 })
                 .onErrorReturnItem(new NetworkConfig());
 
+        // FIXME: 3/25/17 May by memory leaks
         newConfig.blockingSubscribe(new Consumer<NetworkConfig>() {
             @Override
             public void accept(NetworkConfig config) throws Exception {
+                Log.i(TAG, "getNetworkConfig: consume url=" + config.basePosterUrl + ", sec_url=" + config.basePosterSecureUrl + ", images=" + Arrays.toString(config.getImageSizesArray()));
                 networkConfig.basePosterUrl = config.basePosterUrl;
                 networkConfig.basePosterSecureUrl = config.basePosterSecureUrl;
+                networkConfig.setImageSizesArray(config.getImageSizesArray());
             }
         });
 

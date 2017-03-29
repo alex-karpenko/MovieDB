@@ -10,7 +10,6 @@ import android.support.v4.app.Fragment;
 import com.example.leshik.moviedb.R;
 import com.example.leshik.moviedb.data.PreferenceStorage;
 import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
-import com.example.leshik.moviedb.utils.ViewUtils;
 
 
 /**
@@ -45,7 +44,6 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         // For all preferences, attach an OnPreferenceChangeListener so the UI summary can be
         // updated when the preference changes.
         // Now only one
-        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_theme_key)));
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_cache_key)));
     }
 
@@ -83,12 +81,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
             preference.setSummary(stringValue);
         }
 
-        if (preference.getKey().equals(getString(R.string.pref_theme_key))) {
-            int oldThemeId = prefStorage.getTheme();
-            int newThemeId = prefStorage.setTheme(stringValue);
-
-            if (oldThemeId != newThemeId) ViewUtils.scheduleActivityRestart();
-        } else if (preference.getKey().equals(getString(R.string.pref_cache_key))) {
+        if (preference.getKey().equals(getString(R.string.pref_cache_key))) {
             prefStorage.setCacheUpdateIntervalHours(Integer.valueOf(stringValue));
         }
         return true;

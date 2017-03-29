@@ -10,7 +10,6 @@ import com.example.leshik.moviedb.R;
 import com.example.leshik.moviedb.data.PreferenceStorage;
 import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
 import com.example.leshik.moviedb.utils.FirebaseUtils;
-import com.example.leshik.moviedb.utils.ViewUtils;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import butterknife.BindView;
@@ -23,7 +22,7 @@ import butterknife.ButterKnife;
 public class SettingsActivity extends AppCompatActivity {
     private static final String TAG = "SettingsActivity";
 
-    @BindView(R.id.settings_toolbar)
+    @BindView(R.id.toolbar)
     protected Toolbar mToolbar;
 
     private PreferenceInterface prefStorage;
@@ -33,9 +32,8 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         prefStorage = PreferenceStorage.getInstance(this.getApplicationContext());
-        ViewUtils.applyTheme(this, prefStorage.getTheme());
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings);
+        setContentView(R.layout.settings_activity);
         ButterKnife.bind(this);
 
         setSupportActionBar(mToolbar);
