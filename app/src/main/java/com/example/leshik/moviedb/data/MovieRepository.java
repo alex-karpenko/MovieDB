@@ -17,9 +17,11 @@ import java.util.Calendar;
 import java.util.List;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Predicate;
+import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -42,38 +44,50 @@ public class MovieRepository implements MovieInteractor {
 
     @Override
     public Observable<Movie> getMovie(final long movieId) {
-        Observable<Movie> movieFromCache = cacheStorage.getMovieObservable(movieId);
+        final Observable<Movie> movieFromCache = cacheStorage.getMovieObservable(movieId);
+        final Observable<Movie> movieFromNetwork = buildMovieFromNetworkObservable(movieId);
 
-        return movieFromCache.doOnNext(new Consumer<Movie>() {
+        Observable<Movie> returnMovie = movieFromCache.flatMap(new Function<Movie, ObservableSource<Movie>>() {
             @Override
-            public void accept(Movie movie) throws Exception {
-                if (isExpiredOrEmpty(movie)) {
-                    Log.i(TAG, "expired or empty movie, refreshing...");
-                    EventsUtils.postEvent(EventsUtils.EventType.Refreshing);
-                    forceRefresh(movieId);
-                }
-            }
-        })
-                .filter(new Predicate<Movie>() {
+            public ObservableSource<Movie> apply(@NonNull Movie movie) throws Exception {
+
+                if (isEmpty(movie)) return movieFromNetwork.map(new Function<Movie, Movie>() {
                     @Override
-                    public boolean test(Movie movie) throws Exception {
-                        return !movie.isEmpty();
+                    public Movie apply(@NonNull Movie movie) throws Exception {
+                        cacheStorage.updateOrInsertMovieAsync(movie);
+                        return movie;
                     }
                 });
+
+                if (isExpired(movie))
+                    return movieFromCache.concatWith(movieFromNetwork.map(new Function<Movie, Movie>() {
+                        @Override
+                        public Movie apply(@NonNull Movie movie) throws Exception {
+                            cacheStorage.updateOrInsertMovieAsync(movie);
+                            return movie;
+                        }
+                    }));
+
+                return movieFromCache;
+            }
+        });
+
+        return returnMovie;
     }
 
-    private boolean isExpiredOrEmpty(Movie movie) {
+    private boolean isEmpty(Movie movie) {
+        return movie == null || movie.isEmpty();
+    }
+
+    private boolean isExpired(Movie movie) {
         long currentTime = Calendar.getInstance().getTimeInMillis();
         long cacheUpdateInterval = prefStorage.getCacheUpdateInterval();
 
-        // 1) obviously :)
-        // 2) ...
-        // 3) cache exist but expired
-        // 4) cache has never been updated and update interval is "never"
-        return (movie == null
-                || movie.isEmpty()
-                || (movie.getLastUpdate() + cacheUpdateInterval) <= currentTime && cacheUpdateInterval > 0)
+        // 1) cache exist but expired
+        // 2) cache has never been updated and update interval is "never"
+        return ((movie.getLastUpdate() + cacheUpdateInterval) <= currentTime && cacheUpdateInterval > 0)
                 || (movie.getLastUpdate() <= 0 && cacheUpdateInterval <= 0);
+
     }
 
     @Override

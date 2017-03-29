@@ -19,6 +19,8 @@ public interface CacheStorage {
 
     long updateOrInsertMovie(Movie movie);
 
+    long updateOrInsertMovieAsync(Movie movie);
+
     void invertFavorite(long movieId);
 
     Observable<List<Movie>> getMovieListObservable(MovieListType listType);

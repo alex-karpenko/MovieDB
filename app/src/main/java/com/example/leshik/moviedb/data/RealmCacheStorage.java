@@ -19,6 +19,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposables;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmConfiguration;
@@ -26,10 +27,9 @@ import io.realm.RealmResults;
 
 /**
  * Created by Leshik on 01.03.2017.
- *
+ * <p>
  * Implementation of CacheStorage interface
  * with Realm DB
- *
  */
 
 class RealmCacheStorage implements CacheStorage {
@@ -74,31 +74,21 @@ class RealmCacheStorage implements CacheStorage {
         return Observable.create(new ObservableOnSubscribe<Movie>() {
             @Override
             public void subscribe(final ObservableEmitter<Movie> emitter) throws Exception {
-                final Realm realm = getRealmInstance();
-                final RealmResults<Movie> movie = findMovieAsRealmResults(realm, movieId);
+                Realm realm = getRealmInstance();
 
-                final RealmChangeListener<RealmResults<Movie>> listener = new RealmChangeListener<RealmResults<Movie>>() {
-                    @Override
-                    public void onChange(RealmResults<Movie> element) {
-                        if (!emitter.isDisposed() && element.size() > 0)
-                            emitter.onNext(element.get(0));
-                    }
-                };
+                try {
+                    Movie movie = findMovie(realm, movieId);
 
-                emitter.setDisposable(Disposables.fromRunnable(new Runnable() {
-                    @Override
-                    public void run() {
-                        movie.removeChangeListener(listener);
-                        if (!realm.isClosed())
-                            realm.close();
-                    }
-                }));
+                    if (movie != null) emitter.onNext(movie);
+                    emitter.onComplete();
 
-                movie.addChangeListener(listener);
-                if (movie.size() > 0) emitter.onNext(movie.get(0));
-                else emitter.onNext(new Movie());
+                } catch (Exception e) {
+                    emitter.onError(e);
+                } finally {
+                    if (!realm.isClosed()) realm.close();
+                }
             }
-        });
+        }).subscribeOn(Schedulers.io());
     }
 
     private RealmResults<Movie> findMovieAsRealmResults(Realm realm, long movieId) {
@@ -112,6 +102,23 @@ class RealmCacheStorage implements CacheStorage {
         Realm realm = getRealmInstance();
 
         realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm transactionRealm) {
+                Log.i(TAG, "updateOrInsertMovie: +");
+                updateOrInsertMovie(transactionRealm, newMovie);
+                Log.i(TAG, "updateOrInsertMovie: -");
+            }
+        });
+
+        realm.close();
+        return newMovie.getMovieId();
+    }
+
+    @Override
+    public long updateOrInsertMovieAsync(final Movie newMovie) {
+        Realm realm = getRealmInstance();
+
+        realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm transactionRealm) {
                 Log.i(TAG, "updateOrInsertMovie: +");
