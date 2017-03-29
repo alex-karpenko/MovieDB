@@ -69,33 +69,6 @@ class RealmCacheStorage implements CacheStorage {
         return Realm.getDefaultInstance();
     }
 
-    private Observable<Realm> getRealmObservable() {
-        return Observable.create(new ObservableOnSubscribe<Realm>() {
-            @Override
-            public void subscribe(final ObservableEmitter<Realm> emitter)
-                    throws Exception {
-                final Realm observableRealm = getRealmInstance();
-
-                final RealmChangeListener<Realm> listener = new RealmChangeListener<Realm>() {
-                    @Override
-                    public void onChange(Realm element) {
-                        emitter.onNext(element);
-                    }
-                };
-
-                emitter.setDisposable(Disposables.fromRunnable(new Runnable() {
-                    @Override
-                    public void run() {
-                        observableRealm.removeChangeListener(listener);
-                        observableRealm.close();
-                    }
-                }));
-                observableRealm.addChangeListener(listener);
-                emitter.onNext(observableRealm);
-            }
-        });
-    }
-
     @Override
     public Observable<Movie> getMovieObservable(final long movieId) {
         return Observable.create(new ObservableOnSubscribe<Movie>() {
