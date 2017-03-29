@@ -30,6 +30,7 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
@@ -123,6 +124,7 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
                 FirebaseUtils.createAnalyticsSelectBundle(TAG, "Start Main Activity", TAG));
 
         subscription = EventsUtils.getEventObservable()
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<EventsUtils.EventType>() {
                     @Override
                     public void accept(@NonNull EventsUtils.EventType eventType) throws Exception {
