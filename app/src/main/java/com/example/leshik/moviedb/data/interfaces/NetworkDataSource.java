@@ -22,6 +22,8 @@ public interface NetworkDataSource {
 
     Observable<Movie> readMovie(long movieId);
 
+    Observable<Movie> readMovieFull(long movieId);
+
     Observable<List<Video>> readVideoList(long movieId);
 
     Observable<List<Review>> readReviewList(long movieId);
