@@ -27,9 +27,10 @@ import io.realm.RealmResults;
 
 /**
  * Created by Leshik on 01.03.2017.
- * <p>
+ *
  * Implementation of CacheStorage interface
  * with Realm DB
+ *
  */
 
 class RealmCacheStorage implements CacheStorage {
@@ -70,7 +71,7 @@ class RealmCacheStorage implements CacheStorage {
     }
 
     @Override
-    public Observable<Movie> getMovieObservable(final long movieId) {
+    public Observable<Movie> getMovie(final long movieId) {
         return Observable.create(new ObservableOnSubscribe<Movie>() {
             @Override
             public void subscribe(final ObservableEmitter<Movie> emitter) throws Exception {
@@ -121,9 +122,9 @@ class RealmCacheStorage implements CacheStorage {
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm transactionRealm) {
-                Log.i(TAG, "updateOrInsertMovie: +");
+                Log.i(TAG, "updateOrInsertMovieAsync: +");
                 updateOrInsertMovie(transactionRealm, newMovie);
-                Log.i(TAG, "updateOrInsertMovie: -");
+                Log.i(TAG, "updateOrInsertMovieAsync: -");
             }
         });
 
