@@ -15,7 +15,7 @@ import io.reactivex.Observable;
  */
 
 public interface CacheStorage {
-    Observable<Movie> getMovieObservable(long movieId);
+    Observable<Movie> getMovie(long movieId);
 
     long updateOrInsertMovie(Movie movie);
 
