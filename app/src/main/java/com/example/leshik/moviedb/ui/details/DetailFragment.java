@@ -297,7 +297,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
 
         // Favorite mark
         isFavorite = false;
-        if (movie.getFavoritePosition() != null && movie.getFavoritePosition() >= 0) {
+        if (movie.isFavorite()) {
             isFavorite = true;
         }
         // and update mark
