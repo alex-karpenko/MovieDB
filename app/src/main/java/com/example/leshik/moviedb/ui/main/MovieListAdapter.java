@@ -11,9 +11,10 @@ import android.widget.ImageView;
 import com.example.leshik.moviedb.R;
 import com.example.leshik.moviedb.data.PreferenceStorage;
 import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
-import com.example.leshik.moviedb.data.model.Movie;
+import com.example.leshik.moviedb.data.model.MovieListViewItem;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -27,18 +28,30 @@ import static android.support.v7.widget.RecyclerView.NO_ID;
 
 public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.ViewHolder> {
     Context context;
-    private List<Movie> movieList;
+    private List<MovieListViewItem> movieListViewItems;
     PreferenceInterface prefStorage;
 
-    public MovieListAdapter(Context context, List<Movie> movieList) {
+    public MovieListAdapter(Context context) {
         this.context = context;
-        this.movieList = movieList;
+        this.movieListViewItems = new ArrayList<>();
         prefStorage = PreferenceStorage.getInstance(context.getApplicationContext());
     }
 
-    public void setMovieList(List<Movie> newList) {
-        movieList = newList;
-        notifyDataSetChanged();
+    public void updateListItem(MovieListViewItem newItem) {
+        if (movieListViewItems.size() <= newItem.listPosition) {
+            movieListViewItems.add(newItem);
+            notifyItemInserted(newItem.listPosition);
+            return;
+        }
+
+        MovieListViewItem oldItem = movieListViewItems.get(newItem.listPosition);
+        if (oldItem.listPosition == newItem.listPosition) {
+            movieListViewItems.set(newItem.listPosition, newItem);
+            notifyItemChanged(newItem.listPosition);
+        } else {
+            movieListViewItems.add(newItem.listPosition, newItem);
+            notifyItemInserted(newItem.listPosition);
+        }
     }
 
     @Override
@@ -50,14 +63,14 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        if (movieList != null) {
-            Movie movie = movieList.get(position);
+        if (movieListViewItems != null) {
+            MovieListViewItem movie = movieListViewItems.get(position);
             Picasso.with(context)
-                    .load(prefStorage.getPosterSmallUri(movie.getPosterPath()))
+                    .load(prefStorage.getPosterSmallUri(movie.posterPath))
                     .into(holder.mPosterView);
 
             // set item click listener
-            final long movieId = movie.getMovieId();
+            final long movieId = movie.movieId;
             final ImageView posterView = holder.mPosterView;
             holder.mPosterView.setOnClickListener(new AdapterView.OnClickListener() {
                 @Override
@@ -72,13 +85,13 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
 
     @Override
     public int getItemCount() {
-        if (movieList != null) return movieList.size();
+        if (movieListViewItems != null) return movieListViewItems.size();
         else return 0;
     }
 
     @Override
     public long getItemId(int position) {
-        if (movieList != null) return movieList.get(position).getMovieId();
+        if (movieListViewItems != null) return movieListViewItems.get(position).movieId;
         else return NO_ID;
     }
 

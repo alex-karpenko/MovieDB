@@ -3,6 +3,7 @@ package com.example.leshik.moviedb.ui.viewmodels;
 import com.example.leshik.moviedb.data.MovieListType;
 import com.example.leshik.moviedb.data.interfaces.MovieListInteractor;
 import com.example.leshik.moviedb.data.model.Movie;
+import com.example.leshik.moviedb.data.model.MovieListViewItem;
 
 import java.util.List;
 
@@ -27,6 +28,11 @@ public class MovieListViewModel {
 
     public Observable<List<Movie>> getMovieList() {
         return movieListInteractor.getList(listType)
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Observable<MovieListViewItem> getMovieList(Observable<Integer> nextViewItem) {
+        return movieListInteractor.getEndlessList(listType, nextViewItem)
                 .observeOn(AndroidSchedulers.mainThread());
     }
 

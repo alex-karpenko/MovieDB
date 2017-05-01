@@ -17,18 +17,21 @@ import android.widget.ImageView;
 import com.example.leshik.moviedb.R;
 import com.example.leshik.moviedb.data.MovieListRepository;
 import com.example.leshik.moviedb.data.MovieListType;
-import com.example.leshik.moviedb.data.model.Movie;
+import com.example.leshik.moviedb.data.model.MovieListViewItem;
 import com.example.leshik.moviedb.ui.viewmodels.MovieListViewModel;
 import com.example.leshik.moviedb.utils.FirebaseUtils;
 import com.example.leshik.moviedb.utils.ViewUtils;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
-import java.util.List;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.disposables.Disposables;
 import io.reactivex.functions.Consumer;
 
 
@@ -104,7 +107,7 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         // Construct empty adapter ...
-        mAdapter = new MovieListAdapter(getActivity(), null);
+        mAdapter = new MovieListAdapter(getActivity());
         mAdapter.setHasStableIds(true);
         // ... and set it to recycle view
         mRecyclerView.setAdapter(mAdapter);
@@ -112,10 +115,8 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
         // Set up scroll listener for auto load list's tail
         // set scrolling threshold
         scrollingThreshold = scrollingThreshold * ViewUtils.calculateNoOfColumns(getActivity());
-        // set scroll listener
-        mRecyclerView.addOnScrollListener(new AutoLoadingScrollListener());
 
-        subscribeToMovieList();
+        subscribeToEndlessList();
 
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT,
                 FirebaseUtils.createAnalyticsSelectBundle(TAG, "Create Movie List Fragment", fragmentType.toString()));
@@ -138,20 +139,14 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
         } else return DEFAULT_FRAGMENT_TYPE;
     }
 
-    private void subscribeToMovieList() {
-        subscription = viewModel.getMovieList()
-                .subscribe(new Consumer<List<Movie>>() {
+    private void subscribeToEndlessList() {
+        subscription = viewModel.getMovieList(getScrollObservable(mRecyclerView, 20, 0))
+                .subscribe(new Consumer<MovieListViewItem>() {
                     @Override
-                    public void accept(List<Movie> movieList) throws Exception {
-                        updateUi(movieList);
+                    public void accept(@NonNull MovieListViewItem movieListViewItem) throws Exception {
+                        mAdapter.updateListItem(movieListViewItem);
                     }
                 });
-    }
-
-    void updateUi(List<Movie> newList) {
-        loadingCache = false;
-        mAdapter.setMovieList(newList);
-        mSwipeRefreshLayout.setRefreshing(false);
     }
 
     @Override
@@ -225,5 +220,50 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
          * DetailFragmentCallback for when an item has been selected.
          */
         void onMovieListItemSelected(long movieId, ImageView posterView);
+    }
+
+    /**
+     * Source - https://habrahabr.ru/post/271875/
+     *
+     * @param recyclerView
+     * @param limit
+     * @param emptyListCount
+     * @return
+     */
+
+    private Observable<Integer> getScrollObservable(final RecyclerView recyclerView, final int limit, final int emptyListCount) {
+        return Observable.create(new ObservableOnSubscribe<Integer>() {
+            @Override
+            public void subscribe(@NonNull final ObservableEmitter<Integer> subscriber) throws Exception {
+                final RecyclerView.OnScrollListener sl = new RecyclerView.OnScrollListener() {
+                    @Override
+                    public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                        if (!subscriber.isDisposed()) {
+                            int position = getLastVisibleItemPosition(recyclerView);
+                            int updatePosition = recyclerView.getAdapter().getItemCount() - 1 - (limit / 2);
+                            if (position >= updatePosition) {
+                                subscriber.onNext(recyclerView.getAdapter().getItemCount());
+                            }
+                        }
+                    }
+                };
+                recyclerView.addOnScrollListener(sl);
+                subscriber.setDisposable(Disposables.fromRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        recyclerView.removeOnScrollListener(sl);
+                    }
+                }));
+                if (recyclerView.getAdapter().getItemCount() == emptyListCount) {
+                    subscriber.onNext(recyclerView.getAdapter().getItemCount());
+                }
+            }
+        });
+    }
+
+    private int getLastVisibleItemPosition(RecyclerView recyclerView) {
+        LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+        return layoutManager.findLastVisibleItemPosition();
+
     }
 }

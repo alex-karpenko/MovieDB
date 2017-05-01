@@ -8,14 +8,19 @@ import com.example.leshik.moviedb.data.interfaces.MovieListInteractor;
 import com.example.leshik.moviedb.data.interfaces.NetworkDataSource;
 import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
 import com.example.leshik.moviedb.data.model.Movie;
+import com.example.leshik.moviedb.data.model.MovieListViewItem;
 import com.example.leshik.moviedb.utils.EventsUtils;
 import com.example.leshik.moviedb.utils.NetworkUtils;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 
 /**
@@ -37,6 +42,61 @@ public class MovieListRepository implements MovieListInteractor {
         networkDataSource = new TmdbNetworkDataSource(prefStorage.getBaseApiUrl());
         cacheStorage = new RealmCacheStorage(context);
         this.context = context;
+    }
+
+    @Override
+    public Observable<MovieListViewItem> getEndlessList(final MovieListType listType, Observable<Integer> nextViewItem) {
+        final int pageSize = prefStorage.getCachePageSize();
+
+        return nextViewItem
+                .map(new Function<Integer, Integer>() {
+                    @Override
+                    public Integer apply(@NonNull Integer nextViewItem) throws Exception {
+                        return (nextViewItem / prefStorage.getCachePageSize()) + 1;
+                    }
+                })
+                .distinctUntilChanged()
+                .concatMap(new Function<Integer, ObservableSource<MovieListViewItem>>() {
+                    @Override
+                    public ObservableSource<MovieListViewItem> apply(@NonNull final Integer pageNumber) throws Exception {
+                        Observable<MovieListViewItem> listFromCache = cacheStorage.getMovieListPage(listType, pageNumber)
+                                .flatMap(new Function<List<MovieListViewItem>, ObservableSource<MovieListViewItem>>() {
+                                    @Override
+                                    public ObservableSource<MovieListViewItem> apply(@NonNull List<MovieListViewItem> list) throws Exception {
+                                        return Observable.fromIterable(list);
+                                    }
+                                });
+
+                        Observable<MovieListViewItem> listFromNetwork = networkDataSource.readMovieListPage(listType, pageNumber)
+                                .doOnNext(new Consumer<List<Movie>>() {
+                                    @Override
+                                    public void accept(@NonNull List<Movie> movieList) throws Exception {
+                                        cacheStorage.updateOrInsertMoviesFromListAsync(movieList);
+                                        cacheStorage.updateMovieListAsync(listType, pageNumber, movieList);
+                                    }
+                                })
+                                .map(new Function<List<Movie>, List<MovieListViewItem>>() {
+                                    @Override
+                                    public List<MovieListViewItem> apply(@NonNull List<Movie> movieList) throws Exception {
+                                        List<MovieListViewItem> newList = new ArrayList<>();
+                                        for (int i = 0; i < movieList.size(); i++) {
+                                            int position = (pageNumber - 1) * pageSize + i;
+                                            newList.add(new MovieListViewItem(movieList.get(i), position));
+                                        }
+                                        return newList;
+                                    }
+                                })
+                                .flatMap(new Function<List<MovieListViewItem>, ObservableSource<MovieListViewItem>>() {
+                                    @Override
+                                    public ObservableSource<MovieListViewItem> apply(@NonNull List<MovieListViewItem> list) throws Exception {
+                                        return Observable.fromIterable(list);
+                                    }
+                                });
+
+
+                        return Observable.concat(listFromCache, listFromNetwork);
+                    }
+                });
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.example.leshik.moviedb.data.model;
 
+import java.util.Calendar;
 import java.util.List;
 
 import io.realm.RealmList;
@@ -39,6 +40,8 @@ public class Movie extends RealmObject {
     private Integer topratedPosition;
     @Index
     private Integer upcomingPosition;
+    @Index
+    private long favoriteTimestamp;
 
     public boolean isEmpty() {
         return movieId == 0;
@@ -59,14 +62,16 @@ public class Movie extends RealmObject {
             if (videos == null || videos.size() == 0) videos = existentMovie.getVideos();
             if (reviews == null || reviews.size() == 0) reviews = existentMovie.getReviews();
 
-            if (favoritePosition == null || favoritePosition <= 0)
+            if (favoritePosition == null || favoritePosition < 0)
                 favoritePosition = existentMovie.getFavoritePosition();
-            if (popularPosition == null || popularPosition <= 0)
+            if (popularPosition == null || popularPosition < 0)
                 popularPosition = existentMovie.getPopularPosition();
-            if (topratedPosition == null || topratedPosition <= 0)
+            if (topratedPosition == null || topratedPosition < 0)
                 topratedPosition = existentMovie.getTopratedPosition();
-            if (upcomingPosition == null || upcomingPosition <= 0)
+            if (upcomingPosition == null || upcomingPosition < 0)
                 upcomingPosition = existentMovie.getUpcomingPosition();
+
+            if (favoriteTimestamp <= 0L) favoriteTimestamp = existentMovie.getFavoriteTimestamp();
 
             if (lastUpdate == null) lastUpdate = existentMovie.getLastUpdate();
         }
@@ -177,9 +182,34 @@ public class Movie extends RealmObject {
         this.favoritePosition = favoritePosition;
     }
 
+    public void invertFavorite() {
+        if (isFavorite()) unsetFavorite();
+        else setFavorite();
+    }
+
     public boolean isFavorite() {
-        if (favoritePosition == null || favoritePosition <= 0) return false;
-        else return true;
+        return getFavoriteTimestamp() > 0L;
+
+        // FIXME: 4/29/17 Remove this outdated code
+/*        if (favoritePosition == null || favoritePosition < 0) return false;
+        else return true; */
+    }
+
+    public void unsetFavorite() {
+        setFavoriteTimestamp(0L);
+    }
+
+    public void setFavorite() {
+
+        setFavoriteTimestamp(Calendar.getInstance().getTimeInMillis());
+    }
+
+    public long getFavoriteTimestamp() {
+        return favoriteTimestamp;
+    }
+
+    public void setFavoriteTimestamp(long favoriteTimestamp) {
+        this.favoriteTimestamp = favoriteTimestamp;
     }
 
     public Integer getPopularPosition() {

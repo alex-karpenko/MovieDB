@@ -81,7 +81,7 @@ public class ListPageResponse {
     public Integer totalPages;
 
     public List<Movie> getListPageInstance(MovieListType listType) {
-        int startPosition = (page - 1) * PAGE_SIZE + 1;
+        int startPosition = (page - 1) * PAGE_SIZE;
         List<Movie> returnList = new ArrayList<>();
 
         if (listResults != null) {
