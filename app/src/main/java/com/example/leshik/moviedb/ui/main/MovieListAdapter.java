@@ -27,9 +27,9 @@ import static android.support.v7.widget.RecyclerView.NO_ID;
  */
 
 public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.ViewHolder> {
-    Context context;
+    private Context context;
     private List<MovieListViewItem> movieListViewItems;
-    PreferenceInterface prefStorage;
+    private PreferenceInterface prefStorage;
 
     public MovieListAdapter(Context context) {
         this.context = context;
