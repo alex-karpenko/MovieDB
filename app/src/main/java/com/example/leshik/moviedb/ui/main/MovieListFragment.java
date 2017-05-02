@@ -2,7 +2,6 @@ package com.example.leshik.moviedb.ui.main;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -41,15 +40,13 @@ import io.reactivex.functions.Consumer;
  * There are three types of this fragment for popular, top rated and favorites lists
  * <p>
  */
-public class MovieListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+public class MovieListFragment extends Fragment {
     private static final String TAG = "MovieListFragment";
     public static final String ARG_FRAGMENT_TYPE = "FRAGMENT_TYPE";
 
     private static final MovieListType DEFAULT_FRAGMENT_TYPE = MovieListType.Favorite;
 
     // views in the fragment
-    @BindView(R.id.swiperefresh)
-    protected SwipeRefreshLayout mSwipeRefreshLayout;
     @BindView(R.id.movies_list)
     protected RecyclerView mRecyclerView;
     private Unbinder unbinder;
@@ -57,11 +54,6 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
     private RecyclerView.LayoutManager mLayoutManager;
 
     private MovieListAdapter mAdapter;
-
-    // for control auto content loading
-    private boolean loadingCache = false;
-    // start auto loading after this threshold (multiplied by number of the items in list row)
-    private int scrollingThreshold = 5;
 
     private MovieListViewModel viewModel;
     private Disposable subscription;
@@ -99,9 +91,6 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
         View rootView = inflater.inflate(R.layout.main_fragment, container, false);
         unbinder = ButterKnife.bind(this, rootView);
 
-        // store view's references
-        mSwipeRefreshLayout.setOnRefreshListener(this);
-
         // Create layout manager and attach it to recycle view
         mLayoutManager = new GridLayoutManager(getActivity(), ViewUtils.calculateNoOfColumns(getActivity()));
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -111,10 +100,6 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
         mAdapter.setHasStableIds(true);
         // ... and set it to recycle view
         mRecyclerView.setAdapter(mAdapter);
-
-        // Set up scroll listener for auto load list's tail
-        // set scrolling threshold
-        scrollingThreshold = scrollingThreshold * ViewUtils.calculateNoOfColumns(getActivity());
 
         subscribeToEndlessList();
 
@@ -167,47 +152,7 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_refresh) {
-            // set refresh mart to on
-            mSwipeRefreshLayout.setRefreshing(true);
-            // and update current page
-            updateCurrentPageCache();
-
-            return true;
-        }
-
         return super.onOptionsItemSelected(item);
-    }
-
-    // update cache for current page type
-    private void updateCurrentPageCache() {
-        boolean refreshResult = viewModel.forceRefresh();
-        if (!refreshResult) mSwipeRefreshLayout.setRefreshing(false);
-    }
-
-    // listener for check every scroll event on list view and start loading cache content
-    // when scrolled to the end of cached data
-    private class AutoLoadingScrollListener extends RecyclerView.OnScrollListener {
-        @Override
-        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-            super.onScrolled(recyclerView, dx, dy);
-            if (loadingCache) return; // immediate return if we in loading state
-
-            int totalItems = mLayoutManager.getItemCount(); // total items in the view (in the cursor)
-            int lastVisibleItem = ((LinearLayoutManager) mLayoutManager).findLastVisibleItemPosition(); // last visible item
-            // if last view under threshold position - start loading cache
-            if (lastVisibleItem + scrollingThreshold >= totalItems) {
-                boolean isLoadStarted = viewModel.loadNextPage();
-                loadingCache = isLoadStarted;
-            }
-        }
-    }
-
-    // swipe refresh callback
-    @Override
-    public void onRefresh() {
-        updateCurrentPageCache();
     }
 
     /**
