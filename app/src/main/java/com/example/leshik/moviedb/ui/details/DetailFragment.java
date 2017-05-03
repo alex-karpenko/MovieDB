@@ -229,11 +229,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_refresh) {
-            // and start update action
-            refreshCurrentMovie();
-            return true;
-        }
         if (id == R.id.action_favorite) {
             // reverse mark flag
             isFavorite = !isFavorite;
