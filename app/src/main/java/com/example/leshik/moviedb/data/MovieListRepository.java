@@ -60,12 +60,14 @@ public class MovieListRepository implements MovieListInteractor {
                     @Override
                     public ObservableSource<MovieListViewItem> apply(@NonNull final Integer pageNumber) throws Exception {
                         Observable<MovieListViewItem> listFromCache = cacheStorage.getMovieListPage(listType, pageNumber)
-                                .flatMap(new Function<List<MovieListViewItem>, ObservableSource<MovieListViewItem>>() {
+                                .concatMap(new Function<List<MovieListViewItem>, ObservableSource<MovieListViewItem>>() {
                                     @Override
                                     public ObservableSource<MovieListViewItem> apply(@NonNull List<MovieListViewItem> list) throws Exception {
                                         return Observable.fromIterable(list);
                                     }
                                 });
+
+                        if (listType.isLocalOnly()) return listFromCache;
 
                         Observable<MovieListViewItem> listFromNetwork = networkDataSource.readMovieListPage(listType, pageNumber)
                                 .doOnNext(new Consumer<List<Movie>>() {
@@ -86,13 +88,12 @@ public class MovieListRepository implements MovieListInteractor {
                                         return newList;
                                     }
                                 })
-                                .flatMap(new Function<List<MovieListViewItem>, ObservableSource<MovieListViewItem>>() {
+                                .concatMap(new Function<List<MovieListViewItem>, ObservableSource<MovieListViewItem>>() {
                                     @Override
                                     public ObservableSource<MovieListViewItem> apply(@NonNull List<MovieListViewItem> list) throws Exception {
                                         return Observable.fromIterable(list);
                                     }
                                 });
-
 
                         return Observable.concat(listFromCache, listFromNetwork);
                     }

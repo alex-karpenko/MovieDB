@@ -9,6 +9,7 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 
 import com.example.leshik.moviedb.R;
+import com.example.leshik.moviedb.data.MovieListType;
 import com.example.leshik.moviedb.data.PreferenceStorage;
 import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
 import com.example.leshik.moviedb.data.model.MovieListViewItem;
@@ -16,6 +17,8 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -28,29 +31,45 @@ import static android.support.v7.widget.RecyclerView.NO_ID;
 
 public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.ViewHolder> {
     private Context context;
-    private List<MovieListViewItem> movieListViewItems;
+    private List<MovieListViewItem> movieList;
+    private Map<Long, MovieListViewItem> movieMap;
     private PreferenceInterface prefStorage;
+    private MovieListType listType;
 
-    public MovieListAdapter(Context context) {
+    public MovieListAdapter(Context context, MovieListType listType) {
         this.context = context;
-        this.movieListViewItems = new ArrayList<>();
         prefStorage = PreferenceStorage.getInstance(context.getApplicationContext());
+        this.listType = listType;
+        this.movieList = new ArrayList<>();
+
+        if (listType.isLocalOnly()) {
+            this.movieMap = new TreeMap<>();
+        }
     }
 
     public void updateListItem(MovieListViewItem newItem) {
-        if (movieListViewItems.size() <= newItem.listPosition) {
-            movieListViewItems.add(newItem);
-            notifyItemInserted(newItem.listPosition);
-            return;
+        if (listType.isLocalOnly()) updateMovieMap(newItem);
+        else updateMovieList(newItem);
+    }
+
+    private void updateMovieMap(MovieListViewItem newItem) {
+        if (newItem.listPosition < 0) { // delete item from map
+            movieMap.remove(newItem.movieId);
+        } else { // add item to map
+            movieMap.put(newItem.movieId, newItem);
         }
 
-        MovieListViewItem oldItem = movieListViewItems.get(newItem.listPosition);
-        if (oldItem.listPosition == newItem.listPosition) {
-            movieListViewItems.set(newItem.listPosition, newItem);
-            notifyItemChanged(newItem.listPosition);
-        } else {
-            movieListViewItems.add(newItem.listPosition, newItem);
+        movieList = new ArrayList<>(movieMap.values());
+        notifyDataSetChanged();
+    }
+
+    private void updateMovieList(MovieListViewItem newItem) {
+        if (movieList.size() <= newItem.listPosition) {
+            movieList.add(newItem);
             notifyItemInserted(newItem.listPosition);
+        } else {
+            movieList.set(newItem.listPosition, newItem);
+            notifyItemChanged(newItem.listPosition);
         }
     }
 
@@ -63,8 +82,8 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        if (movieListViewItems != null) {
-            MovieListViewItem movie = movieListViewItems.get(position);
+        if (movieList != null) {
+            MovieListViewItem movie = movieList.get(position);
             Picasso.with(context)
                     .load(prefStorage.getPosterSmallUri(movie.posterPath))
                     .into(holder.mPosterView);
@@ -85,13 +104,13 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
 
     @Override
     public int getItemCount() {
-        if (movieListViewItems != null) return movieListViewItems.size();
+        if (movieList != null) return movieList.size();
         else return 0;
     }
 
     @Override
     public long getItemId(int position) {
-        if (movieListViewItems != null) return movieListViewItems.get(position).movieId;
+        if (movieList != null) return movieList.get(position).movieId;
         else return NO_ID;
     }
 

@@ -258,26 +258,45 @@ class RealmCacheStorage implements CacheStorage {
             @Override
             public void subscribe(@NonNull ObservableEmitter<List<MovieListViewItem>> emitter) throws Exception {
                 Realm realm = getRealmInstance();
+                List<MovieListItem> movieList;
+                List<MovieListViewItem> returnList = new ArrayList<>();
 
                 try {
-                    RealmResults<MovieListItem> movieListResult = realm.where(MovieListItem.class)
-                            .equalTo(MovieListItem.LIST_TYPE_COLUMN, listType.getIndex())
-                            .equalTo(MovieListItem.PAGE_COLUMN, page)
-                            .findAllSorted(MovieListItem.POSITION_COLUMN);
-
-                    if (movieListResult.size() > 0 && movieListResult.isValid()) {
-                        List<MovieListItem> movieList = realm.copyFromRealm(movieListResult);
-                        List<MovieListViewItem> returnList = new ArrayList<>();
-                        int pageSize = prefStorage.getCachePageSize();
-
-                        for (MovieListItem item : movieList) {
-                            Movie movie = findMovie(realm, item.movieId);
-                            if (movie != null) {
-                                MovieListViewItem viewListItem = new MovieListViewItem(movie, item.getAbsolutePosition(pageSize));
-                                returnList.add(item.position, viewListItem);
-                            }
+                    if (listType.isLocalOnly()) {
+                        RealmResults<Movie> movieResult;
+                        switch (listType) {
+                            case Favorite:
+                                movieResult = realm.where(Movie.class)
+                                        .greaterThan("favoriteTimestamp", 0L)
+                                        .findAllSorted("favoriteTimestamp");
+                                break;
+                            default:
+                                throw new IllegalArgumentException("Local list with unknown type");
                         }
 
+                        for (int i = 0; i < movieResult.size(); i++) {
+                            returnList.add(i, new MovieListViewItem(movieResult.get(i), i));
+                        }
+                    } else {
+                        RealmResults<MovieListItem> movieListResult = realm.where(MovieListItem.class)
+                                .equalTo(MovieListItem.LIST_TYPE_COLUMN, listType.getIndex())
+                                .equalTo(MovieListItem.PAGE_COLUMN, page)
+                                .findAllSorted(MovieListItem.POSITION_COLUMN);
+                        if (movieListResult.size() > 0 && movieListResult.isValid()) {
+                            movieList = realm.copyFromRealm(movieListResult);
+                            int pageSize = prefStorage.getCachePageSize();
+
+                            for (MovieListItem item : movieList) {
+                                Movie movie = findMovie(realm, item.movieId);
+                                if (movie != null) {
+                                    MovieListViewItem viewListItem = new MovieListViewItem(movie, item.getAbsolutePosition(pageSize));
+                                    returnList.add(item.position, viewListItem);
+                                }
+                            }
+                        }
+                    }
+
+                    if (returnList.size() > 0) {
                         if (!emitter.isDisposed()) emitter.onNext(returnList);
                     }
                     if (!emitter.isDisposed()) emitter.onComplete();

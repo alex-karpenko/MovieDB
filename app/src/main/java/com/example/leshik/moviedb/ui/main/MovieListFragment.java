@@ -96,7 +96,7 @@ public class MovieListFragment extends Fragment {
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         // Construct empty adapter ...
-        mAdapter = new MovieListAdapter(getActivity());
+        mAdapter = new MovieListAdapter(getActivity(), fragmentType);
         mAdapter.setHasStableIds(true);
         // ... and set it to recycle view
         mRecyclerView.setAdapter(mAdapter);

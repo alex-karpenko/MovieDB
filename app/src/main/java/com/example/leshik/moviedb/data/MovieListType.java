@@ -8,66 +8,66 @@ public enum MovieListType {
 
     Popular(0) {
         @Override
-        boolean isFromNetwork() {
+        public boolean isFromNetwork() {
             return true;
         }
 
         @Override
-        boolean isLocalOnly() {
+        public boolean isLocalOnly() {
             return false;
         }
 
         @Override
-        String getModelColumnName() {
+        public String getModelColumnName() {
             return "popularPosition";
         }
 
     },
     Toprated(1) {
         @Override
-        boolean isFromNetwork() {
+        public boolean isFromNetwork() {
             return true;
         }
 
         @Override
-        boolean isLocalOnly() {
+        public boolean isLocalOnly() {
             return false;
         }
 
         @Override
-        String getModelColumnName() {
+        public String getModelColumnName() {
             return "topratedPosition";
         }
     },
     Upcoming(2) {
         @Override
-        boolean isFromNetwork() {
+        public boolean isFromNetwork() {
             return true;
         }
 
         @Override
-        boolean isLocalOnly() {
+        public boolean isLocalOnly() {
             return false;
         }
 
         @Override
-        String getModelColumnName() {
+        public String getModelColumnName() {
             return "upcomingPosition";
         }
     },
     Favorite(3) {
         @Override
-        boolean isFromNetwork() {
+        public boolean isFromNetwork() {
             return false;
         }
 
         @Override
-        boolean isLocalOnly() {
+        public boolean isLocalOnly() {
             return true;
         }
 
         @Override
-        String getModelColumnName() {
+        public String getModelColumnName() {
             return "favoritePosition";
         }
     };
@@ -82,21 +82,21 @@ public enum MovieListType {
         return index;
     }
 
-    abstract boolean isFromNetwork();
+    abstract public boolean isFromNetwork();
 
-    abstract boolean isLocalOnly();
+    abstract public boolean isLocalOnly();
 
-    abstract String getModelColumnName();
+    abstract public String getModelColumnName();
 
-    String getTotalPagesKey() {
+    public String getTotalPagesKey() {
         return name() + "total_pages";
     }
 
-    String getTotalItemsKey() {
+    public String getTotalItemsKey() {
         return name() + "total_items";
     }
 
-    String getUpdateTimestampKey() {
+    public String getUpdateTimestampKey() {
         return name() + "last_update";
     }
 }
