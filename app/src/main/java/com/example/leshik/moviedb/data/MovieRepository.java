@@ -7,7 +7,6 @@ import com.example.leshik.moviedb.data.interfaces.MovieInteractor;
 import com.example.leshik.moviedb.data.interfaces.NetworkDataSource;
 import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
 import com.example.leshik.moviedb.data.model.Movie;
-import com.example.leshik.moviedb.utils.EventsUtils;
 
 import java.util.Calendar;
 
@@ -85,34 +84,5 @@ public class MovieRepository implements MovieInteractor {
     @Override
     public void invertFavorite(long movieId) {
         cacheStorage.invertFavorite(movieId);
-    }
-
-    @Override
-    public boolean forceRefresh(long movieId) {
-        // Simply set last update time to 0
-        // after this we have to unsubscribe from movie and subscribe again
-        // TODO: 3/30/17 May be delete this method???
-        try {
-            cacheStorage.getMovie(movieId)
-                    .flatMap(new Function<Movie, ObservableSource<Movie>>() {
-                        @Override
-                        public ObservableSource<Movie> apply(@NonNull Movie movie) throws Exception {
-                            movie.setLastUpdate(0L);
-                            return Observable.just(movie);
-                        }
-                    })
-                    .map(new Function<Movie, Long>() {
-                        @Override
-                        public Long apply(@NonNull Movie movie) throws Exception {
-                            return cacheStorage.updateOrInsertMovie(movie);
-                        }
-                    })
-                    .blockingSubscribe();
-            return true;
-        } catch (Exception e) {
-            EventsUtils.postEvent(EventsUtils.EventType.NetworkUnavailable);
-        }
-
-        return false;
     }
 }

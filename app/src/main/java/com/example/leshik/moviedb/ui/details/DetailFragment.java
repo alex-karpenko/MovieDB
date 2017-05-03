@@ -412,9 +412,4 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     private void unsubscribeFromMovie() {
         subscription.dispose();
     }
-
-    // starting intent services to update cache tables
-    void refreshCurrentMovie() {
-        mViewModel.forceRefresh();
-    }
 }
