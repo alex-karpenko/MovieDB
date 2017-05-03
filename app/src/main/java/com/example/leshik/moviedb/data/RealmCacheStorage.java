@@ -17,15 +17,9 @@ import java.util.List;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.ObservableSource;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
-import io.reactivex.disposables.Disposables;
-import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
-import io.realm.RealmChangeListener;
 import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
 
@@ -93,23 +87,6 @@ class RealmCacheStorage implements CacheStorage {
                 }
             }
         }).subscribeOn(Schedulers.io());
-    }
-
-    @Override
-    public long updateOrInsertMovie(final Movie newMovie) {
-        Realm realm = getRealmInstance();
-
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm transactionRealm) {
-                Log.i(TAG, "updateOrInsertMovie: +");
-                updateOrInsertMovie(transactionRealm, newMovie);
-                Log.i(TAG, "updateOrInsertMovie: -");
-            }
-        });
-
-        realm.close();
-        return newMovie.getMovieId();
     }
 
     @Override
@@ -216,43 +193,6 @@ class RealmCacheStorage implements CacheStorage {
     }
 
     @Override
-    public Observable<List<Movie>> getMovieListObservable(final MovieListType listType) {
-        return Observable.create(new ObservableOnSubscribe<List<Movie>>() {
-            @Override
-            public void subscribe(final ObservableEmitter<List<Movie>> emitter) throws Exception {
-                final Realm realm = getRealmInstance();
-                final RealmResults<Movie> movieList = findMovieListAsRealmResults(realm, listType);
-
-                final RealmChangeListener<RealmResults<Movie>> listener = new RealmChangeListener<RealmResults<Movie>>() {
-                    @Override
-                    public void onChange(RealmResults<Movie> element) {
-                        if (!emitter.isDisposed())
-                            emitter.onNext(element);
-                    }
-                };
-
-                emitter.setDisposable(Disposables.fromRunnable(new Runnable() {
-                    @Override
-                    public void run() {
-                        movieList.removeChangeListener(listener);
-                        if (!realm.isClosed())
-                            realm.close();
-                    }
-                }));
-
-                movieList.addChangeListener(listener);
-                emitter.onNext(movieList);
-            }
-        });
-    }
-
-    private RealmResults<Movie> findMovieListAsRealmResults(Realm realm, MovieListType listType) {
-        return realm.where(Movie.class)
-                .greaterThanOrEqualTo(listType.getModelColumnName(), 0)
-                .findAllSorted(listType.getModelColumnName());
-    }
-
-    @Override
     public Observable<List<MovieListViewItem>> getMovieListPage(final MovieListType listType, final int page) {
         return Observable.create(new ObservableOnSubscribe<List<MovieListViewItem>>() {
             @Override
@@ -307,83 +247,6 @@ class RealmCacheStorage implements CacheStorage {
                 }
             }
         }).subscribeOn(Schedulers.io());
-    }
-
-    @Override
-    public void insertOrUpdateMovieList(final MovieListType listType, final Observable<List<Movie>> movieList) {
-        Realm realm = getRealmInstance();
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm transactionRealm) {
-                Log.i(TAG, "insertOrUpdateMovieList: +");
-                updateOrInsertMovieList(transactionRealm, movieList);
-                Log.i(TAG, "insertOrUpdateMovieList: -");
-            }
-        });
-
-        realm.close();
-    }
-
-    @Override
-    public void clearMovieListPositionsAndInsertOrUpdateData(final MovieListType listType, final Observable<List<Movie>> movieList) {
-        Realm realm = getRealmInstance();
-
-        if (realm.isInTransaction())
-            clearMovieListPositionsAndInsertOrUpdateData(realm, listType, movieList);
-        else realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm transactionRealm) {
-                clearMovieListPositionsAndInsertOrUpdateData(transactionRealm, listType, movieList);
-            }
-        });
-
-        realm.close();
-    }
-
-    private void clearMovieListPositionsAndInsertOrUpdateData(Realm transactionRealm, final MovieListType listType, final Observable<List<Movie>> movieList) {
-        Log.i(TAG, "clearMovieListPositionsAndInsertOrUpdateData: +, " + listType);
-        final RealmResults<Movie> result = transactionRealm.where(Movie.class)
-                .greaterThanOrEqualTo(listType.getModelColumnName(), 0)
-                .findAll();
-        clearMovieListPosition(listType, result);
-        updateOrInsertMovieList(transactionRealm, movieList);
-        Log.i(TAG, "clearMovieListPositionsAndInsertOrUpdateData: -");
-    }
-
-    private void clearMovieListPosition(MovieListType listType, RealmResults<Movie> movieList) {
-        for (Movie m : movieList) {
-            // TODO: 3/6/17 Optimize this, in the Movie model class. Maybe define array of the list types
-            switch (listType) {
-                case Popular:
-                    m.setPopularPosition(0);
-                    break;
-                case Toprated:
-                    m.setTopratedPosition(0);
-                    break;
-                case Upcoming:
-                    m.setUpcomingPosition(0);
-                    break;
-                default:
-                    throw new IllegalArgumentException("Clearing not supported for the list type");
-            }
-        }
-    }
-
-    private void updateOrInsertMovieList(final Realm realm, Observable<List<Movie>> movieObservable) {
-        movieObservable
-                .flatMap(new Function<List<Movie>, ObservableSource<Movie>>() {
-                    @Override
-                    public ObservableSource<Movie> apply(List<Movie> movieList) throws Exception {
-                        return Observable.fromIterable(movieList);
-                    }
-                })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<Movie>() {
-                    @Override
-                    public void accept(Movie newMovie) throws Exception {
-                        updateOrInsertMovie(realm, newMovie);
-                    }
-                });
     }
 
     @Override

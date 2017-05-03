@@ -18,8 +18,6 @@ import io.reactivex.Observable;
 public interface CacheStorage {
     Observable<Movie> getMovie(long movieId);
 
-    long updateOrInsertMovie(Movie movie);
-
     long updateOrInsertMovieAsync(Movie movie);
 
     void updateOrInsertMoviesFromListAsync(List<Movie> movieList);
@@ -27,14 +25,6 @@ public interface CacheStorage {
     void updateMovieListAsync(MovieListType listType, int page, List<Movie> movieList);
 
     void invertFavorite(long movieId);
-
-    Observable<List<Movie>> getMovieListObservable(MovieListType listType);
-
     Observable<List<MovieListViewItem>> getMovieListPage(MovieListType listType, int page);
-
-    void clearMovieListPositionsAndInsertOrUpdateData(MovieListType listType, Observable<List<Movie>> movieList);
-
-    void insertOrUpdateMovieList(MovieListType listType, Observable<List<Movie>> movieList);
-
     int getMovieListLastPageNumber(MovieListType listType);
 }

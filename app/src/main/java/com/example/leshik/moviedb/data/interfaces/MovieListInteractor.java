@@ -1,10 +1,7 @@
 package com.example.leshik.moviedb.data.interfaces;
 
 import com.example.leshik.moviedb.data.MovieListType;
-import com.example.leshik.moviedb.data.model.Movie;
 import com.example.leshik.moviedb.data.model.MovieListViewItem;
-
-import java.util.List;
 
 import io.reactivex.Observable;
 
@@ -16,11 +13,5 @@ import io.reactivex.Observable;
  */
 
 public interface MovieListInteractor {
-    Observable<List<Movie>> getList(MovieListType listType);
-
-    Observable<MovieListViewItem> getEndlessList(MovieListType listType, Observable<Integer> nextViewItem);
-
-    boolean forceRefreshList(MovieListType listType);
-
-    boolean loadNextPage(MovieListType listType);
+    Observable<MovieListViewItem> getList(MovieListType listType, Observable<Integer> nextViewItem);
 }
