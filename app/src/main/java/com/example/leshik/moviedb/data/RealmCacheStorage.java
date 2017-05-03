@@ -267,8 +267,8 @@ class RealmCacheStorage implements CacheStorage {
                         switch (listType) {
                             case Favorite:
                                 movieResult = realm.where(Movie.class)
-                                        .greaterThan("favoriteTimestamp", 0L)
-                                        .findAllSorted("favoriteTimestamp");
+                                        .greaterThan(listType.getModelColumnName(), 0L)
+                                        .findAllSorted(listType.getModelColumnName());
                                 break;
                             default:
                                 throw new IllegalArgumentException("Local list with unknown type");

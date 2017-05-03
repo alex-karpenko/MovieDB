@@ -68,7 +68,7 @@ public enum MovieListType {
 
         @Override
         public String getModelColumnName() {
-            return "favoritePosition";
+            return "favoriteTimestamp";
         }
     };
 
