@@ -8,6 +8,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.leshik.moviedb.R;
+import com.example.leshik.moviedb.data.MovieListType;
+import com.example.leshik.moviedb.ui.main.MovieListAdapter;
 
 /**
  * Utility class for provide some common (project-wide) methods, variables and constants
@@ -17,6 +19,8 @@ public final class ViewUtils {
     private static final String TAG = "ViewUtils";
     // is main screen has two panes
     private static boolean twoPane = false;
+    // Lists' adapters state
+    private static MovieListAdapter.AdapterState movieListAdapterStates[] = {null, null, null, null}; // 4 pages
 
     // private constructor to avoid creation on instance
     private ViewUtils() {
@@ -35,6 +39,14 @@ public final class ViewUtils {
         if (noOfColumns == 1) noOfColumns = 2;
 
         return noOfColumns;
+    }
+
+    public static MovieListAdapter.AdapterState getMovieListAdapterState(MovieListType listType) {
+        return movieListAdapterStates[listType.getIndex()];
+    }
+
+    public static void setMovieListAdapterStates(MovieListType listType, MovieListAdapter.AdapterState state) {
+        movieListAdapterStates[listType.getIndex()] = state;
     }
 
     public static int getScreenPxWidth(Context context) {

@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.example.leshik.moviedb.MovieApplication;
 import com.example.leshik.moviedb.R;
 import com.example.leshik.moviedb.data.MovieListRepository;
 import com.example.leshik.moviedb.data.MovieListType;
@@ -141,12 +140,12 @@ public class MovieListFragment extends Fragment {
     }
 
     private MovieListAdapter.AdapterState getAdapterState() {
-        return MovieApplication.getMovieListAdapterState(listType);
+        return ViewUtils.getMovieListAdapterState(listType);
     }
 
     private void saveAdapterState() {
         if (mAdapter != null)
-            MovieApplication.setMovieListAdapterStates(listType, mAdapter.getAdapterState());
+            ViewUtils.setMovieListAdapterStates(listType, mAdapter.getAdapterState());
     }
 
     @Override
