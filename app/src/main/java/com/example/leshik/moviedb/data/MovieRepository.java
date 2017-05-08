@@ -10,6 +10,7 @@ import com.example.leshik.moviedb.data.model.Movie;
 
 import io.reactivex.Observable;
 import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Predicate;
 
@@ -47,7 +48,14 @@ public class MovieRepository implements MovieInteractor {
                     }
                 });
 
-        return Observable.concat(movieFromCache, movieFromNetwork);
+        return Observable.concat(movieFromCache, movieFromNetwork)
+                .scan(new BiFunction<Movie, Movie, Movie>() {
+                    @Override
+                    public Movie apply(@NonNull Movie movie, @NonNull Movie movie2) throws Exception {
+                        movie2.updateNullFields(movie);
+                        return movie2;
+                    }
+                });
     }
 
     @Override
