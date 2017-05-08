@@ -215,7 +215,7 @@ class TmdbNetworkDataSource implements NetworkDataSource {
                 .map(new Function<ListPageResponse, List<Movie>>() {
                     @Override
                     public List<Movie> apply(ListPageResponse listPageResponse) throws Exception {
-                        return listPageResponse.getListPageInstance(listType);
+                        return listPageResponse.getListPageInstance();
                     }
                 })
                 .onErrorReturnItem(new ArrayList<Movie>());
