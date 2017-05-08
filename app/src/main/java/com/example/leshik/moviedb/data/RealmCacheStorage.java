@@ -252,14 +252,23 @@ class RealmCacheStorage implements CacheStorage {
     @Override
     public int getMovieListLastPageNumber(MovieListType listType) {
         Realm realm = getRealmInstance();
-        int lastPosition;
+        int lastPage;
 
-        lastPosition = realm.where(Movie.class)
-                .greaterThanOrEqualTo(listType.getModelColumnName(), 0)
-                .findAll()
-                .size();
+        if (listType.isLocalOnly()) {
+            int lastPosition = realm.where(Movie.class)
+                    .greaterThan(listType.getModelColumnName(), 0L)
+                    .findAll()
+                    .size();
+            lastPage = lastPosition / prefStorage.getCachePageSize();
+            if (lastPosition % prefStorage.getCachePageSize() != 0) lastPage++;
+        } else {
+            lastPage = realm.where(MovieListItem.class)
+                    .equalTo(MovieListItem.LIST_TYPE_COLUMN, listType.getIndex())
+                    .max(MovieListItem.PAGE_COLUMN)
+                    .intValue();
+        }
 
         realm.close();
-        return lastPosition / prefStorage.getCachePageSize();
+        return lastPage;
     }
 }
