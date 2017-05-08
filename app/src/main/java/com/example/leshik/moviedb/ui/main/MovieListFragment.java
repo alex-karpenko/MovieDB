@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -13,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.example.leshik.moviedb.MovieApplication;
 import com.example.leshik.moviedb.R;
 import com.example.leshik.moviedb.data.MovieListRepository;
 import com.example.leshik.moviedb.data.MovieListType;
@@ -43,8 +45,9 @@ import io.reactivex.functions.Consumer;
 public class MovieListFragment extends Fragment {
     private static final String TAG = "MovieListFragment";
     public static final String ARG_FRAGMENT_TYPE = "FRAGMENT_TYPE";
-
     private static final MovieListType DEFAULT_FRAGMENT_TYPE = MovieListType.Favorite;
+
+    private MovieListType listType;
 
     // views in the fragment
     @BindView(R.id.movies_list)
@@ -83,8 +86,8 @@ public class MovieListFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        MovieListType fragmentType = getFragmentTypeFromArgs();
-        viewModel = new MovieListViewModel(fragmentType,
+        listType = getFragmentTypeFromArgs();
+        viewModel = new MovieListViewModel(listType,
                 new MovieListRepository(getActivity().getApplicationContext()));
 
         // Inflate fragment
@@ -96,16 +99,19 @@ public class MovieListFragment extends Fragment {
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         // Construct empty adapter ...
-        mAdapter = new MovieListAdapter(getActivity(), fragmentType);
+        if (getAdapterState() == null) mAdapter = new MovieListAdapter(getActivity(), listType);
+        else mAdapter = new MovieListAdapter(getActivity(), listType, getAdapterState());
         mAdapter.setHasStableIds(true);
         // ... and set it to recycle view
         mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.setHasFixedSize(true);
 
         subscribeToEndlessList();
 
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT,
-                FirebaseUtils.createAnalyticsSelectBundle(TAG, "Create Movie List Fragment", fragmentType.toString()));
+                FirebaseUtils.createAnalyticsSelectBundle(TAG, "Create Movie List Fragment", listType.toString()));
 
+        Log.i(TAG, "onCreateView: listType=" + listType.toString());
         return rootView;
     }
 
@@ -134,15 +140,33 @@ public class MovieListFragment extends Fragment {
                 });
     }
 
+    private MovieListAdapter.AdapterState getAdapterState() {
+        return MovieApplication.getMovieListAdapterState(listType);
+    }
+
+    private void saveAdapterState() {
+        if (mAdapter != null)
+            MovieApplication.setMovieListAdapterStates(listType, mAdapter.getAdapterState());
+    }
+
     @Override
     public void onDestroyView() {
+        saveAdapterState();
         unsubscribeFromMovieList();
         super.onDestroyView();
         unbinder.unbind();
+
+        Log.i(TAG, "onDestroyView: listType=" + listType.toString());
     }
 
     private void unsubscribeFromMovieList() {
         if (subscription != null && !subscription.isDisposed()) subscription.dispose();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        saveAdapterState();
     }
 
     @Override

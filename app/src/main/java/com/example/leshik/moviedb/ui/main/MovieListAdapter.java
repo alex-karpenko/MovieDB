@@ -36,18 +36,30 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
     private PreferenceInterface prefStorage;
     private MovieListType listType;
 
-    public MovieListAdapter(Context context, MovieListType listType) {
+    MovieListAdapter(Context context, MovieListType listType) {
         this.context = context;
         prefStorage = PreferenceStorage.getInstance(context.getApplicationContext());
         this.listType = listType;
-        this.movieList = new ArrayList<>();
 
+        this.movieList = new ArrayList<>();
         if (listType.isLocalOnly()) {
             this.movieMap = new TreeMap<>();
         }
     }
 
-    public void updateListItem(MovieListViewItem newItem) {
+    MovieListAdapter(Context context, MovieListType listType, AdapterState state) {
+        this.context = context;
+        prefStorage = PreferenceStorage.getInstance(context.getApplicationContext());
+        this.listType = listType;
+
+        if (state.getMovieList() != null) this.movieList = state.getMovieList();
+        else this.movieList = new ArrayList<>();
+
+        if (state.getMovieMap() != null) movieMap = state.getMovieMap();
+        else this.movieMap = new TreeMap<>();
+    }
+
+    void updateListItem(MovieListViewItem newItem) {
         if (listType.isLocalOnly()) updateMovieMap(newItem);
         else updateMovieList(newItem);
     }
@@ -122,5 +134,32 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
+    }
+
+    public static class AdapterState {
+        private List<MovieListViewItem> movieList;
+        private Map<Long, MovieListViewItem> movieMap;
+
+        public AdapterState(List<MovieListViewItem> movieList, Map<Long, MovieListViewItem> movieMap) {
+            this.movieList = movieList;
+            this.movieMap = movieMap;
+        }
+
+        public List<MovieListViewItem> getMovieList() {
+            return movieList;
+        }
+
+        public Map<Long, MovieListViewItem> getMovieMap() {
+            return movieMap;
+        }
+    }
+
+    public AdapterState getAdapterState() {
+        return new AdapterState(movieList, movieMap);
+    }
+
+    public void setAdapterState(AdapterState state) {
+        movieList = state.getMovieList();
+        movieMap = state.getMovieMap();
     }
 }
