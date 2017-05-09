@@ -136,6 +136,15 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
         }
     }
 
+    public AdapterState getAdapterState() {
+        return new AdapterState(movieList, movieMap);
+    }
+
+    public void setAdapterState(AdapterState state) {
+        movieList = state.getMovieList();
+        movieMap = state.getMovieMap();
+    }
+
     public static class AdapterState {
         private List<MovieListViewItem> movieList;
         private Map<Long, MovieListViewItem> movieMap;
@@ -152,14 +161,5 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
         public Map<Long, MovieListViewItem> getMovieMap() {
             return movieMap;
         }
-    }
-
-    public AdapterState getAdapterState() {
-        return new AdapterState(movieList, movieMap);
-    }
-
-    public void setAdapterState(AdapterState state) {
-        movieList = state.getMovieList();
-        movieMap = state.getMovieMap();
     }
 }

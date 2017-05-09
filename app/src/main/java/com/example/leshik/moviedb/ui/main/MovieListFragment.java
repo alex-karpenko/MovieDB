@@ -105,7 +105,7 @@ public class MovieListFragment extends Fragment {
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setHasFixedSize(true);
 
-        subscribeToEndlessList();
+        subscribeToMovieList();
 
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT,
                 FirebaseUtils.createAnalyticsSelectBundle(TAG, "Create Movie List Fragment", listType.toString()));
@@ -129,7 +129,7 @@ public class MovieListFragment extends Fragment {
         } else return DEFAULT_FRAGMENT_TYPE;
     }
 
-    private void subscribeToEndlessList() {
+    private void subscribeToMovieList() {
         subscription = viewModel.getMovieList(getScrollObservable(mRecyclerView, 20, 0))
                 .subscribe(new Consumer<MovieListViewItem>() {
                     @Override
@@ -145,7 +145,7 @@ public class MovieListFragment extends Fragment {
 
     private void saveAdapterState() {
         if (mAdapter != null)
-            ViewUtils.setMovieListAdapterStates(listType, mAdapter.getAdapterState());
+            ViewUtils.setMovieListAdapterState(listType, mAdapter.getAdapterState());
     }
 
     @Override
