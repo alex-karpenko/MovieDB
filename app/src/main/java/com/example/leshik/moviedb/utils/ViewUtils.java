@@ -45,7 +45,7 @@ public final class ViewUtils {
         return movieListAdapterStates[listType.getIndex()];
     }
 
-    public static void setMovieListAdapterStates(MovieListType listType, MovieListAdapter.AdapterState state) {
+    public static void setMovieListAdapterState(MovieListType listType, MovieListAdapter.AdapterState state) {
         movieListAdapterStates[listType.getIndex()] = state;
     }
 
