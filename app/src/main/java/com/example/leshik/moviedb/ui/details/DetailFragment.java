@@ -229,11 +229,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_refresh) {
-            // and start update action
-            refreshCurrentMovie();
-            return true;
-        }
         if (id == R.id.action_favorite) {
             // reverse mark flag
             isFavorite = !isFavorite;
@@ -297,7 +292,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
 
         // Favorite mark
         isFavorite = false;
-        if (movie.getFavoritePosition() != null && movie.getFavoritePosition() >= 0) {
+        if (movie.isFavorite()) {
             isFavorite = true;
         }
         // and update mark
@@ -416,10 +411,5 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
 
     private void unsubscribeFromMovie() {
         subscription.dispose();
-    }
-
-    // starting intent services to update cache tables
-    void refreshCurrentMovie() {
-        mViewModel.forceRefresh();
     }
 }

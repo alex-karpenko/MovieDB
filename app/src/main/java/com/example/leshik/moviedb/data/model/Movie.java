@@ -1,5 +1,6 @@
 package com.example.leshik.moviedb.data.model;
 
+import java.util.Calendar;
 import java.util.List;
 
 import io.realm.RealmList;
@@ -17,7 +18,6 @@ public class Movie extends RealmObject {
 
     private String originalTitle;
     private String overview;
-    @Index
     private String releaseDate;
     private Float voteAverage;
     private Float popularity;
@@ -28,17 +28,11 @@ public class Movie extends RealmObject {
     private Integer runTime;
     private Long lastUpdate;
 
+    @Index
+    private long favoriteTimestamp;
+
     private RealmList<Video> videos;
     private RealmList<Review> reviews;
-
-    @Index
-    private Integer favoritePosition;
-    @Index
-    private Integer popularPosition;
-    @Index
-    private Integer topratedPosition;
-    @Index
-    private Integer upcomingPosition;
 
     public boolean isEmpty() {
         return movieId == 0;
@@ -58,16 +52,7 @@ public class Movie extends RealmObject {
             if (runTime == null) runTime = existentMovie.getRunTime();
             if (videos == null || videos.size() == 0) videos = existentMovie.getVideos();
             if (reviews == null || reviews.size() == 0) reviews = existentMovie.getReviews();
-
-            if (favoritePosition == null || favoritePosition <= 0)
-                favoritePosition = existentMovie.getFavoritePosition();
-            if (popularPosition == null || popularPosition <= 0)
-                popularPosition = existentMovie.getPopularPosition();
-            if (topratedPosition == null || topratedPosition <= 0)
-                topratedPosition = existentMovie.getTopratedPosition();
-            if (upcomingPosition == null || upcomingPosition <= 0)
-                upcomingPosition = existentMovie.getUpcomingPosition();
-
+            if (favoriteTimestamp <= 0L) favoriteTimestamp = existentMovie.getFavoriteTimestamp();
             if (lastUpdate == null) lastUpdate = existentMovie.getLastUpdate();
         }
     }
@@ -169,41 +154,30 @@ public class Movie extends RealmObject {
         this.lastUpdate = lastUpdate;
     }
 
-    public Integer getFavoritePosition() {
-        return favoritePosition;
-    }
-
-    public void setFavoritePosition(Integer favoritePosition) {
-        this.favoritePosition = favoritePosition;
+    public void invertFavorite() {
+        if (isFavorite()) unsetFavorite();
+        else setFavorite();
     }
 
     public boolean isFavorite() {
-        if (favoritePosition == null || favoritePosition <= 0) return false;
-        else return true;
+        return getFavoriteTimestamp() > 0L;
     }
 
-    public Integer getPopularPosition() {
-        return popularPosition;
+    public void unsetFavorite() {
+        setFavoriteTimestamp(0L);
     }
 
-    public void setPopularPosition(Integer popularPosition) {
-        this.popularPosition = popularPosition;
+    public void setFavorite() {
+
+        setFavoriteTimestamp(Calendar.getInstance().getTimeInMillis());
     }
 
-    public Integer getTopratedPosition() {
-        return topratedPosition;
+    public long getFavoriteTimestamp() {
+        return favoriteTimestamp;
     }
 
-    public void setTopratedPosition(Integer topratedPosition) {
-        this.topratedPosition = topratedPosition;
-    }
-
-    public Integer getUpcomingPosition() {
-        return upcomingPosition;
-    }
-
-    public void setUpcomingPosition(Integer upcomingPosition) {
-        this.upcomingPosition = upcomingPosition;
+    public void setFavoriteTimestamp(long favoriteTimestamp) {
+        this.favoriteTimestamp = favoriteTimestamp;
     }
 
     public RealmList<Video> getVideos() {
