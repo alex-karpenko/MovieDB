@@ -11,8 +11,6 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.leshik.moviedb.R;
-import com.example.leshik.moviedb.data.PreferenceStorage;
-import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
 import com.example.leshik.moviedb.ui.settings.SettingsActivity;
 import com.example.leshik.moviedb.utils.EventsUtils;
 
@@ -35,8 +33,6 @@ public class DetailActivity extends AppCompatActivity {
     @BindView(R.id.detail_frame)
     protected LinearLayout mDetailFrame;
 
-    private PreferenceInterface prefStorage;
-
     private Disposable subscription;
 
     // helper method to create proper intent to start DetailActivity
@@ -48,7 +44,6 @@ public class DetailActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        prefStorage = PreferenceStorage.getInstance(this.getApplicationContext());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detail_activity);
 

@@ -18,7 +18,6 @@ public class Movie extends RealmObject {
 
     private String originalTitle;
     private String overview;
-    @Index
     private String releaseDate;
     private Float voteAverage;
     private Float popularity;
@@ -29,11 +28,11 @@ public class Movie extends RealmObject {
     private Integer runTime;
     private Long lastUpdate;
 
-    private RealmList<Video> videos;
-    private RealmList<Review> reviews;
-
     @Index
     private long favoriteTimestamp;
+
+    private RealmList<Video> videos;
+    private RealmList<Review> reviews;
 
     public boolean isEmpty() {
         return movieId == 0;

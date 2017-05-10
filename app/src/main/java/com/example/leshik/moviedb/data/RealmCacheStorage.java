@@ -122,6 +122,26 @@ class RealmCacheStorage implements CacheStorage {
         realm.close();
     }
 
+    private void updateOrInsertMovie(final Realm realm, final Movie newMovie) {
+        Movie oldMovie = findMovie(realm, newMovie.getMovieId());
+        if (oldMovie != null)
+            newMovie.updateNullFields(oldMovie);
+
+        if (realm.isInTransaction()) {
+            realm.copyToRealmOrUpdate(newMovie);
+        } else {
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm transactionRealm) {
+                    Log.i(TAG, "updateOrInsertMovie: +");
+                    transactionRealm.copyToRealmOrUpdate(newMovie);
+                    Log.i(TAG, "updateOrInsertMovie: -");
+                }
+            });
+        }
+
+    }
+
     @Override
     public void updateMovieListAsync(final MovieListType listType, final int page, final List<Movie> movieList) {
         Realm realm = getRealmInstance();
@@ -145,26 +165,6 @@ class RealmCacheStorage implements CacheStorage {
         });
 
         realm.close();
-    }
-
-    private void updateOrInsertMovie(final Realm realm, final Movie newMovie) {
-        Movie oldMovie = findMovie(realm, newMovie.getMovieId());
-        if (oldMovie != null)
-            newMovie.updateNullFields(oldMovie);
-
-        if (realm.isInTransaction()) {
-            realm.copyToRealmOrUpdate(newMovie);
-        } else {
-            realm.executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(Realm transactionRealm) {
-                    Log.i(TAG, "updateOrInsertMovie: +");
-                    transactionRealm.copyToRealmOrUpdate(newMovie);
-                    Log.i(TAG, "updateOrInsertMovie: -");
-                }
-            });
-        }
-
     }
 
     @Nullable

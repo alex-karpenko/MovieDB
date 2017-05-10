@@ -11,12 +11,6 @@ public class MovieListViewItem {
     public String title;
     public float voteAverage;
 
-    public MovieListViewItem(long movieId, int listPosition, String posterPath) {
-        this.movieId = movieId;
-        this.listPosition = listPosition;
-        this.posterPath = posterPath;
-    }
-
     public MovieListViewItem(Movie movie, int position) {
         if (movie == null) throw new IllegalArgumentException("Movie cannot be null");
         if (position < 0) throw new IllegalArgumentException("Movie`s position cannot be negative");

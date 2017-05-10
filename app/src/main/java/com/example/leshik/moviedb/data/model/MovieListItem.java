@@ -1,6 +1,7 @@
 package com.example.leshik.moviedb.data.model;
 
 import io.realm.RealmObject;
+import io.realm.annotations.Ignore;
 import io.realm.annotations.Index;
 
 /**
@@ -10,16 +11,21 @@ import io.realm.annotations.Index;
  */
 
 public class MovieListItem extends RealmObject {
+    @Ignore
     public static final String LIST_TYPE_COLUMN = "listType";
+    @Ignore
+    public static final String PAGE_COLUMN = "page";
+    @Ignore
+    public static final String POSITION_COLUMN = "position";
+    @Ignore
+    public static final String MOVIE_ID_COLUMN = "movieId";
+
     @Index
     public int listType;
-    public static final String PAGE_COLUMN = "page";
     @Index
     public int page;
-    public static final String POSITION_COLUMN = "position";
     @Index
     public int position;
-    public static final String MOVIE_ID_COLUMN = "movieId";
     @Index
     public long movieId;
 

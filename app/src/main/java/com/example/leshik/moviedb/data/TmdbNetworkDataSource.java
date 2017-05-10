@@ -90,7 +90,6 @@ class TmdbNetworkDataSource implements NetworkDataSource {
                 })
                 .onErrorReturnItem(new NetworkConfig());
 
-        // FIXME: 3/25/17 May by memory leaks
         newConfig.blockingSubscribe(new Consumer<NetworkConfig>() {
             @Override
             public void accept(NetworkConfig config) throws Exception {

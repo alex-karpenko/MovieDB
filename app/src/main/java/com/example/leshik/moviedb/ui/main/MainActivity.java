@@ -18,8 +18,6 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.leshik.moviedb.R;
-import com.example.leshik.moviedb.data.PreferenceStorage;
-import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
 import com.example.leshik.moviedb.ui.details.DetailActivity;
 import com.example.leshik.moviedb.ui.details.DetailFragment;
 import com.example.leshik.moviedb.ui.settings.SettingsActivity;
@@ -61,15 +59,12 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
     // current selected movie (for two pane view)
     private long selectedMovieId = 0;
 
-    private PreferenceInterface prefStorage;
-
     private FirebaseAnalytics mFirebaseAnalytics;
 
     private Disposable subscription;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        prefStorage = PreferenceStorage.getInstance(this.getApplicationContext());
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.main_activity);

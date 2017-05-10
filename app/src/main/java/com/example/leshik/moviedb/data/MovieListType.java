@@ -8,11 +8,6 @@ public enum MovieListType {
 
     Popular(0) {
         @Override
-        public boolean isFromNetwork() {
-            return true;
-        }
-
-        @Override
         public boolean isLocalOnly() {
             return false;
         }
@@ -25,11 +20,6 @@ public enum MovieListType {
     },
     Toprated(1) {
         @Override
-        public boolean isFromNetwork() {
-            return true;
-        }
-
-        @Override
         public boolean isLocalOnly() {
             return false;
         }
@@ -41,11 +31,6 @@ public enum MovieListType {
     },
     Upcoming(2) {
         @Override
-        public boolean isFromNetwork() {
-            return true;
-        }
-
-        @Override
         public boolean isLocalOnly() {
             return false;
         }
@@ -56,11 +41,6 @@ public enum MovieListType {
         }
     },
     Favorite(3) {
-        @Override
-        public boolean isFromNetwork() {
-            return false;
-        }
-
         @Override
         public boolean isLocalOnly() {
             return true;
@@ -81,8 +61,6 @@ public enum MovieListType {
     public int getIndex() {
         return index;
     }
-
-    abstract public boolean isFromNetwork();
 
     abstract public boolean isLocalOnly();
 
