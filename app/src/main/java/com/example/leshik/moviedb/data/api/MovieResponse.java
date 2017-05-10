@@ -161,7 +161,7 @@ public class MovieResponse {
         Movie movie = new Movie();
 
         movie.setMovieId(id);
-        movie.setOriginalTitle(originalTitle);
+        movie.setOriginalTitle(title);
         movie.setOverview(overview);
         movie.setReleaseDate(releaseDate);
         movie.setVoteAverage(voteAverage);
