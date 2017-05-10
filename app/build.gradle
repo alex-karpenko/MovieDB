@@ -13,8 +13,8 @@ android {
         applicationId "com.example.leshik.moviedb"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 5
-        versionName '0.4-develop-debug'
+        versionCode 6
+        versionName '0.4'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         signingConfig signingConfigs.config
