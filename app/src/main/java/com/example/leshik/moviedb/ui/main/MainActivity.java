@@ -18,8 +18,6 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.leshik.moviedb.R;
-import com.example.leshik.moviedb.data.PreferenceStorage;
-import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
 import com.example.leshik.moviedb.ui.details.DetailActivity;
 import com.example.leshik.moviedb.ui.details.DetailFragment;
 import com.example.leshik.moviedb.ui.settings.SettingsActivity;
@@ -30,6 +28,7 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
@@ -60,15 +59,12 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
     // current selected movie (for two pane view)
     private long selectedMovieId = 0;
 
-    private PreferenceInterface prefStorage;
-
     private FirebaseAnalytics mFirebaseAnalytics;
 
     private Disposable subscription;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        prefStorage = PreferenceStorage.getInstance(this.getApplicationContext());
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.main_activity);
@@ -123,6 +119,7 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
                 FirebaseUtils.createAnalyticsSelectBundle(TAG, "Start Main Activity", TAG));
 
         subscription = EventsUtils.getEventObservable()
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<EventsUtils.EventType>() {
                     @Override
                     public void accept(@NonNull EventsUtils.EventType eventType) throws Exception {

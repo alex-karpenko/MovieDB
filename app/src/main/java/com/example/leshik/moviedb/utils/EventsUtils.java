@@ -5,6 +5,7 @@ import android.util.Log;
 import com.example.leshik.moviedb.R;
 
 import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.Subject;
 
@@ -35,7 +36,7 @@ public class EventsUtils {
     }
 
     public static Observable<EventType> getEventObservable() {
-        return eventObservable;
+        return eventObservable.subscribeOn(AndroidSchedulers.mainThread());
     }
 
     public static void postEvent(EventType event) {

@@ -22,8 +22,11 @@ import java.util.List;
 import java.util.Map;
 
 import io.reactivex.Observable;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
+import io.reactivex.functions.Predicate;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -34,6 +37,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  *
  * Implementation of the NetworkDataSource interface
  * with TheMovieDataBase API via Retrofit2
+ *
  */
 
 class TmdbNetworkDataSource implements NetworkDataSource {
@@ -86,7 +90,6 @@ class TmdbNetworkDataSource implements NetworkDataSource {
                 })
                 .onErrorReturnItem(new NetworkConfig());
 
-        // FIXME: 3/25/17 May by memory leaks
         newConfig.blockingSubscribe(new Consumer<NetworkConfig>() {
             @Override
             public void accept(NetworkConfig config) throws Exception {
@@ -113,6 +116,37 @@ class TmdbNetworkDataSource implements NetworkDataSource {
                     }
                 })
                 .onErrorReturnItem(new Movie());
+    }
+
+    @Override
+    public Observable<Movie> readMovieFull(long movieId) {
+        return readMovie(movieId)
+                .zipWith(readVideoList(movieId),
+                        new BiFunction<Movie, List<Video>, Movie>() {
+                            @Override
+                            public Movie apply(Movie movie, List<Video> videos) throws Exception {
+                                movie.setVideos(videos);
+                                return movie;
+                            }
+                        })
+                .zipWith(readReviewList(movieId),
+                        new BiFunction<Movie, List<Review>, Movie>() {
+                            @Override
+                            public Movie apply(Movie movie, List<Review> reviews) throws Exception {
+                                movie.setReviews(reviews);
+                                return movie;
+                            }
+                        })
+                .filter(new Predicate<Movie>() {
+                    @Override
+                    public boolean test(@NonNull Movie movie) throws Exception {
+                        return !isEmpty(movie);
+                    }
+                });
+    }
+
+    private boolean isEmpty(Movie movie) {
+        return movie == null || movie.isEmpty();
     }
 
     @Override
@@ -180,7 +214,7 @@ class TmdbNetworkDataSource implements NetworkDataSource {
                 .map(new Function<ListPageResponse, List<Movie>>() {
                     @Override
                     public List<Movie> apply(ListPageResponse listPageResponse) throws Exception {
-                        return listPageResponse.getListPageInstance(listType);
+                        return listPageResponse.getListPageInstance();
                     }
                 })
                 .onErrorReturnItem(new ArrayList<Movie>());
