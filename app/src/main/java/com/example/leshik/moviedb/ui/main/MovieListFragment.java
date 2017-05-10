@@ -97,7 +97,7 @@ public class MovieListFragment extends Fragment {
         mLayoutManager = new GridLayoutManager(getActivity(), ViewUtils.calculateNoOfColumns(getActivity()));
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        // Construct empty adapter ...
+        // Construct adapter ...
         if (getAdapterState() == null) mAdapter = new MovieListAdapter(getActivity(), listType);
         else mAdapter = new MovieListAdapter(getActivity(), listType, getAdapterState());
         mAdapter.setHasStableIds(true);
@@ -105,7 +105,8 @@ public class MovieListFragment extends Fragment {
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setHasFixedSize(true);
 
-        subscribeToMovieList();
+        // FIXME: 5/10/17 remove next line
+        // subscribeToMovieList();
 
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT,
                 FirebaseUtils.createAnalyticsSelectBundle(TAG, "Create Movie List Fragment", listType.toString()));
@@ -127,6 +128,19 @@ public class MovieListFragment extends Fragment {
                 return MovieListType.Favorite;
             else throw new IllegalArgumentException("Incorrect fragment type argument");
         } else return DEFAULT_FRAGMENT_TYPE;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (listType.isLocalOnly()) mAdapter.setAdapterState(null);
+        subscribeToMovieList();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        unsubscribeFromMovieList();
     }
 
     private void subscribeToMovieList() {
@@ -151,7 +165,8 @@ public class MovieListFragment extends Fragment {
     @Override
     public void onDestroyView() {
         saveAdapterState();
-        unsubscribeFromMovieList();
+        // FIXME: 5/10/17 remove next line
+        // unsubscribeFromMovieList();
         super.onDestroyView();
         unbinder.unbind();
 

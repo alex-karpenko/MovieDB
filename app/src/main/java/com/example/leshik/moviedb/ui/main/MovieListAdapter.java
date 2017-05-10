@@ -65,11 +65,8 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
     }
 
     private void updateMovieMap(MovieListViewItem newItem) {
-        if (newItem.listPosition < 0) { // delete item from map
-            movieMap.remove(newItem.movieId);
-        } else { // add item to map
-            movieMap.put(newItem.movieId, newItem);
-        }
+        if (newItem.listPosition == 0) movieMap.clear();
+        movieMap.put(newItem.movieId, newItem);
 
         movieList = new ArrayList<>(movieMap.values());
         notifyDataSetChanged();
@@ -141,8 +138,13 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
     }
 
     public void setAdapterState(AdapterState state) {
-        movieList = state.getMovieList();
-        movieMap = state.getMovieMap();
+        if (state == null) {
+            movieList = new ArrayList<>();
+            movieMap = new TreeMap<>();
+        } else {
+            movieList = state.getMovieList();
+            movieMap = state.getMovieMap();
+        }
     }
 
     public static class AdapterState {
