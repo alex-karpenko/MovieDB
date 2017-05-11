@@ -4,7 +4,6 @@ package com.example.leshik.moviedb.data.api;
  * Created by Leshik on 19.12.2016.
  */
 
-import com.example.leshik.moviedb.data.MovieListType;
 import com.example.leshik.moviedb.data.model.Movie;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -80,8 +79,7 @@ public class ListPageResponse {
     @Expose
     public Integer totalPages;
 
-    public List<Movie> getListPageInstance(MovieListType listType) {
-        int startPosition = (page - 1) * PAGE_SIZE + 1;
+    public List<Movie> getListPageInstance() {
         List<Movie> returnList = new ArrayList<>();
 
         if (listResults != null) {
@@ -102,21 +100,6 @@ public class ListPageResponse {
                 movie.setLastUpdate(null);
                 movie.setVideos(null);
                 movie.setReviews(null);
-                movie.setFavoritePosition(null);
-                movie.setPopularPosition(null);
-                movie.setTopratedPosition(null);
-
-                switch (listType) {
-                    case Popular:
-                        movie.setPopularPosition(startPosition);
-                        break;
-                    case Toprated:
-                        movie.setTopratedPosition(startPosition);
-                        break;
-                    default:
-                        throw new IllegalArgumentException("ListPageResponse: instance type does not supported");
-                }
-                startPosition++;
 
                 returnList.add(movie);
             }

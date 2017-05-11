@@ -15,6 +15,4 @@ public interface MovieInteractor {
     Observable<Movie> getMovie(long movieId);
 
     void invertFavorite(long movieId);
-
-    void forceRefresh(long movieId);
 }

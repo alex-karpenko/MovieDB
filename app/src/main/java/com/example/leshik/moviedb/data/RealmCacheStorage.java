@@ -8,28 +8,26 @@ import android.util.Log;
 import com.example.leshik.moviedb.data.interfaces.CacheStorage;
 import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
 import com.example.leshik.moviedb.data.model.Movie;
+import com.example.leshik.moviedb.data.model.MovieListItem;
+import com.example.leshik.moviedb.data.model.MovieListViewItem;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.ObservableSource;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposables;
-import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
-import io.realm.RealmChangeListener;
 import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
 
 /**
  * Created by Leshik on 01.03.2017.
- *
+ * <p>
  * Implementation of CacheStorage interface
  * with Realm DB
- *
  */
 
 class RealmCacheStorage implements CacheStorage {
@@ -69,86 +67,59 @@ class RealmCacheStorage implements CacheStorage {
         return Realm.getDefaultInstance();
     }
 
-    private Observable<Realm> getRealmObservable() {
-        return Observable.create(new ObservableOnSubscribe<Realm>() {
-            @Override
-            public void subscribe(final ObservableEmitter<Realm> emitter)
-                    throws Exception {
-                final Realm observableRealm = getRealmInstance();
-
-                final RealmChangeListener<Realm> listener = new RealmChangeListener<Realm>() {
-                    @Override
-                    public void onChange(Realm element) {
-                        emitter.onNext(element);
-                    }
-                };
-
-                emitter.setDisposable(Disposables.fromRunnable(new Runnable() {
-                    @Override
-                    public void run() {
-                        observableRealm.removeChangeListener(listener);
-                        observableRealm.close();
-                    }
-                }));
-                observableRealm.addChangeListener(listener);
-                emitter.onNext(observableRealm);
-            }
-        });
-    }
-
     @Override
-    public Observable<Movie> getMovieObservable(final long movieId) {
+    public Observable<Movie> getMovie(final long movieId) {
         return Observable.create(new ObservableOnSubscribe<Movie>() {
             @Override
             public void subscribe(final ObservableEmitter<Movie> emitter) throws Exception {
-                final Realm realm = getRealmInstance();
-                final RealmResults<Movie> movie = findMovieAsRealmResults(realm, movieId);
+                Realm realm = getRealmInstance();
 
-                final RealmChangeListener<RealmResults<Movie>> listener = new RealmChangeListener<RealmResults<Movie>>() {
-                    @Override
-                    public void onChange(RealmResults<Movie> element) {
-                        if (!emitter.isDisposed() && element.size() > 0)
-                            emitter.onNext(element.get(0));
-                    }
-                };
+                try {
+                    Movie movie = findMovie(realm, movieId);
 
-                emitter.setDisposable(Disposables.fromRunnable(new Runnable() {
-                    @Override
-                    public void run() {
-                        movie.removeChangeListener(listener);
-                        if (!realm.isClosed())
-                            realm.close();
-                    }
-                }));
+                    if (movie != null) emitter.onNext(movie);
+                    emitter.onComplete();
 
-                movie.addChangeListener(listener);
-                if (movie.size() > 0) emitter.onNext(movie.get(0));
-                else emitter.onNext(new Movie());
+                } catch (Exception e) {
+                    emitter.onError(e);
+                } finally {
+                    if (!realm.isClosed()) realm.close();
+                }
             }
-        });
-    }
-
-    private RealmResults<Movie> findMovieAsRealmResults(Realm realm, long movieId) {
-        return realm.where(Movie.class)
-                .equalTo("movieId", movieId)
-                .findAll();
+        }).subscribeOn(Schedulers.io());
     }
 
     @Override
-    public long updateOrInsertMovie(final Movie newMovie) {
+    public long updateOrInsertMovieAsync(final Movie newMovie) {
         Realm realm = getRealmInstance();
 
-        realm.executeTransaction(new Realm.Transaction() {
+        realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm transactionRealm) {
-                Log.i(TAG, "updateOrInsertMovie: +");
+                Log.i(TAG, "updateOrInsertMovieAsync: +");
                 updateOrInsertMovie(transactionRealm, newMovie);
-                Log.i(TAG, "updateOrInsertMovie: -");
+                Log.i(TAG, "updateOrInsertMovieAsync: -");
             }
         });
 
         realm.close();
         return newMovie.getMovieId();
+    }
+
+    @Override
+    public void updateOrInsertMoviesFromListAsync(final List<Movie> movieList) {
+        Realm realm = getRealmInstance();
+
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm transactionRealm) {
+                Log.i(TAG, "updateOrInsertMoviesFromListAsync: +");
+                for (Movie movie : movieList) updateOrInsertMovie(transactionRealm, movie);
+                Log.i(TAG, "updateOrInsertMoviesFromListAsync: -");
+            }
+        });
+
+        realm.close();
     }
 
     private void updateOrInsertMovie(final Realm realm, final Movie newMovie) {
@@ -171,6 +142,31 @@ class RealmCacheStorage implements CacheStorage {
 
     }
 
+    @Override
+    public void updateMovieListAsync(final MovieListType listType, final int page, final List<Movie> movieList) {
+        Realm realm = getRealmInstance();
+
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm transactionRealm) {
+                Log.i(TAG, "updateMovieListAsync: +");
+                RealmResults<MovieListItem> listItems = transactionRealm.where(MovieListItem.class)
+                        .equalTo(MovieListItem.LIST_TYPE_COLUMN, listType.getIndex())
+                        .equalTo(MovieListItem.PAGE_COLUMN, page)
+                        .findAll();
+                listItems.deleteAllFromRealm();
+                for (int i = 0; i < movieList.size(); i++) {
+                    MovieListItem newItem = new MovieListItem(listType.getIndex(),
+                            page, i, movieList.get(i).getMovieId());
+                    transactionRealm.copyToRealm(newItem);
+                }
+                Log.i(TAG, "updateMoviesListAsync: -");
+            }
+        });
+
+        realm.close();
+    }
+
     @Nullable
     private Movie findMovie(Realm realm, long movieId) {
         Movie movie = realm.where(Movie.class).equalTo("movieId", movieId).findFirst();
@@ -183,23 +179,12 @@ class RealmCacheStorage implements CacheStorage {
     public void invertFavorite(final long movieId) {
         Realm realm = getRealmInstance();
 
-        realm.executeTransaction(new Realm.Transaction() {
+        realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
-            public void execute(Realm realm) {
+            public void execute(Realm transactRealm) {
                 Log.i(TAG, "invertFavorite: +");
-                Movie movie = realm.where(Movie.class).equalTo("movieId", movieId).findFirst();
-                if (movie != null) {
-                    if (movie.isFavorite()) {
-                        movie.setFavoritePosition(-1);
-                    } else {
-                        Integer newFavoriteListPosition;
-                        Number maxCurrentFavoritePosition = realm.where(Movie.class)
-                                .max(MovieListType.Favorite.getModelColumnName());
-                        if (maxCurrentFavoritePosition == null) newFavoriteListPosition = 1;
-                        else newFavoriteListPosition = maxCurrentFavoritePosition.intValue() + 1;
-                        movie.setFavoritePosition(newFavoriteListPosition);
-                    }
-                }
+                Movie movie = transactRealm.where(Movie.class).equalTo("movieId", movieId).findFirst();
+                if (movie != null) movie.invertFavorite();
                 Log.i(TAG, "invertFavorite: -");
             }
         });
@@ -208,127 +193,82 @@ class RealmCacheStorage implements CacheStorage {
     }
 
     @Override
-    public Observable<List<Movie>> getMovieListObservable(final MovieListType listType) {
-        return Observable.create(new ObservableOnSubscribe<List<Movie>>() {
+    public Observable<List<MovieListViewItem>> getMovieListPage(final MovieListType listType, final int page) {
+        return Observable.create(new ObservableOnSubscribe<List<MovieListViewItem>>() {
             @Override
-            public void subscribe(final ObservableEmitter<List<Movie>> emitter) throws Exception {
-                final Realm realm = getRealmInstance();
-                final RealmResults<Movie> movieList = findMovieListAsRealmResults(realm, listType);
+            public void subscribe(@NonNull ObservableEmitter<List<MovieListViewItem>> emitter) throws Exception {
+                Realm realm = getRealmInstance();
+                List<MovieListItem> movieList;
+                List<MovieListViewItem> returnList = new ArrayList<>();
 
-                final RealmChangeListener<RealmResults<Movie>> listener = new RealmChangeListener<RealmResults<Movie>>() {
-                    @Override
-                    public void onChange(RealmResults<Movie> element) {
-                        if (!emitter.isDisposed())
-                            emitter.onNext(element);
+                try {
+                    if (listType.isLocalOnly()) {
+                        RealmResults<Movie> movieResult;
+                        switch (listType) {
+                            case Favorite:
+                                movieResult = realm.where(Movie.class)
+                                        .greaterThan(listType.getModelColumnName(), 0L)
+                                        .findAllSorted(listType.getModelColumnName());
+                                break;
+                            default:
+                                throw new IllegalArgumentException("Local list with unknown type");
+                        }
+
+                        for (int i = 0; i < movieResult.size(); i++) {
+                            returnList.add(i, new MovieListViewItem(movieResult.get(i), i));
+                        }
+                    } else {
+                        RealmResults<MovieListItem> movieListResult = realm.where(MovieListItem.class)
+                                .equalTo(MovieListItem.LIST_TYPE_COLUMN, listType.getIndex())
+                                .equalTo(MovieListItem.PAGE_COLUMN, page)
+                                .findAllSorted(MovieListItem.POSITION_COLUMN);
+                        if (movieListResult.size() > 0 && movieListResult.isValid()) {
+                            movieList = realm.copyFromRealm(movieListResult);
+                            int pageSize = prefStorage.getCachePageSize();
+
+                            for (MovieListItem item : movieList) {
+                                Movie movie = findMovie(realm, item.movieId);
+                                if (movie != null) {
+                                    MovieListViewItem viewListItem = new MovieListViewItem(movie, item.getAbsolutePosition(pageSize));
+                                    returnList.add(item.position, viewListItem);
+                                }
+                            }
+                        }
                     }
-                };
 
-                emitter.setDisposable(Disposables.fromRunnable(new Runnable() {
-                    @Override
-                    public void run() {
-                        movieList.removeChangeListener(listener);
-                        if (!realm.isClosed())
-                            realm.close();
+                    if (returnList.size() > 0) {
+                        if (!emitter.isDisposed()) emitter.onNext(returnList);
                     }
-                }));
-
-                movieList.addChangeListener(listener);
-                emitter.onNext(movieList);
+                    if (!emitter.isDisposed()) emitter.onComplete();
+                } catch (Exception exception) {
+                    if (!emitter.isDisposed()) emitter.onError(exception);
+                } finally {
+                    if (!realm.isClosed()) realm.close();
+                }
             }
-        });
-    }
-
-    private RealmResults<Movie> findMovieListAsRealmResults(Realm realm, MovieListType listType) {
-        return realm.where(Movie.class)
-                .greaterThan(listType.getModelColumnName(), 0)
-                .findAllSorted(listType.getModelColumnName());
-    }
-
-    @Override
-    public void insertOrUpdateMovieList(final MovieListType listType, final Observable<List<Movie>> movieList) {
-        Realm realm = getRealmInstance();
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm transactionRealm) {
-                Log.i(TAG, "insertOrUpdateMovieList: +");
-                updateOrInsertMovieList(transactionRealm, movieList);
-                Log.i(TAG, "insertOrUpdateMovieList: -");
-            }
-        });
-
-        realm.close();
-    }
-
-    @Override
-    public void clearMovieListPositionsAndInsertOrUpdateData(final MovieListType listType, final Observable<List<Movie>> movieList) {
-        Realm realm = getRealmInstance();
-
-        if (realm.isInTransaction())
-            clearMovieListPositionsAndInsertOrUpdateData(realm, listType, movieList);
-        else realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm transactionRealm) {
-                clearMovieListPositionsAndInsertOrUpdateData(transactionRealm, listType, movieList);
-            }
-        });
-
-        realm.close();
-    }
-
-    private void clearMovieListPositionsAndInsertOrUpdateData(Realm transactionRealm, final MovieListType listType, final Observable<List<Movie>> movieList) {
-        Log.i(TAG, "clearMovieListPositionsAndInsertOrUpdateData: +, " + listType);
-        final RealmResults<Movie> result = transactionRealm.where(Movie.class)
-                .greaterThan(listType.getModelColumnName(), 0)
-                .findAll();
-        clearMovieListPosition(listType, result);
-        updateOrInsertMovieList(transactionRealm, movieList);
-        Log.i(TAG, "clearMovieListPositionsAndInsertOrUpdateData: -");
-    }
-
-    private void clearMovieListPosition(MovieListType listType, RealmResults<Movie> movieList) {
-        for (Movie m : movieList) {
-            // TODO: 3/6/17 Optimize this, in the Movie model class. Maybe define array of the list types
-            switch (listType) {
-                case Popular:
-                    m.setPopularPosition(0);
-                    break;
-                case Toprated:
-                    m.setTopratedPosition(0);
-                    break;
-                default:
-                    throw new IllegalArgumentException("Clearing not supported for the list type");
-            }
-        }
-    }
-
-    private void updateOrInsertMovieList(final Realm realm, Observable<List<Movie>> movieObservable) {
-        movieObservable
-                .flatMap(new Function<List<Movie>, ObservableSource<Movie>>() {
-                    @Override
-                    public ObservableSource<Movie> apply(List<Movie> movieList) throws Exception {
-                        return Observable.fromIterable(movieList);
-                    }
-                })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<Movie>() {
-                    @Override
-                    public void accept(Movie newMovie) throws Exception {
-                        updateOrInsertMovie(realm, newMovie);
-                    }
-                });
+        }).subscribeOn(Schedulers.io());
     }
 
     @Override
     public int getMovieListLastPageNumber(MovieListType listType) {
         Realm realm = getRealmInstance();
-        int lastPosition;
+        int lastPage;
 
-        lastPosition = realm.where(Movie.class)
-                .greaterThan(listType.getModelColumnName(), 0)
-                .findAll()
-                .size();
+        if (listType.isLocalOnly()) {
+            int lastPosition = realm.where(Movie.class)
+                    .greaterThan(listType.getModelColumnName(), 0L)
+                    .findAll()
+                    .size();
+            lastPage = lastPosition / prefStorage.getCachePageSize();
+            if (lastPosition % prefStorage.getCachePageSize() != 0) lastPage++;
+        } else {
+            lastPage = realm.where(MovieListItem.class)
+                    .equalTo(MovieListItem.LIST_TYPE_COLUMN, listType.getIndex())
+                    .max(MovieListItem.PAGE_COLUMN)
+                    .intValue();
+        }
 
         realm.close();
-        return lastPosition / prefStorage.getCachePageSize();
+        return lastPage;
     }
 }

@@ -8,51 +8,47 @@ public enum MovieListType {
 
     Popular(0) {
         @Override
-        boolean isFromNetwork() {
-            return true;
-        }
-
-        @Override
-        boolean isLocalOnly() {
+        public boolean isLocalOnly() {
             return false;
         }
 
         @Override
-        String getModelColumnName() {
+        public String getModelColumnName() {
             return "popularPosition";
         }
 
     },
     Toprated(1) {
         @Override
-        boolean isFromNetwork() {
-            return true;
-        }
-
-        @Override
-        boolean isLocalOnly() {
+        public boolean isLocalOnly() {
             return false;
         }
 
         @Override
-        String getModelColumnName() {
+        public String getModelColumnName() {
             return "topratedPosition";
         }
     },
-    Favorite(2) {
+    Upcoming(2) {
         @Override
-        boolean isFromNetwork() {
+        public boolean isLocalOnly() {
             return false;
         }
 
         @Override
-        boolean isLocalOnly() {
+        public String getModelColumnName() {
+            return "upcomingPosition";
+        }
+    },
+    Favorite(3) {
+        @Override
+        public boolean isLocalOnly() {
             return true;
         }
 
         @Override
-        String getModelColumnName() {
-            return "favoritePosition";
+        public String getModelColumnName() {
+            return "favoriteTimestamp";
         }
     };
 
@@ -66,21 +62,19 @@ public enum MovieListType {
         return index;
     }
 
-    abstract boolean isFromNetwork();
+    abstract public boolean isLocalOnly();
 
-    abstract boolean isLocalOnly();
+    abstract public String getModelColumnName();
 
-    abstract String getModelColumnName();
-
-    String getTotalPagesKey() {
+    public String getTotalPagesKey() {
         return name() + "total_pages";
     }
 
-    String getTotalItemsKey() {
+    public String getTotalItemsKey() {
         return name() + "total_items";
     }
 
-    String getUpdateTimestampKey() {
+    public String getUpdateTimestampKey() {
         return name() + "last_update";
     }
 }

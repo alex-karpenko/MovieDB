@@ -29,8 +29,4 @@ public class MovieViewModel {
     public void invertFavorite() {
         mMovieInteractor.invertFavorite(movieId);
     }
-
-    public void forceRefresh() {
-        mMovieInteractor.forceRefresh(movieId);
-    }
 }

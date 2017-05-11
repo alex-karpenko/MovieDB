@@ -16,13 +16,17 @@ import com.example.leshik.moviedb.data.model.Review;
 import com.example.leshik.moviedb.data.model.Video;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import io.reactivex.Observable;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
+import io.reactivex.functions.Predicate;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -30,9 +34,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Created by Leshik on 01.03.2017.
- * <p>
+ *
  * Implementation of the NetworkDataSource interface
  * with TheMovieDataBase API via Retrofit2
+ *
  */
 
 class TmdbNetworkDataSource implements NetworkDataSource {
@@ -71,8 +76,16 @@ class TmdbNetworkDataSource implements NetworkDataSource {
                 .map(new Function<ConfigurationResponse, NetworkConfig>() {
                     @Override
                     public NetworkConfig apply(ConfigurationResponse configurationResponse) throws Exception {
-                        return new NetworkConfig(configurationResponse.getImagesBaseUrl(),
+                        NetworkConfig newConfig = new NetworkConfig(configurationResponse.getImagesBaseUrl(),
                                 configurationResponse.getImagesBaseSecureUrl());
+
+                        for (NetworkConfig.ImageType t : NetworkConfig.ImageType.values()) {
+                            Log.i(TAG, "getNetworkConfig: setup image sizes, type=" + t);
+                            if (configurationResponse.getImageSizes(t) != null)
+                                newConfig.setupImageSizes(t, configurationResponse.getImageSizes(t));
+                        }
+
+                        return newConfig;
                     }
                 })
                 .onErrorReturnItem(new NetworkConfig());
@@ -80,8 +93,10 @@ class TmdbNetworkDataSource implements NetworkDataSource {
         newConfig.blockingSubscribe(new Consumer<NetworkConfig>() {
             @Override
             public void accept(NetworkConfig config) throws Exception {
+                Log.i(TAG, "getNetworkConfig: consume url=" + config.basePosterUrl + ", sec_url=" + config.basePosterSecureUrl + ", images=" + Arrays.toString(config.getImageSizesArray()));
                 networkConfig.basePosterUrl = config.basePosterUrl;
                 networkConfig.basePosterSecureUrl = config.basePosterSecureUrl;
+                networkConfig.setImageSizesArray(config.getImageSizesArray());
             }
         });
 
@@ -101,6 +116,37 @@ class TmdbNetworkDataSource implements NetworkDataSource {
                     }
                 })
                 .onErrorReturnItem(new Movie());
+    }
+
+    @Override
+    public Observable<Movie> readMovieFull(long movieId) {
+        return readMovie(movieId)
+                .zipWith(readVideoList(movieId),
+                        new BiFunction<Movie, List<Video>, Movie>() {
+                            @Override
+                            public Movie apply(Movie movie, List<Video> videos) throws Exception {
+                                movie.setVideos(videos);
+                                return movie;
+                            }
+                        })
+                .zipWith(readReviewList(movieId),
+                        new BiFunction<Movie, List<Review>, Movie>() {
+                            @Override
+                            public Movie apply(Movie movie, List<Review> reviews) throws Exception {
+                                movie.setReviews(reviews);
+                                return movie;
+                            }
+                        })
+                .filter(new Predicate<Movie>() {
+                    @Override
+                    public boolean test(@NonNull Movie movie) throws Exception {
+                        return !isEmpty(movie);
+                    }
+                });
+    }
+
+    private boolean isEmpty(Movie movie) {
+        return movie == null || movie.isEmpty();
     }
 
     @Override
@@ -168,7 +214,7 @@ class TmdbNetworkDataSource implements NetworkDataSource {
                 .map(new Function<ListPageResponse, List<Movie>>() {
                     @Override
                     public List<Movie> apply(ListPageResponse listPageResponse) throws Exception {
-                        return listPageResponse.getListPageInstance(listType);
+                        return listPageResponse.getListPageInstance();
                     }
                 })
                 .onErrorReturnItem(new ArrayList<Movie>());
@@ -184,6 +230,9 @@ class TmdbNetworkDataSource implements NetworkDataSource {
                 break;
             case Toprated:
                 returnObservable = service.getToprated(getApiKey(), page);
+                break;
+            case Upcoming:
+                returnObservable = service.getUpcoming(getApiKey(), page);
                 break;
             default:
                 throw new IllegalArgumentException("NetworkDataSource: list type does not supported");

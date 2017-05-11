@@ -9,7 +9,8 @@ import android.view.MenuItem;
 import com.example.leshik.moviedb.R;
 import com.example.leshik.moviedb.data.PreferenceStorage;
 import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
-import com.example.leshik.moviedb.utils.Utils;
+import com.example.leshik.moviedb.utils.FirebaseUtils;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -19,18 +20,20 @@ import butterknife.ButterKnife;
  * Now we use only one setting - sorting order
  */
 public class SettingsActivity extends AppCompatActivity {
+    private static final String TAG = "SettingsActivity";
 
-    @BindView(R.id.settings_toolbar)
+    @BindView(R.id.toolbar)
     protected Toolbar mToolbar;
 
     private PreferenceInterface prefStorage;
 
+    private FirebaseAnalytics mFirebaseAnalytics;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         prefStorage = PreferenceStorage.getInstance(this.getApplicationContext());
-        Utils.applyTheme(this, prefStorage.getTheme());
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings);
+        setContentView(R.layout.settings_activity);
         ButterKnife.bind(this);
 
         setSupportActionBar(mToolbar);
@@ -45,6 +48,10 @@ public class SettingsActivity extends AppCompatActivity {
         getFragmentManager().beginTransaction()
                 .replace(R.id.settings_container, SettingsFragment.newInstance())
                 .commit();
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT,
+                FirebaseUtils.createAnalyticsSelectBundle(TAG, "Create Settings Activity", "Settings"));
     }
 
     @Override

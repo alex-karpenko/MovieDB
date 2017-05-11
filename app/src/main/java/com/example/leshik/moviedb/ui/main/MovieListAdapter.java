@@ -8,13 +8,17 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
 import com.example.leshik.moviedb.R;
+import com.example.leshik.moviedb.data.MovieListType;
 import com.example.leshik.moviedb.data.PreferenceStorage;
 import com.example.leshik.moviedb.data.interfaces.PreferenceInterface;
-import com.example.leshik.moviedb.data.model.Movie;
+import com.example.leshik.moviedb.data.model.MovieListViewItem;
+import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -26,49 +30,82 @@ import static android.support.v7.widget.RecyclerView.NO_ID;
  */
 
 public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.ViewHolder> {
-    Context context;
-    private List<Movie> movieList;
-    PreferenceInterface prefStorage;
+    private Context context;
+    private List<MovieListViewItem> movieList;
+    private Map<Long, MovieListViewItem> movieMap;
+    private PreferenceInterface prefStorage;
+    private MovieListType listType;
 
-    public MovieListAdapter(Context context, List<Movie> movieList) {
+    MovieListAdapter(Context context, MovieListType listType) {
         this.context = context;
-        this.movieList = movieList;
         prefStorage = PreferenceStorage.getInstance(context.getApplicationContext());
+        this.listType = listType;
+
+        this.movieList = new ArrayList<>();
+        if (listType.isLocalOnly()) {
+            this.movieMap = new TreeMap<>();
+        }
     }
 
-    public void setMovieList(List<Movie> newList) {
-        movieList = newList;
+    MovieListAdapter(Context context, MovieListType listType, AdapterState state) {
+        this.context = context;
+        prefStorage = PreferenceStorage.getInstance(context.getApplicationContext());
+        this.listType = listType;
+
+        if (state.getMovieList() != null) this.movieList = state.getMovieList();
+        else this.movieList = new ArrayList<>();
+
+        if (state.getMovieMap() != null) movieMap = state.getMovieMap();
+        else this.movieMap = new TreeMap<>();
+    }
+
+    void updateListItem(MovieListViewItem newItem) {
+        if (listType.isLocalOnly()) updateMovieMap(newItem);
+        else updateMovieList(newItem);
+    }
+
+    private void updateMovieMap(MovieListViewItem newItem) {
+        if (newItem.listPosition == 0) movieMap.clear();
+        movieMap.put(newItem.movieId, newItem);
+
+        movieList = new ArrayList<>(movieMap.values());
         notifyDataSetChanged();
+    }
+
+    private void updateMovieList(MovieListViewItem newItem) {
+        if (movieList.size() <= newItem.listPosition) {
+            movieList.add(newItem);
+            notifyItemInserted(newItem.listPosition);
+        } else {
+            movieList.set(newItem.listPosition, newItem);
+            notifyItemChanged(newItem.listPosition);
+        }
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.list_item, parent, false);
+                .inflate(R.layout.main_list_item, parent, false);
         return new ViewHolder(itemView);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         if (movieList != null) {
-            Movie movie = movieList.get(position);
-//            Picasso.with(context)
-            Glide.with(context)
-                    .load(prefStorage.getPosterSmallUri(movie.getPosterPath()))
-                    .thumbnail(0.01f)
-                    .crossFade()
-                    .fitCenter()
+            MovieListViewItem movie = movieList.get(position);
+            Picasso.with(context)
+                    .load(prefStorage.getPosterSmallUri(movie.posterPath))
                     .into(holder.mPosterView);
 
             // set item click listener
-            final long movieId = movie.getMovieId();
+            final long movieId = movie.movieId;
             final ImageView posterView = holder.mPosterView;
             holder.mPosterView.setOnClickListener(new AdapterView.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     // Call callback interface method to start detail activity with cursor data
                     ((MovieListFragment.Callback) context).
-                            onItemSelected(movieId, posterView);
+                            onMovieListItemSelected(movieId, posterView);
                 }
             });
         }
@@ -82,7 +119,7 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
 
     @Override
     public long getItemId(int position) {
-        if (movieList != null) return movieList.get(position).getMovieId();
+        if (movieList != null) return movieList.get(position).movieId;
         else return NO_ID;
     }
 
@@ -93,6 +130,38 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
         ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+        }
+    }
+
+    public AdapterState getAdapterState() {
+        return new AdapterState(movieList, movieMap);
+    }
+
+    public void setAdapterState(AdapterState state) {
+        if (state == null) {
+            movieList = new ArrayList<>();
+            movieMap = new TreeMap<>();
+        } else {
+            movieList = state.getMovieList();
+            movieMap = state.getMovieMap();
+        }
+    }
+
+    public static class AdapterState {
+        private List<MovieListViewItem> movieList;
+        private Map<Long, MovieListViewItem> movieMap;
+
+        public AdapterState(List<MovieListViewItem> movieList, Map<Long, MovieListViewItem> movieMap) {
+            this.movieList = movieList;
+            this.movieMap = movieMap;
+        }
+
+        public List<MovieListViewItem> getMovieList() {
+            return movieList;
+        }
+
+        public Map<Long, MovieListViewItem> getMovieMap() {
+            return movieMap;
         }
     }
 }
