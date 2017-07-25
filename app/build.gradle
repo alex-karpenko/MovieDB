@@ -8,7 +8,7 @@ android {
         }
     }
     compileSdkVersion 25
-    buildToolsVersion '25.0.2'
+    buildToolsVersion '25.0.3'
     defaultConfig {
         applicationId "com.example.leshik.moviedb"
         minSdkVersion 16
@@ -43,11 +43,11 @@ repositories {
 
 }
 ext {
-    supportLib = "25.3.1"
+    supportLib = "25.4.0"
     okHttpLib = "3.7.0"
     butterKnifeLib = "8.5.1"
     retrofitLib = "2.2.0"
-    firebaseLib = "10.0.1"
+    firebaseLib = "11.0.2"
 }
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
@@ -62,22 +62,28 @@ dependencies {
     compile "com.android.support:support-v4:${supportLib}"
     compile "com.android.support:support-vector-drawable:${supportLib}"
     compile "com.android.support:design:${supportLib}"
+
     // Firebase
     compile "com.google.firebase:firebase-core:${firebaseLib}"
     compile "com.google.firebase:firebase-crash:${firebaseLib}"
+
     // OkHttp
     compile "com.squareup.okhttp3:okhttp:${okHttpLib}"
     compile "com.squareup.okhttp3:okhttp-urlconnection:${okHttpLib}"
+
     // ButterKnife
     compile "com.jakewharton:butterknife:${butterKnifeLib}"
     annotationProcessor "com.jakewharton:butterknife-compiler:${butterKnifeLib}"
+
     // Retrofit
     compile "com.squareup.retrofit2:retrofit:${retrofitLib}"
     compile "com.squareup.retrofit2:converter-gson:${retrofitLib}"
     compile "com.squareup.retrofit2:adapter-rxjava2:${retrofitLib}"
     compile 'com.google.code.gson:gson:2.8.0'
+
     // Picasso
     compile 'com.squareup.picasso:picasso:2.5.2'
+
     // RxJava
     compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
     compile 'io.reactivex.rxjava2:rxjava:2.1.0'
