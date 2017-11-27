@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Popular Movies</string>
+    <string name="released_format_str">Дата выхода: %s</string>
+    <string name="rating_format_str">Рейтинг: %.1f/10</string>
+    <string name="runtime_format_str">Продолжительность: %d мин</string>
+    <string name="null_runtime_format_str">Продолжительность: -</string>
+    <string name="videos_list_title">Видео</string>
+    <string name="reviews_list_title">Обзоры</string>
+    <string name="detail_overview_title">Описание</string>
+    <string name="title_activity_settings">Настройки</string>
+    <string name="action_refresh_list">Обновить</string>
+    <string name="action_refresh_movie">Обновить</string>
+    <string name="action_settings">Настройки</string>
+    <string name="action_favorite">Закладки</string>
+    <string name="action_share">Поделиться</string>
+    <string name="pref_cache_label">Интервал обновления кеша</string>
+    <string name="pref_cache_label_never">Никогда</string>
+    <string name="pref_cache_label_1h">1 час</string>
+    <string name="pref_cache_label_4h">4 часа</string>
+    <string name="pref_cache_label_12h">12 часов</string>
+    <string name="pref_cache_label_24h">1 день</string>
+    <string name="popular_tab_title">Популярные</string>
+    <string name="toprated_tab_title">Рейтинговые</string>
+    <string name="favorites_tab_title">Закладки</string>
+    <string name="upcoming_tab_title">Скоро на экране</string>
+    <string name="event_message_refreshing">Обновление...</string>
+    <string name="event_message_network_down">Сеть не доступна</string>
+    <string name="event_message_network_up">Сеть доступна</string>
+</resources>
