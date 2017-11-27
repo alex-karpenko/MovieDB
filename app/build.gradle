@@ -8,7 +8,7 @@ android {
         }
     }
     compileSdkVersion 26
-    buildToolsVersion '26.0.1'
+    buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "com.example.leshik.moviedb"
         minSdkVersion 16
@@ -43,11 +43,11 @@ repositories {
 
 }
 ext {
-    supportLib = "26.0.0"
-    okHttpLib = "3.7.0"
-    butterKnifeLib = "8.5.1"
-    retrofitLib = "2.2.0"
-    firebaseLib = "11.0.2"
+    supportLib = "26.1.0"
+    okHttpLib = "3.9.0"
+    butterKnifeLib = "8.8.1"
+    retrofitLib = "2.3.0"
+    firebaseLib = "11.6.2"
 }
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
@@ -74,12 +74,12 @@ dependencies {
     compile "com.squareup.retrofit2:retrofit:${retrofitLib}"
     compile "com.squareup.retrofit2:converter-gson:${retrofitLib}"
     compile "com.squareup.retrofit2:adapter-rxjava2:${retrofitLib}"
-    compile 'com.google.code.gson:gson:2.8.0'
+    compile 'com.google.code.gson:gson:2.8.2'
     // Picasso
     compile 'com.squareup.picasso:picasso:2.5.2'
     // RxJava
     compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
-    compile 'io.reactivex.rxjava2:rxjava:2.1.0'
+    compile 'io.reactivex.rxjava2:rxjava:2.1.7'
     //
     testCompile 'junit:junit:4.12'
 }
