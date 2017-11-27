@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import io.reactivex.Observable;
@@ -107,7 +108,7 @@ class TmdbNetworkDataSource implements NetworkDataSource {
     public Observable<Movie> readMovie(long movieId) {
         ApiService service = getServiceInstance();
 
-        return service.getMovie(movieId, getApiKey())
+        return service.getMovie(movieId, getApiKey(), getLanguage())
                 .subscribeOn(Schedulers.io())
                 .map(new Function<MovieResponse, Movie>() {
                     @Override
@@ -153,7 +154,7 @@ class TmdbNetworkDataSource implements NetworkDataSource {
     public Observable<List<Video>> readVideoList(long movieId) {
         ApiService service = getServiceInstance();
 
-        return service.getVideos(movieId, getApiKey())
+        return service.getVideos(movieId, getApiKey(), getLanguage())
                 .subscribeOn(Schedulers.io())
                 .map(new Function<VideosResponse, List<Video>>() {
                     @Override
@@ -172,7 +173,7 @@ class TmdbNetworkDataSource implements NetworkDataSource {
     private Observable<List<Review>> readReviewListPagesRecursively(final long movieId, final int startPage) {
         final ApiService service = getServiceInstance();
 
-        return service.getReviews(movieId, getApiKey(), startPage)
+        return service.getReviews(movieId, getApiKey(), startPage, getLanguage())
                 .subscribeOn(Schedulers.io())
                 .map(new Function<ReviewsResponse, List<Review>>() {
                     @Override
@@ -226,13 +227,13 @@ class TmdbNetworkDataSource implements NetworkDataSource {
 
         switch (listType) {
             case Popular:
-                returnObservable = service.getPopular(getApiKey(), page);
+                returnObservable = service.getPopular(getApiKey(), page, getLanguage(), getRegion());
                 break;
             case Toprated:
-                returnObservable = service.getToprated(getApiKey(), page);
+                returnObservable = service.getToprated(getApiKey(), page, getLanguage(), getRegion());
                 break;
             case Upcoming:
-                returnObservable = service.getUpcoming(getApiKey(), page);
+                returnObservable = service.getUpcoming(getApiKey(), page, getLanguage(), getRegion());
                 break;
             default:
                 throw new IllegalArgumentException("NetworkDataSource: list type does not supported");
@@ -256,5 +257,13 @@ class TmdbNetworkDataSource implements NetworkDataSource {
     public int getTotalListItems(MovieListType listType) {
         if (totalItems.containsKey(listType)) return totalItems.get(listType);
         else return 0;
+    }
+
+    public String getRegion() {
+        return Locale.getDefault().getCountry();
+    }
+
+    public String getLanguage() {
+        return Locale.getDefault().getLanguage();
     }
 }
