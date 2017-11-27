@@ -87,7 +87,7 @@ public class ListPageResponse {
                 Movie movie = new Movie();
 
                 movie.setMovieId(r.id);
-                movie.setOriginalTitle(r.originalTitle);
+                movie.setOriginalTitle(r.title); // ???
                 movie.setOverview(r.overview);
                 movie.setReleaseDate(r.releaseDate);
                 movie.setVoteAverage(r.voteAverage);
