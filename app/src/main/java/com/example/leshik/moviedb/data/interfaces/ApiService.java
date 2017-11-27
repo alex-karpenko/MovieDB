@@ -25,25 +25,25 @@ public interface ApiService {
 
     // retrieve details about specific movie
     @GET("movie/{movie_id}")
-    Observable<MovieResponse> getMovie(@Path("movie_id") long movie_id, @Query("api_key") String apiKey);
+    Observable<MovieResponse> getMovie(@Path("movie_id") long movie_id, @Query("api_key") String apiKey, @Query("language") String language);
 
     // retrieve list of videos of the movie
     @GET("movie/{movie_id}/videos")
-    Observable<VideosResponse> getVideos(@Path("movie_id") long movie_id, @Query("api_key") String apiKey);
+    Observable<VideosResponse> getVideos(@Path("movie_id") long movie_id, @Query("api_key") String apiKey, @Query("language") String language);
 
     // retrieve list of reviews of the movie
     @GET("movie/{movie_id}/reviews")
-    Observable<ReviewsResponse> getReviews(@Path("movie_id") long movie_id, @Query("api_key") String apiKey, @Query("page") int page);
+    Observable<ReviewsResponse> getReviews(@Path("movie_id") long movie_id, @Query("api_key") String apiKey, @Query("page") int page, @Query("language") String language);
 
     // retrieve list of movies sorted by popularity
     @GET("movie/popular")
-    Observable<ListPageResponse> getPopular(@Query("api_key") String apiKey, @Query("page") int page);
+    Observable<ListPageResponse> getPopular(@Query("api_key") String apiKey, @Query("page") int page, @Query("language") String language, @Query("region") String region);
 
     // retrieve list of movies sorted by rating
     @GET("movie/top_rated")
-    Observable<ListPageResponse> getToprated(@Query("api_key") String apiKey, @Query("page") int page);
+    Observable<ListPageResponse> getToprated(@Query("api_key") String apiKey, @Query("page") int page, @Query("language") String language, @Query("region") String region);
 
     // retrieve list of movies sorted by upcoming date
     @GET("movie/upcoming")
-    Observable<ListPageResponse> getUpcoming(@Query("api_key") String apiKey, @Query("page") int page);
+    Observable<ListPageResponse> getUpcoming(@Query("api_key") String apiKey, @Query("page") int page, @Query("language") String language, @Query("region") String region);
 }
